@@ -433,42 +433,105 @@ const CREATURES = [
 }
 ,
 {
-  id:'rillet', name:'Rillet', types:['tide'], plan:'Upright swimmer · river forager',
-  blurb:'Barely longer than a hand and extremely difficult to look directly at. Sits up on its tail to watch the bank.',
-  outline:'#0e2231',
-  colors:{ body:'#3f8fc0', limb:'#3580ae', dark:'#235f88', belly:'#cfe8f5', fin:'#67b6e0',
-           sclera:'#eef8ff', eye:'#10222e', glint:'#ffffff', mouth:'#7a3a44' },
-  pivots:{ body:[0,-4.0,0], head:[0,-10.8,0.3], jaw:[0,-11.9,1.5], hip:[0,-4.4,0.2],
-           tail:[0,-4.0,-1.8], ear:[0,-14.6,-0.2] },
+  /* NAME PENDING — the tide starter is designed but not christened yet. */
+  id:'tide_starter', name:'Tide Starter', types:['tide'], plan:'Upright fish · standing river hunter',
+  blurb:'A river fish that learned to stand. Broad at the shoulder and narrow at the waist, it walks the shallows upright with its arms loose at its sides, gills working the whole time. The tail fan behind it is a rudder, not a leg.',
+  outline:'#0c2233',
+  colors:{ body:'#3282b4', back:'#1d5780', limb:'#24628d', dark:'#123c5c',
+           belly:'#e2f2fa', fin:'#86d4f0',
+           sclera:'#f4fcff', eye:'#0b1a24', glint:'#ffffff', mouth:'#6f2f3c' },
+  pivots:{ body:[0,-4.0,0], head:[0,-12.2,0.3], jaw:[0,-13.1,1.1],
+           hip:[0,-6.8,0.1], shoulder:[0,-11.6,0.2], tail:[0,-6.0,-1.8] },
   parts:[
-    {n:'tail',      shape:'ell', role:'tail', pos:[0,-3.6,-3.6], size:[1.6,1.8,3.0], color:'body'},
-    {n:'tailTip',   shape:'ell', role:'tail', pos:[0,-3.2,-6.4], size:[1.15,1.25,1.8], color:'fin'},
-    {n:'legL',      shape:'box', role:'leg', phase:0,   pos:[-1.7,-2.6,0.4], size:[1.0,2.6,1.1], color:'limb'},
-    {n:'legR',      shape:'box', role:'leg', phase:0.5, pos:[ 1.7,-2.6,0.4], size:[1.0,2.6,1.1], color:'limb'},
-    {n:'footL',     shape:'ell', role:'foot', phase:0,   pos:[-1.7,-0.55,1.9], size:[1.5,0.6,2.1], color:'fin'},
-    {n:'footR',     shape:'ell', role:'foot', phase:0.5, pos:[ 1.7,-0.55,1.9], size:[1.5,0.6,2.1], color:'fin'},
-    {n:'body',      shape:'ell', role:'body', pos:[0,-6.6,0],   size:[3.1,4.2,3.0], color:'body'},
-    {n:'belly',     shape:'ell', role:'body', pos:[0,-6.0,1.7], size:[2.2,3.0,1.9], color:'belly', hideIn:['back']},
-    {n:'flipperL',  shape:'ell', role:'wing', side:-1, pos:[-3.0,-7.0,0.9], size:[0.9,1.9,1.1], color:'limb', pivot:[-2.1,-8.2,0.6]},
-    {n:'flipperR',  shape:'ell', role:'wing', side: 1, pos:[ 3.0,-7.0,0.9], size:[0.9,1.9,1.1], color:'limb', pivot:[ 2.1,-8.2,0.6]},
-    {n:'neck',      shape:'ell', role:'neck', pos:[0,-10.4,0.4], size:[1.6,1.6,1.5], color:'body'},
-    {n:'head',      shape:'ell', role:'head', pos:[0,-13.0,0.5], size:[3.1,2.9,3.1], color:'body'},
-    {n:'dorsal',    shape:'ell', role:'deco', pos:[0,-15.6,-1.2], size:[0.45,1.7,2.0], color:'fin'},
-    {n:'earL',      shape:'ell', role:'ear', pos:[-2.3,-15.0,-0.2], size:[0.75,0.7,0.75], color:'body'},
-    {n:'earR',      shape:'ell', role:'ear', pos:[ 2.3,-15.0,-0.2], size:[0.75,0.7,0.75], color:'body'},
-    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-12.0,2.3], size:[1.0,0.6,0.8], color:'mouth', hideIn:['back']},
-    {n:'jaw',       shape:'ell', role:'jaw', pos:[0,-11.6,2.8], size:[1.3,0.7,1.3], color:'belly', hideIn:['back']},
-    {n:'muzzle',    shape:'ell', role:'head', pos:[0,-12.4,3.0], size:[1.5,1.1,1.4], color:'belly', hideIn:['back']},
-    {n:'nose',      shape:'ell', flat:true, role:'head', pos:[0,-12.9,4.1], size:[0.5,0.42,0.42], color:'eye', hideIn:['back']},
-    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-1.55,-13.8,2.4], size:[1.1,1.25,0.78], color:'sclera', hideIn:['back']},
-    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 1.55,-13.8,2.4], size:[1.1,1.25,0.78], color:'sclera', hideIn:['back']},
-    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-1.68,-13.65,2.7], size:[0.68,0.8,0.6], color:'eye', hideIn:['back']},
-    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 1.68,-13.65,2.7], size:[0.68,0.8,0.6], color:'eye', hideIn:['back']},
-    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-1.92,-14.15,2.9], size:[0.34,0.34,0.3], color:'glint', hideIn:['back']},
-    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 1.92,-14.15,2.9], size:[0.34,0.34,0.3], color:'glint', hideIn:['back']},
-    {n:'lidL',      shape:'ell', role:'lid', pos:[-1.55,-13.8,2.45], size:[1.18,0.27,0.84], color:'body', hideIn:['back']},
-    {n:'lidR',      shape:'ell', role:'lid', pos:[ 1.55,-13.8,2.45], size:[1.18,0.27,0.84], color:'body', hideIn:['back']},
-  ]
+    /* ---- caudal fan: a rudder off the pelvis, held clear of the legs ---- */
+    {n:'tailFin',   shape:'ell', role:'tail', pos:[0,-5.90,-5.40], size:[0.45,2.55,2.05], color:'fin'},
+    {n:'tailBase',  shape:'ell', role:'tail', pos:[0,-5.70,-3.00], size:[1.15,1.50,1.90], color:'back'},
+
+    /* ---- legs: thigh and shin stay body-coloured and overlap deep into the
+           pelvis, so the leg reads as the torso narrowing rather than as a
+           stick bolted on underneath ---- */
+    {n:'thighL',    shape:'ell', role:'leg',  phase:0,   pos:[-1.65,-4.60,0.10], size:[1.55,2.35,1.65], color:'body'},
+    {n:'thighR',    shape:'ell', role:'leg',  phase:0.5, pos:[ 1.65,-4.60,0.10], size:[1.55,2.35,1.65], color:'body'},
+    {n:'shinL',     shape:'ell', role:'leg',  phase:0,   pos:[-1.70,-2.20,0.25], size:[1.20,1.75,1.30], color:'body'},
+    {n:'shinR',     shape:'ell', role:'leg',  phase:0.5, pos:[ 1.70,-2.20,0.25], size:[1.20,1.75,1.30], color:'body'},
+    {n:'footL',     shape:'ell', role:'foot', phase:0,   pos:[-1.75,-0.50,1.40], size:[1.55,0.60,2.30], color:'fin'},
+    {n:'footR',     shape:'ell', role:'foot', phase:0.5, pos:[ 1.75,-0.50,1.40], size:[1.55,0.60,2.30], color:'fin'},
+
+    /* ---- torso: wide at the shoulder, narrow at the waist, flared at the hip ---- */
+    {n:'pelvis',    shape:'ell', role:'body', pos:[0,-6.50,0.10], size:[3.05,2.00,2.60], color:'body'},
+    {n:'waist',     shape:'ell', role:'body', pos:[0,-8.80,0.20], size:[2.55,2.10,2.40], color:'body'},
+    {n:'chest',     shape:'ell', role:'body', pos:[0,-11.00,0.10], size:[3.65,2.60,3.00], color:'body'},
+    {n:'belly',     shape:'ell', role:'body', pos:[0,-9.40,1.90], size:[1.70,2.45,1.70], color:'belly', hideIn:['back']},
+    /* countershaded like a real fish — dark over the back, pale underneath.
+       The yoke also gives the shoulders a hard top edge to read against. */
+    {n:'shoulderYoke',shape:'ell', role:'body', pos:[0,-12.40,-0.30], size:[3.45,1.40,2.80], color:'back'},
+    {n:'hipFinL',   shape:'ell', role:'body', pos:[-3.15,-6.30,-0.90], size:[0.90,1.25,1.35], color:'fin'},
+    {n:'hipFinR',   shape:'ell', role:'body', pos:[ 3.15,-6.30,-0.90], size:[0.90,1.25,1.35], color:'fin'},
+    {n:'backFin',   shape:'ell', role:'body', pos:[0,-12.30,-3.10], size:[0.42,2.30,1.35], color:'fin'},
+
+    /* ---- arms: darker than the torso so the side view does not collapse into
+           one blob. Trailing blade on the forearm is the pectoral fin. ---- */
+    {n:'armUpL',    shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-3.75,-10.20,0.10], size:[1.25,2.20,1.35], color:'limb'},
+    {n:'armUpR',    shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 3.75,-10.20,0.10], size:[1.25,2.20,1.35], color:'limb'},
+    {n:'armLoL',    shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-4.05,-7.20,0.40], size:[1.10,2.00,1.20], color:'limb'},
+    {n:'armLoR',    shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 4.05,-7.20,0.40], size:[1.10,2.00,1.20], color:'limb'},
+    {n:'finArmL',   shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-5.10,-7.50,-0.60], size:[1.10,2.30,1.60], color:'fin'},
+    {n:'finArmR',   shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 5.10,-7.50,-0.60], size:[1.10,2.30,1.60], color:'fin'},
+    {n:'handL',     shape:'ell', role:'hand', side:-1, phase:0.5, pos:[-4.20,-4.90,0.70], size:[1.30,1.20,1.35], color:'limb'},
+    {n:'handR',     shape:'ell', role:'hand', side: 1, phase:0,   pos:[ 4.20,-4.90,0.70], size:[1.30,1.20,1.35], color:'limb'},
+
+    /* ---- head: sits straight on the shoulders, no neck ---- */
+    {n:'head',      shape:'ell', role:'head', pos:[0,-14.40,0.30], size:[3.10,2.70,3.05], color:'body'},
+    {n:'headCap',   shape:'ell', role:'head', pos:[0,-15.60,-0.20], size:[2.75,1.45,2.70], color:'back'},
+    /* dorsal crest: runs off the crown and sweeps back into the spine fin */
+    {n:'crestA',    shape:'ell', role:'deco', pos:[0,-16.85,-0.30], size:[0.62,2.05,2.05], color:'fin'},
+    {n:'crestB',    shape:'ell', role:'deco', pos:[0,-15.55,-2.65], size:[0.50,1.45,1.65], color:'fin'},
+    /* operculum: the gill plate is the single clearest fish cue on the head */
+    {n:'gillPlateL',shape:'ell', role:'head', pos:[-2.70,-13.85,0.55], size:[0.55,1.80,1.55], color:'back'},
+    {n:'gillPlateR',shape:'ell', role:'head', pos:[ 2.70,-13.85,0.55], size:[0.55,1.80,1.55], color:'back'},
+    {n:'gillL1',    shape:'ell', flat:true, role:'head', pos:[-2.88,-13.85,0.20], size:[0.26,1.20,0.22], color:'dark'},
+    {n:'gillL2',    shape:'ell', flat:true, role:'head', pos:[-2.88,-13.85,-0.45], size:[0.26,1.10,0.22], color:'dark'},
+    {n:'gillR1',    shape:'ell', flat:true, role:'head', pos:[ 2.88,-13.85,0.20], size:[0.26,1.20,0.22], color:'dark'},
+    {n:'gillR2',    shape:'ell', flat:true, role:'head', pos:[ 2.88,-13.85,-0.45], size:[0.26,1.10,0.22], color:'dark'},
+    /* blunt fish snout: wider than it is tall, with a pale lip line */
+    {n:'snout',     shape:'ell', role:'head', pos:[0,-14.00,2.45], size:[2.10,1.45,1.65], color:'body', hideIn:['back']},
+    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-13.15,2.60], size:[1.90,0.52,0.95], color:'mouth', hideIn:['back']},
+    {n:'lipUpper',  shape:'ell', role:'head', pos:[0,-13.52,2.70], size:[2.20,0.58,1.35], color:'belly', hideIn:['back']},
+    {n:'jaw',       shape:'ell', role:'jaw',  pos:[0,-12.78,2.45], size:[2.10,0.92,1.50], color:'body', hideIn:['back']},
+    {n:'throat',    shape:'ell', role:'jaw',  pos:[0,-12.55,2.35], size:[1.20,0.62,1.20], color:'belly', hideIn:['back']},
+    {n:'barbelL',   shape:'ell', role:'jaw',  pos:[-0.95,-12.25,3.10], size:[0.30,0.85,0.32], color:'belly', hideIn:['back']},
+    {n:'barbelR',   shape:'ell', role:'jaw',  pos:[ 0.95,-12.25,3.10], size:[0.30,0.85,0.32], color:'belly', hideIn:['back']},
+
+    /* ---- eyes: large, round and set on the SIDES of the skull, bulging past
+           it. Side-set eyes are the strongest fish cue the silhouette has. ---- */
+    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-2.35,-14.95,1.60], size:[1.45,1.60,1.05], color:'sclera', hideIn:['back']},
+    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 2.35,-14.95,1.60], size:[1.45,1.60,1.05], color:'sclera', hideIn:['back']},
+    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-2.58,-14.82,2.05], size:[1.00,1.12,0.82], color:'eye', hideIn:['back']},
+    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 2.58,-14.82,2.05], size:[1.00,1.12,0.82], color:'eye', hideIn:['back']},
+    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-2.88,-15.40,2.15], size:[0.40,0.40,0.35], color:'glint', hideIn:['back']},
+    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 2.88,-15.40,2.15], size:[0.40,0.40,0.35], color:'glint', hideIn:['back']},
+    {n:'lidL',      shape:'ell', role:'lid', pos:[-2.35,-14.95,1.65], size:[1.54,0.34,1.12], color:'body', hideIn:['back']},
+    {n:'lidR',      shape:'ell', role:'lid', pos:[ 2.35,-14.95,1.65], size:[1.54,0.34,1.12], color:'body', hideIn:['back']},
+  ],
+  /* Upright runners lean from the hip and pump their arms; the lean is milder
+     than the bird's because there is no wing out front to balance against. */
+  sprint(cr, p, f, nF){
+    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+    const r = p.role;
+    const lean = [0.24,0.29,0.22,0.24,0.29,0.22][f];
+    d.y += [-0.5,-1.1,0.0,-0.5,-1.1,0.0][f];
+    rots.push({axis:'x', ang:-lean, pivot:cr.pivots.body});
+    if(['head','jaw','eye','deco','mouth','lid'].includes(r))
+      rots.push({axis:'x', ang: lean + 0.05, pivot:cr.pivots.head});
+    const stride = [0.52,0.08,-0.46,-0.52,-0.10,0.46];
+    const step = p => stride[(f + ((p.phase||0) === 0 ? 0 : 3)) % 6];
+    if(r === 'leg' || r === 'foot')  rots.push({axis:'x', ang:step(p),      pivot:cr.pivots.hip});
+    if(r === 'arm' || r === 'hand')  rots.push({axis:'x', ang:step(p)*0.85, pivot:cr.pivots.shoulder});
+    if(r === 'tail') rots.push({axis:'x', ang:-0.30, pivot:cr.pivots.tail});
+    if(r === 'jaw')  rots.push({axis:'x', ang:-0.18, pivot:cr.pivots.jaw});
+    if(r === 'eye')  sc.y = 0.82;
+    return {d, sc, rots};
+  }
 },
 {
   id:'grittle', name:'Grittle', types:['stone'], plan:'Accretive golem · scree dweller',
@@ -753,6 +816,10 @@ function baseAnim(cr, p, anim, f, nF){
     ? (p.grp === 'hind' ? cr.pivots.hipHind : (cr.pivots.hipFore || cr.pivots.hip))
     : null;
   const UPPER = ['head','beak','jaw','eye','deco','mouth','ear','neck','lid'];
+  // arms swing from a shoulder joint buried in the chest, the same way legs
+  // swing from a buried hip — a creature without one simply has no arms.
+  const armed = (r === 'arm' || r === 'hand');
+  const shoulder = cr.pivots.shoulder;
   if(r === 'lid') sc.y = 0;        // lids stay hidden until a blink swaps them in
 
   if(anim === 'idle'){
@@ -762,6 +829,7 @@ function baseAnim(cr, p, anim, f, nF){
     if(r === 'body'){ sc.x = 1+br; sc.y = 1+br*0.6; sc.z = 1+br; }
     if(UPPER.includes(r)) d.y -= br*22;                     // head rides up as the chest fills
     if(r === 'wing') d.y -= br*14;
+    if(armed) d.y -= br*16;                                 // shoulders carry the arms up with them
     // no blink baked into the cycle — blinking is driven at runtime instead
 
   } else if(anim === 'walk'){
@@ -771,17 +839,20 @@ function baseAnim(cr, p, anim, f, nF){
     if(r === 'tail') rots.push({axis:'z', ang:s*0.13, pivot:cr.pivots.tail});
     if(r === 'wing') rots.push({axis:'z', ang:-(p.side||1)*Math.abs(s)*0.22, pivot:p.pivot});
     if(r === 'ear')  rots.push({axis:'x', ang:-Math.abs(s)*0.12, pivot:cr.pivots.ear});
+    if(armed && shoulder) rots.push({axis:'x', ang:s*0.30, pivot:shoulder});
 
   } else if(anim === 'attack'){
     // The whole creature lunges as one body; only joints differentiate.
     const LUNGE=[-1.6,1.2,3.6,2.6,0.6], PT=[0.16,-0.12,-0.34,-0.26,-0.06];
     const JAW=[0,0.18,0.50,0.34,0.06], WING=[0.10,0.50,0.80,0.60,0.20];
+    const ARM=[-0.20,0.40,1.30,0.90,0.20];   // wound back, then driven forward
     d.z += LUNGE[f];
     rots.push({axis:'x', ang:PT[f], pivot:cr.pivots.body});
     if(grounded) rots.push({axis:'x', ang:-PT[f]*0.6, pivot:hip});     // legs brace under it
     if(r === 'jaw')  rots.push({axis:'x', ang:-JAW[f], pivot:cr.pivots.jaw});
     if(r === 'wing') rots.push({axis:'z', ang:-(p.side||1)*WING[f], pivot:p.pivot});
     if(r === 'tail') rots.push({axis:'x', ang:PT[f]*0.5, pivot:cr.pivots.tail});
+    if(armed && shoulder) rots.push({axis:'x', ang:ARM[f], pivot:shoulder});
     if(r === 'eye')  sc.y = f >= 1 && f <= 3 ? 0.62 : 1;    // narrowed on the strike
 
   } else if(anim === 'call'){
@@ -792,6 +863,7 @@ function baseAnim(cr, p, anim, f, nF){
     if(r === 'jaw')  rots.push({axis:'x', ang:-JAW[f], pivot:cr.pivots.jaw});
     if(r === 'body'){ sc.x = 1+PUFF[f]; sc.z = 1+PUFF[f]; }             // chest fills
     if(r === 'wing') rots.push({axis:'z', ang:-(p.side||1)*WING[f], pivot:p.pivot});
+    if(armed && shoulder) rots.push({axis:'x', ang:-[0,0.14,0.20,0.08][f], pivot:shoulder});
     if(r === 'eye' && f === 2) sc.y = 0.5;                  // squeezed shut at full volume
   }
   return {d, sc, rots};
@@ -801,12 +873,14 @@ function baseAnim(cr, p, anim, f, nF){
 function genericSprint(cr, p, f, nF){
   const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
   const r = p.role, grounded = (r === 'leg' || r === 'foot' || r === 'paw');
+  const armed = (r === 'arm' || r === 'hand');
   const hip = grounded ? (p.grp === 'hind' ? cr.pivots.hipHind : (cr.pivots.hipFore || cr.pivots.hip)) : null;
   const t = f/nF, s = Math.sin((t + (p.phase||0))*Math.PI*2);
   const lean = [0.22,0.27,0.20,0.22,0.27,0.20][f];
   d.y += [-0.4,-1.0,0,-0.4,-1.0,0][f];
   rots.push({axis:'x', ang:-lean, pivot:cr.pivots.body});
   if(grounded && hip) rots.push({axis:'x', ang:s*0.62, pivot:hip});
+  if(armed && cr.pivots.shoulder) rots.push({axis:'x', ang:s*0.55, pivot:cr.pivots.shoulder});
   if(r === 'neck') rots.push({axis:'x', ang:lean*0.5, pivot:cr.pivots.head});
   if(r === 'ear')  rots.push({axis:'x', ang:0.35, pivot:cr.pivots.ear});
   if(r === 'tail') rots.push({axis:'x', ang:-0.26, pivot:cr.pivots.tail});
