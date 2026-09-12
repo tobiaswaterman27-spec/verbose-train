@@ -190,7 +190,11 @@ const VIEW_LABEL = {front:'FRONT', right:'RIGHT', back:'BACK', left:'LEFT'};
 // Each animation carries its own natural rate — a breath is not a sprint.
 const ANIMS = { idle:{frames:6,fps:3}, walk:{frames:4,fps:7}, sprint:{frames:6,fps:12},
                 attack:{frames:5,fps:8}, call:{frames:4,fps:5} };
-const ANIM_LABEL = { idle:'Idle', walk:'Walk', sprint:'Sprint', attack:'Attack', call:'Call' };
+const ANIM_LABEL = { idle:'Idle', walk:'Walk', sprint:'Sprint', attack:'Attack', call:'Call',
+                     takeoff:'Take off', tuck:'Tuck in', untuck:'Unfurl' };
+// A creature may carry transitions nobody else has — taking off, shutting a
+// shell. They are listed only on the creature that defines them.
+const animsOf = cr => Object.assign({}, ANIMS, cr.extraAnims || {});
 
 /* ---------- elements ---------- */
 const ELEMENTS = {
@@ -276,10 +280,10 @@ function flightPose(cr, p, f, nF, o){
   const r = p.role, t = f/nF*Math.PI*2;
   d.y -= o.lift + Math.sin(t + (o.bobPhase||0))*(o.bob||0);
   rots.push({axis:'x', ang:-o.pitch, pivot:cr.pivots.body});
-  if(r === 'leg' || r === 'foot') rots.push({axis:'x', ang:-1.05, pivot:cr.pivots.hip});
+  if(r === 'leg' || r === 'foot') rots.push({axis:'x', ang:-1.05*(o.fold===undefined?1:o.fold), pivot:cr.pivots.hip});
   if(r === 'wing'){
-    const beat = Math.sin(t + (o.beatPhase||0));
-    rots.push({axis:'z', ang:-(p.side||1)*(o.spread + beat*o.beat), pivot:p.pivot});
+    const beat = (o.beatAt !== undefined) ? o.beatAt : Math.sin(t + (o.beatPhase||0));
+    rots.push({axis:'z', ang:-(p.side||1)*(o.spread + beat*(o.beat||0)), pivot:p.pivot});
   }
   if(r === 'tail'){
     sc.x = 1.35;                                   // the fork opens as a rudder
@@ -292,6 +296,31 @@ function flightPose(cr, p, f, nF, o){
   if(r === 'neck') rots.push({axis:'x', ang:lvl*0.5, pivot:cr.pivots.head});
   if(r === 'jaw')  rots.push({axis:'x', ang:-(o.gape||0), pivot:cr.pivots.jaw});
   if(r === 'eye' && o.squint) sc.y = o.squint;
+  return {d, sc, rots};
+}
+
+/* Half a fold, shared by tucking in and unfurling — `step` runs 0 (standing)
+   to 5 (balled) either way, and `back` only decides which way the ball spins
+   as it settles. Appendages shrink as they are drawn toward the ball's centre
+   so they disappear INTO the shell rather than behind it. */
+function shellFold(cr, p, step, back){
+  const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+  const balled = step >= 3;
+  if((p.role === 'ball') !== balled){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
+  const C = cr.pivots.ball;
+  if(balled){
+    const i = step - 3, w = back ? -1 : 1;
+    rots.push({axis:'x', ang:w*[0.55, 0.22, 0][i], pivot:C});
+    d.y -= [1.1, 0.3, 0][i];                       // drops the last of the way in
+    return {d, sc, rots};
+  }
+  const t = [0, 0.30, 0.74][step];
+  if(['leg','paw','head','jaw','eye','mouth','lid','ear','tail'].includes(p.role)){
+    sc.x = sc.y = sc.z = 1 - 0.70*t;
+    d.x = (C[0]-p.pos[0])*t; d.y = (C[1]-p.pos[1])*t; d.z = (C[2]-p.pos[2])*t;
+  } else {
+    d.y += 1.5*t;                                  // the shell hunkers down over them
+  }
   return {d, sc, rots};
 }
 
@@ -649,6 +678,15 @@ const CREATURES = [
     {n:'ballSeam',   shape:'ell', flat:true, role:'ball', pos:[-3.40,-10.00,2.60], size:[0.85,0.70,0.85], color:'quartz'},
     {n:'ballChip',   shape:'ell', flat:true, role:'ball', pos:[ 3.60,-4.60,-2.40], size:[0.75,0.65,0.75], color:'quartz'},
   ],
+  extraAnims:{ tuck:{frames:6, fps:9}, untuck:{frames:6, fps:9} },
+  /* Folding up is a swap between two different shapes, not one shape
+     squeezed. The first half draws the standing form pulling its head, tail
+     and legs in until its outline is nearly round; the second half draws the
+     ball. No frame shows both, so there is never a moment of two overlapping
+     creatures — and by the time the swap happens the two silhouettes are
+     close enough that the cut reads as a fold. */
+  tuck(cr, p, f, nF){ return shellFold(cr, p, f, false); },
+  untuck(cr, p, f, nF){ return shellFold(cr, p, 5 - f, true); },
   /* It tucks and rolls. One full revolution per cycle, so the loop is
      seamless; the plates orbiting the core are what sell the spin. */
   sprint(cr, p, f, nF){
@@ -714,6 +752,19 @@ const CREATURES = [
   ],
   /* Idle is the only time its feet are on the ground. Everything else is
      the flight pose with a different wingbeat on top. */
+  extraAnims:{ takeoff:{frames:6, fps:9} },
+  /* Crouch, snap the wings up, then two hard downstrokes to climb out of it.
+     Every value below ramps from the perched pose to the cruise pose, so the
+     last frame of the launch is the first frame of the flight. */
+  takeoff(cr,p,f,nF){
+    const UP   = [0, 0.10, 0.40, 0.66, 0.86, 1.00][f];       // how airborne
+    const DIP  = [0.9, 0.2,  0,    0,    0,    0   ][f];     // the crouch before it
+    const WING = [0.14, 1.95, 0.62, 1.88, 0.78, 1.56][f];    // up, DOWN, up, settle
+    return flightPose(cr, p, f, nF, {
+      lift : 8.5*UP - DIP, bob:0, pitch: 0.86*UP,
+      spread: WING, beat:0, fold: UP, squint: 0.85,
+    });
+  },
   walk  (cr,p,f,nF){ return flightPose(cr,p,f,nF,{lift:7.0,  bob:0.9, pitch:0.55, spread:1.56, beat:0.34}); },
   sprint(cr,p,f,nF){ return flightPose(cr,p,f,nF,{lift:8.5,  bob:0.6, pitch:0.86, spread:1.46, beat:0.62, squint:0.80}); },
   attack(cr,p,f,nF){ return flightPose(cr,p,f,nF,{lift:6.0,  bob:1.6, pitch:1.02, spread:1.10, beat:0.50, gape:0.45, squint:0.62}); },
@@ -1196,10 +1247,11 @@ function bake(cr){
   prep(cr);
   if(cr.frames) return cr;
   cr.frames = {}; cr.buffers = {}; cr.blinkFrames = {};
+  const AN = animsOf(cr);
   for(const v of VIEWS){
     cr.frames[v] = {}; cr.buffers[v] = {}; cr.blinkFrames[v] = {};
-    for(const a in ANIMS){
-      const n = ANIMS[a].frames, bufs = [], cans = [];
+    for(const a in AN){
+      const n = AN[a].frames, bufs = [], cans = [];
       for(let f = 0; f < n; f++){
         const b = renderFrame(cr, v, a, f, n, false);
         bufs.push(b); cans.push(bufferToCanvas(b));
@@ -1288,12 +1340,13 @@ function overlayGuides(canvas, cr, scale){
 }
 
 function buildSpecimen(cr){
-  const st = { anim:'idle', frame:0, playing:!reduced, scale:4, fps:ANIMS.idle.fps,
+  const AN = animsOf(cr);
+  const st = { anim:'idle', frame:0, playing:!reduced, scale:4, fps:AN.idle.fps,
                guides:false, grid:false, blinking:false };
   const el = document.createElement('section');
   el.className = 'specimen';
 
-  const totalFrames = VIEWS.length * Object.values(ANIMS).reduce((a,b)=>a+b.frames,0);
+  const totalFrames = VIEWS.length * Object.values(AN).reduce((a,b)=>a+b.frames,0);
   const modelH = Math.round(-cr.guides.headTop * SCALE * (cr.scale||1));
 
   const weak = EL_KEYS.filter(k => cr.defense[k] > 1).sort((a,b)=>cr.defense[b]-cr.defense[a]);
@@ -1326,7 +1379,7 @@ function buildSpecimen(cr){
 
     <div class="controls">
       <div class="seg" role="group" aria-label="Animation">
-        ${Object.keys(ANIMS).map((a,i)=>`<button data-anim="${a}" aria-pressed="${i===0}">${ANIM_LABEL[a]}</button>`).join('')}
+        ${Object.keys(AN).map((a,i)=>`<button data-anim="${a}" aria-pressed="${i===0}">${ANIM_LABEL[a]}</button>`).join('')}
       </div>
       <button class="mini" data-act="play">${st.playing?'❚❚ Pause':'▶ Play'}</button>
       <button class="mini" data-act="step">Step ›</button>
@@ -1372,7 +1425,7 @@ function buildSpecimen(cr){
   const playBtn = el.querySelector('[data-act="play"]');
 
   function drawPreview(){
-    const f = st.frame % ANIMS[st.anim].frames;
+    const f = st.frame % AN[st.anim].frames;
     const set = (st.blinking && cr.blinkFrames[VIEWS[0]][st.anim]) ? cr.blinkFrames : cr.frames;
     for(const v of VIEWS){
       const c = pcv[v];
@@ -1404,7 +1457,7 @@ function buildSpecimen(cr){
 
     // connectivity: sweep every frame of every animation in every direction
     let checked=0; const broken=[];
-    for(const v of VIEWS) for(const a in ANIMS){
+    for(const v of VIEWS) for(const a in AN){
       cr.buffers[v][a].forEach((buf,f)=>{
         checked++;
         if(islandCount(buf) > 1) broken.push(`${VIEW_LABEL[v]} ${a} #${f}`);
@@ -1419,7 +1472,7 @@ function buildSpecimen(cr){
   }
   function drawSheet(){
     sheetAnim.textContent = st.anim;
-    const n = ANIMS[st.anim].frames;
+    const n = AN[st.anim].frames;
     sheetEl.innerHTML = VIEWS.map(v=>`
       <div class="sheet-row"><span class="rlab">${VIEW_LABEL[v]}</span><div class="sheet-frames">
       ${Array.from({length:n},(_,f)=>`<div class="frame-box" data-v="${v}" data-f="${f}"><span class="fnum">${f}</span></div>`).join('')}
@@ -1436,7 +1489,7 @@ function buildSpecimen(cr){
   el.querySelectorAll('[data-anim]').forEach(b=>{
     b.addEventListener('click',()=>{
       st.anim=b.dataset.anim; st.frame=0;
-      st.fps = ANIMS[st.anim].fps;                       // each gait has its own natural rate
+      st.fps = AN[st.anim].fps;                       // each gait has its own natural rate
       el.querySelector(`#${cr.id}-spd`).value = st.fps;
       el.querySelectorAll('[data-anim]').forEach(o=>o.setAttribute('aria-pressed',String(o===b)));
       drawPreview(); drawSheet();
@@ -1445,7 +1498,7 @@ function buildSpecimen(cr){
   playBtn.addEventListener('click',()=>{ st.playing=!st.playing; playBtn.textContent=st.playing?'❚❚ Pause':'▶ Play'; });
   el.querySelector('[data-act="step"]').addEventListener('click',()=>{
     st.playing=false; playBtn.textContent='▶ Play';
-    st.frame=(st.frame+1)%ANIMS[st.anim].frames; drawPreview();
+    st.frame=(st.frame+1)%AN[st.anim].frames; drawPreview();
   });
   el.querySelector(`#${cr.id}-spd`).addEventListener('input',e=>st.fps=+e.target.value);
   el.querySelector(`#${cr.id}-scl`).addEventListener('input',e=>{ st.scale=+e.target.value; drawPreview(); });
@@ -1472,7 +1525,7 @@ function buildSpecimen(cr){
       }
       if(st.blinking !== wasBlinking) dirty = true;
       acc += dt;
-      if(acc >= 1/st.fps){ acc=0; st.frame=(st.frame+1)%ANIMS[st.anim].frames; dirty = true; }
+      if(acc >= 1/st.fps){ acc=0; st.frame=(st.frame+1)%AN[st.anim].frames; dirty = true; }
       if(dirty) drawPreview();
     }
     requestAnimationFrame(tick);
