@@ -535,100 +535,99 @@ const CREATURES = [
 },
 {
   id:'cobbleback', name:'Cobbleback', types:['stone'], scale:0.60,
-  plan:'Armoured quadruped · banded scree forager',
-  blurb:'Low, long and plated in overlapping slabs of river stone. It cannot run and does not try to — it trundles, and anything that wants what is underneath the shell has to get through the shell first. Digs with the fore claws and sleeps folded against a bank.',
-  outline:'#221a11',
-  colors:{ shell:'#9a9081', shellDark:'#63594a', skin:'#7c6d5a', belly:'#b5a992',
-           dark:'#3c3327', quartz:'#e2dccb', claw:'#ece4d2',
-           sclera:'#f6f2e6', eye:'#1c1710', glint:'#ffffff', mouth:'#6e3a38' },
-  /* Hips sit INSIDE the shell, so a leg swinging about one can never pull
-     free of the skirt it hangs from. */
-  pivots:{ body:[0,-11.2,0], head:[0,-7.5,7.4], jaw:[0,-5.7,10.6], ear:[0,-8.9,8.6],
-           tail:[0,-8.6,-10.0], hipFore:[0,-7.2,5.4], hipHind:[0,-7.4,-7.0] },
+  plan:'Plated quadruped · rolls when pressed',
+  blurb:'Its back is five slabs of rock that overlap like roof tiles. It cannot outrun anything on those legs, so it does not try: it folds head, tail and all four legs under the shell and goes downhill as a boulder. Steering is not part of the plan.',
+  outline:'#1e1810',
+  colors:{ shell:'#a89d8c', shellDark:'#5b5244', skin:'#6b5b49', belly:'#b8ac96',
+           dark:'#332b21', quartz:'#e6e0d0', claw:'#efe8d6',
+           sclera:'#f7f3e8', eye:'#1a150f', glint:'#ffffff', mouth:'#5e2f30' },
+  /* Hips sit INSIDE the skirt so a swinging leg can never pull free of it. */
+  pivots:{ body:[0,-8.0,-1.2], head:[0,-5.6,7.8], jaw:[0,-4.2,11.2], ear:[0,-7.2,8.5],
+           tail:[0,-5.8,-10.2], hipFore:[0,-5.6,5.0], hipHind:[0,-5.6,-7.4],
+           ball:[0,-6.3,-0.6] },
+  /* PART ORDER MATTERS. Parts on the centreline all share one depth in the
+     side views, so the sort falls through to array order there while the
+     front view sorts by z. List centreline parts in ascending z and the two
+     orders agree — otherwise the face restacks itself from view to view. */
   parts:[
-    /* ---- tail: the banding carries on down it, tapering to a point ---- */
-    {n:'tailC',      shape:'ell', role:'tail', pos:[0,-6.50,-15.00], size:[0.90,0.90,1.20], color:'shell'},
-    {n:'tailB',      shape:'ell', role:'tail', pos:[0,-7.00,-13.50], size:[1.35,1.35,1.70], color:'shellDark'},
-    {n:'tailA',      shape:'ell', role:'tail', pos:[0,-7.80,-11.40], size:[1.90,1.90,2.30], color:'shell'},
+    {n:'tailC',      shape:'ell', role:'tail', pos:[0,-4.50,-15.10], size:[0.80,0.80,1.20], color:'shell'},
+    {n:'tailB',      shape:'ell', role:'tail', pos:[0,-4.90,-13.60], size:[1.15,1.15,1.70], color:'shellDark'},
+    {n:'tailA',      shape:'ell', role:'tail', pos:[0,-5.40,-11.60], size:[1.60,1.60,2.20], color:'shell'},
 
-    /* ---- legs: stubby, and the shell skirt hangs low enough that only the
-           bottom third of one is ever visible. Nothing to blend — the shell
-           does the blending. ---- */
-    {n:'foreLegL',   shape:'box', role:'leg', grp:'fore', phase:0,   pos:[-3.30,-3.30,5.40], size:[1.35,3.30,1.45], color:'skin'},
-    {n:'foreLegR',   shape:'box', role:'leg', grp:'fore', phase:0.5, pos:[ 3.30,-3.30,5.40], size:[1.35,3.30,1.45], color:'skin'},
-    {n:'hindLegL',   shape:'box', role:'leg', grp:'hind', phase:0.5, pos:[-3.40,-3.40,-7.00], size:[1.40,3.40,1.50], color:'skin'},
-    {n:'hindLegR',   shape:'box', role:'leg', grp:'hind', phase:0,   pos:[ 3.40,-3.40,-7.00], size:[1.40,3.40,1.50], color:'skin'},
-    {n:'forePawL',   shape:'ell', role:'paw', grp:'fore', phase:0,   pos:[-3.30,-0.70,6.20], size:[1.60,0.95,2.10], color:'skin'},
-    {n:'forePawR',   shape:'ell', role:'paw', grp:'fore', phase:0.5, pos:[ 3.30,-0.70,6.20], size:[1.60,0.95,2.10], color:'skin'},
-    {n:'hindPawL',   shape:'ell', role:'paw', grp:'hind', phase:0.5, pos:[-3.40,-0.70,-6.40], size:[1.60,0.95,2.00], color:'skin'},
-    {n:'hindPawR',   shape:'ell', role:'paw', grp:'hind', phase:0,   pos:[ 3.40,-0.70,-6.40], size:[1.60,0.95,2.00], color:'skin'},
-    /* digging claws, front only — boxes so they come out as hard points */
-    {n:'clawL1',     shape:'box', role:'paw', grp:'fore', phase:0,   pos:[-4.05,-0.60,7.55], size:[0.38,0.42,0.95], color:'claw'},
-    {n:'clawL2',     shape:'box', role:'paw', grp:'fore', phase:0,   pos:[-3.30,-0.60,7.75], size:[0.38,0.42,1.05], color:'claw'},
-    {n:'clawL3',     shape:'box', role:'paw', grp:'fore', phase:0,   pos:[-2.55,-0.60,7.55], size:[0.38,0.42,0.95], color:'claw'},
-    {n:'clawR1',     shape:'box', role:'paw', grp:'fore', phase:0.5, pos:[ 4.05,-0.60,7.55], size:[0.38,0.42,0.95], color:'claw'},
-    {n:'clawR2',     shape:'box', role:'paw', grp:'fore', phase:0.5, pos:[ 3.30,-0.60,7.75], size:[0.38,0.42,1.05], color:'claw'},
-    {n:'clawR3',     shape:'box', role:'paw', grp:'fore', phase:0.5, pos:[ 2.55,-0.60,7.55], size:[0.38,0.42,0.95], color:'claw'},
+    /* rounded skirt under everything; the plates sit on top of it */
+    {n:'skirt',      shape:'ell', role:'body', pos:[0,-6.60,-1.40], size:[5.50,3.20,9.20], color:'shell'},
+    {n:'belly',      shape:'ell', role:'body', pos:[0,-3.80,-0.60], size:[4.10,1.50,7.80], color:'belly'},
+    {n:'carapace',   shape:'ell', role:'body', pos:[0,-10.20,-1.20], size:[5.60,5.00,9.60], color:'shell'},
+    /* Five scutes laid over the dome like roof tiles: wide and flat, each
+       stepping down off the crown. Boxes give the hard horizontal edge that
+       makes it rock rather than fur, but they must LIE on the back — stood
+       up on the spine they read as fins, which is a different animal. */
+    {n:'tileF',      shape:'box', role:'body', pos:[0,-12.70,4.80], size:[3.50,1.00,2.40], color:'shellDark'},
+    {n:'tile2',      shape:'box', role:'body', pos:[0,-13.90,1.80], size:[4.10,1.05,2.20], color:'shell'},
+    {n:'tile3',      shape:'box', role:'body', pos:[0,-14.80,-1.20], size:[4.30,1.10,2.40], color:'shellDark'},
+    {n:'tile4',      shape:'box', role:'body', pos:[0,-13.90,-4.20], size:[4.10,1.05,2.20], color:'shell'},
+    {n:'tileR',      shape:'box', role:'body', pos:[0,-12.70,-7.20], size:[3.50,1.00,2.40], color:'shellDark'},
+    /* quartz caught in the stone — listed after its tile so it reads as
+       surface, and off the centreline so it survives the side views too */
+    {n:'quartzL',    shape:'box', role:'body', pos:[-2.40,-14.30,-1.20], size:[0.70,0.50,0.75], color:'quartz'},
+    {n:'quartzR',    shape:'box', role:'body', pos:[ 2.90,-12.20,1.80], size:[0.60,0.45,0.65], color:'quartz'},
 
-    /* ---- soft parts, kept underneath where the shell covers them ---- */
-    {n:'belly',      shape:'ell', role:'body', pos:[0,-4.20,0], size:[4.60,2.00,9.00], color:'belly'},
-    /* one smooth carapace under the banding, so the dome does not come out
-       scalloped; the bands sit slightly proud of it and read as ridges */
-    {n:'carapace',   shape:'ell', role:'body', pos:[0,-11.20,-1.40], size:[6.60,6.00,9.40], color:'shell'},
-    /* five slabs front to back, alternating tone — the banding IS the
-       silhouette, so it has to read in colour, not in outline */
-    {n:'foreShield', shape:'ell', role:'body', pos:[0,-11.20,5.20], size:[6.50,5.90,4.00], color:'shell'},
-    {n:'band1',      shape:'ell', role:'body', pos:[0,-11.20,1.30], size:[6.90,6.30,1.50], color:'shellDark'},
-    {n:'band2',      shape:'ell', role:'body', pos:[0,-11.20,-1.30], size:[7.00,6.40,1.50], color:'shell'},
-    {n:'band3',      shape:'ell', role:'body', pos:[0,-11.20,-3.90], size:[6.90,6.30,1.50], color:'shellDark'},
-    {n:'rearShield', shape:'ell', role:'body', pos:[0,-11.20,-8.00], size:[6.40,5.80,4.40], color:'shell'},
-    /* angular chips along the crown — boxes, so the top edge is not all curve */
-    {n:'ridgeA',     shape:'box', role:'body', pos:[0,-16.90,4.60], size:[1.45,1.00,1.80], color:'shellDark'},
-    {n:'ridgeB',     shape:'box', role:'body', pos:[0,-17.50,-1.30], size:[1.45,1.00,1.70], color:'shellDark'},
-    {n:'ridgeC',     shape:'box', role:'body', pos:[0,-16.80,-7.20], size:[1.35,1.00,1.70], color:'shellDark'},
-    /* quartz seams caught in the stone */
-    {n:'quartzL',    shape:'box', role:'body', pos:[-3.10,-15.30,-1.30], size:[0.90,0.60,0.95], color:'quartz'},
-    {n:'quartzR',    shape:'box', role:'body', pos:[ 3.60,-14.50,5.00], size:[0.80,0.55,0.90], color:'quartz'},
+    /* legs: stubby, and the skirt hangs low enough that only the bottom of
+       one ever shows — the shell does the blending */
+    {n:'hindLegL',   shape:'box', role:'leg', grp:'hind', phase:0.5, pos:[-3.00,-2.90,-7.40], size:[1.20,2.90,1.30], color:'skin'},
+    {n:'hindLegR',   shape:'box', role:'leg', grp:'hind', phase:0,   pos:[ 3.00,-2.90,-7.40], size:[1.20,2.90,1.30], color:'skin'},
+    {n:'hindPawL',   shape:'ell', role:'paw', grp:'hind', phase:0.5, pos:[-3.00,-0.65,-6.90], size:[1.45,0.90,1.80], color:'skin'},
+    {n:'hindPawR',   shape:'ell', role:'paw', grp:'hind', phase:0,   pos:[ 3.00,-0.65,-6.90], size:[1.45,0.90,1.80], color:'skin'},
+    {n:'foreLegL',   shape:'box', role:'leg', grp:'fore', phase:0,   pos:[-2.95,-2.90,5.00], size:[1.20,2.90,1.30], color:'skin'},
+    {n:'foreLegR',   shape:'box', role:'leg', grp:'fore', phase:0.5, pos:[ 2.95,-2.90,5.00], size:[1.20,2.90,1.30], color:'skin'},
+    {n:'forePawL',   shape:'ell', role:'paw', grp:'fore', phase:0,   pos:[-2.95,-0.65,5.70], size:[1.45,0.90,1.90], color:'skin'},
+    {n:'forePawR',   shape:'ell', role:'paw', grp:'fore', phase:0.5, pos:[ 2.95,-0.65,5.70], size:[1.45,0.90,1.90], color:'skin'},
+    {n:'clawL1',     shape:'box', role:'paw', grp:'fore', phase:0,   pos:[-3.60,-0.55,6.95], size:[0.33,0.38,0.85], color:'claw'},
+    {n:'clawL2',     shape:'box', role:'paw', grp:'fore', phase:0,   pos:[-2.95,-0.55,7.10], size:[0.33,0.38,0.95], color:'claw'},
+    {n:'clawL3',     shape:'box', role:'paw', grp:'fore', phase:0,   pos:[-2.30,-0.55,6.95], size:[0.33,0.38,0.85], color:'claw'},
+    {n:'clawR1',     shape:'box', role:'paw', grp:'fore', phase:0.5, pos:[ 3.60,-0.55,6.95], size:[0.33,0.38,0.85], color:'claw'},
+    {n:'clawR2',     shape:'box', role:'paw', grp:'fore', phase:0.5, pos:[ 2.95,-0.55,7.10], size:[0.33,0.38,0.95], color:'claw'},
+    {n:'clawR3',     shape:'box', role:'paw', grp:'fore', phase:0.5, pos:[ 2.30,-0.55,6.95], size:[0.33,0.38,0.85], color:'claw'},
 
-    /* ---- head: narrow, carried low and forward, under the lip of the shell ---- */
-    {n:'head',       shape:'ell', role:'head', pos:[0,-6.60,9.50], size:[3.70,3.30,3.30], color:'skin'},
-    {n:'headPlate',  shape:'box', role:'head', pos:[0,-9.40,9.20], size:[3.10,0.95,3.00], color:'shellDark'},
-    {n:'earL',       shape:'ell', role:'ear', side:-1, pos:[-3.30,-9.30,8.30], size:[1.05,1.85,0.80], color:'skin'},
-    {n:'earR',       shape:'ell', role:'ear', side: 1, pos:[ 3.30,-9.30,8.30], size:[1.05,1.85,0.80], color:'skin'},
-    /* long tapering snout — the one soft, pointed thing on a creature of slabs */
-    {n:'snoutA',     shape:'ell', role:'head', pos:[0,-6.40,11.80], size:[2.25,1.95,2.60], color:'skin'},
-    {n:'snoutB',     shape:'ell', role:'head', pos:[0,-6.20,13.80], size:[1.40,1.30,1.70], color:'belly'},
-    {n:'nose',       shape:'ell', flat:true, role:'head', pos:[0,-6.40,15.20], size:[0.50,0.45,0.45], color:'dark', hideIn:['back']},
-    {n:'mouthInner', shape:'ell', flat:true, role:'mouth', pos:[0,-5.80,12.60], size:[1.35,0.50,1.40], color:'mouth', hideIn:['back']},
-    {n:'jaw',        shape:'ell', role:'jaw', pos:[0,-5.30,12.40], size:[1.70,0.80,2.20], color:'belly', hideIn:['back']},
+    /* ---- head: narrow and pointed, carried low in front of the shell ---- */
+    {n:'head',       shape:'ell', role:'head', pos:[0,-5.20,9.60], size:[3.20,3.10,3.10], color:'skin'},
+    {n:'headPlate',  shape:'box', role:'head', pos:[0,-7.80,9.50], size:[2.75,1.00,2.80], color:'shellDark'},
+    {n:'earL',       shape:'ell', role:'ear', side:-1, pos:[-2.40,-7.70,8.50], size:[0.95,1.55,0.78], color:'skin'},
+    {n:'earR',       shape:'ell', role:'ear', side: 1, pos:[ 2.40,-7.70,8.50], size:[0.95,1.55,0.78], color:'skin'},
+    {n:'snoutA',     shape:'ell', role:'head', pos:[0,-5.00,11.80], size:[2.00,1.80,2.50], color:'skin'},
+    /* the mouth rides on the UNDERSIDE of the snout, where nothing in front
+       of it can cover it in one view and not another */
+    {n:'mouth',      shape:'ell', flat:true, role:'mouth', pos:[0,-3.50,12.80], size:[1.20,0.34,1.50], color:'mouth', hideIn:['back']},
+    {n:'snoutB',     shape:'ell', role:'head', pos:[0,-4.80,13.80], size:[1.30,1.20,1.70], color:'belly'},
+    {n:'nose',       shape:'ell', flat:true, role:'head', pos:[0,-5.10,15.20], size:[0.45,0.40,0.42], color:'dark', hideIn:['back']},
+    {n:'eyeWhiteL',  shape:'ell', role:'eye', pos:[-2.05,-6.30,11.10], size:[1.12,1.28,0.86], color:'sclera', hideIn:['back']},
+    {n:'eyeWhiteR',  shape:'ell', role:'eye', pos:[ 2.05,-6.30,11.10], size:[1.12,1.28,0.86], color:'sclera', hideIn:['back']},
+    {n:'pupilL',     shape:'ell', flat:true, role:'eye', pos:[-2.19,-6.15,11.44], size:[0.70,0.83,0.62], color:'eye', hideIn:['back']},
+    {n:'pupilR',     shape:'ell', flat:true, role:'eye', pos:[ 2.19,-6.15,11.44], size:[0.70,0.83,0.62], color:'eye', hideIn:['back']},
+    {n:'glintL',     shape:'ell', flat:true, role:'eye', pos:[-2.42,-6.64,11.62], size:[0.33,0.33,0.31], color:'glint', hideIn:['back']},
+    {n:'glintR',     shape:'ell', flat:true, role:'eye', pos:[ 2.42,-6.64,11.62], size:[0.33,0.33,0.31], color:'glint', hideIn:['back']},
+    {n:'lidL',       shape:'ell', role:'lid', pos:[-2.05,-6.30,11.15], size:[1.20,0.29,0.92], color:'skin', hideIn:['back']},
+    {n:'lidR',       shape:'ell', role:'lid', pos:[ 2.05,-6.30,11.15], size:[1.20,0.29,0.92], color:'skin', hideIn:['back']},
 
-    /* ---- eyes: small and set well back, the way a digger's are ---- */
-    {n:'eyeWhiteL',  shape:'ell', role:'eye', pos:[-2.20,-7.40,11.50], size:[1.20,1.38,0.90], color:'sclera', hideIn:['back']},
-    {n:'eyeWhiteR',  shape:'ell', role:'eye', pos:[ 2.20,-7.40,11.50], size:[1.20,1.38,0.90], color:'sclera', hideIn:['back']},
-    {n:'pupilL',     shape:'ell', flat:true, role:'eye', pos:[-2.34,-7.24,11.88], size:[0.76,0.90,0.66], color:'eye', hideIn:['back']},
-    {n:'pupilR',     shape:'ell', flat:true, role:'eye', pos:[ 2.34,-7.24,11.88], size:[0.76,0.90,0.66], color:'eye', hideIn:['back']},
-    {n:'glintL',     shape:'ell', flat:true, role:'eye', pos:[-2.58,-7.72,12.08], size:[0.34,0.34,0.30], color:'glint', hideIn:['back']},
-    {n:'glintR',     shape:'ell', flat:true, role:'eye', pos:[ 2.58,-7.72,12.08], size:[0.34,0.34,0.30], color:'glint', hideIn:['back']},
-    {n:'lidL',       shape:'ell', role:'lid', pos:[-2.20,-7.40,11.55], size:[1.28,0.30,0.96], color:'skin', hideIn:['back']},
-    {n:'lidR',       shape:'ell', role:'lid', pos:[ 2.20,-7.40,11.55], size:[1.28,0.30,0.96], color:'skin', hideIn:['back']},
+    /* ---- the rolled form. Role 'ball' is scaled to nothing in every
+           animation except the sprint, where everything else is scaled to
+           nothing instead. A tucked creature is a different shape, not the
+           standing one squeezed — so it gets its own geometry. ---- */
+    {n:'ballCore',   shape:'ell', role:'ball', pos:[0,-6.30,-0.60], size:[6.20,6.20,6.20], color:'shell'},
+    {n:'ballBack',   shape:'box', role:'ball', pos:[0,-7.60,-5.50], size:[3.00,3.40,1.60], color:'shellDark'},
+    {n:'ballTop',    shape:'box', role:'ball', pos:[0,-11.40,-0.60], size:[3.20,1.60,3.60], color:'shellDark'},
+    {n:'ballFront',  shape:'box', role:'ball', pos:[0,-7.60,4.30], size:[3.00,3.40,1.60], color:'shellDark'},
+    {n:'ballUnder',  shape:'box', role:'ball', pos:[0,-1.80,-0.60], size:[3.20,1.60,3.60], color:'skin'},
+    {n:'ballSeam',   shape:'ell', flat:true, role:'ball', pos:[-3.40,-10.00,2.60], size:[0.85,0.70,0.85], color:'quartz'},
+    {n:'ballChip',   shape:'ell', flat:true, role:'ball', pos:[ 3.60,-4.60,-2.40], size:[0.75,0.65,0.75], color:'quartz'},
   ],
-  /* It has no bound in it. The shell is one rigid piece that does not flex,
-     so the run is all leg: short, fast, scurrying strides under a hull that
-     barely moves. */
+  /* It tucks and rolls. One full revolution per cycle, so the loop is
+     seamless; the plates orbiting the core are what sell the spin. */
   sprint(cr, p, f, nF){
     const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
-    const r = p.role, grounded = (r === 'leg' || r === 'paw');
-    d.y += [-0.3,-0.7,-0.3,0.0,-0.7,-0.3][f];
-    rots.push({axis:'x', ang:-0.07, pivot:cr.pivots.body});   // barely any lean
-    const stride = [0.62,0.10,-0.56,-0.62,-0.12,0.56];
-    if(grounded){
-      const hip = p.grp === 'hind' ? cr.pivots.hipHind : cr.pivots.hipFore;
-      rots.push({axis:'x', ang:stride[(f + ((p.phase||0) === 0 ? 0 : 3)) % 6], pivot:hip});
-    }
-    if(['head','jaw','eye','mouth','lid','ear'].includes(r))
-      rots.push({axis:'x', ang:-0.10, pivot:cr.pivots.head});   // head tucked down
-    if(r === 'tail') rots.push({axis:'x', ang:0.12, pivot:cr.pivots.tail});
-    if(r === 'eye')  sc.y = 0.85;
+    if(p.role !== 'ball'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
+    rots.push({axis:'x', ang:(f/nF)*Math.PI*2, pivot:cr.pivots.ball});
+    d.y += [0,-0.35,-0.5,-0.35,0,-0.2][f];      // just enough bounce to live
     return {d, sc, rots};
   }
 },
@@ -882,6 +881,8 @@ function baseAnim(cr, p, anim, f, nF){
   const hip = grounded
     ? (p.grp === 'hind' ? cr.pivots.hipHind : (cr.pivots.hipFore || cr.pivots.hip))
     : null;
+  // a rolled-up form is separate geometry that only the roll uses
+  if(r === 'ball'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
   const UPPER = ['head','beak','jaw','eye','deco','mouth','ear','neck','lid'];
   // arms swing from a shoulder joint buried in the chest, the same way legs
   // swing from a buried hip — a creature without one simply has no arms.
@@ -940,6 +941,7 @@ function baseAnim(cr, p, anim, f, nF){
 function genericSprint(cr, p, f, nF){
   const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
   const r = p.role, grounded = (r === 'leg' || r === 'foot' || r === 'paw');
+  if(r === 'ball'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
   const armed = (r === 'arm' || r === 'hand');
   const hip = grounded ? (p.grp === 'hind' ? cr.pivots.hipHind : (cr.pivots.hipFore || cr.pivots.hip)) : null;
   const t = f/nF, s = Math.sin((t + (p.phase||0))*Math.PI*2);
