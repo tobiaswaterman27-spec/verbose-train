@@ -270,11 +270,11 @@ function project(view, x,y,z, sx,sy,sz){
    ══════════════════════════════════════════════════════════════════════ */
 const CREATURES = [
 {
-  id:'sporelet', name:'Sporelet', types:['verdant','venom'],
+  id:'sporelet', name:'Sporelet', types:['verdant'],   // starters are always single-element
   plan:'Quadruped · mycelial symbiont',
   blurb:'Grows a pair of caps along its spine that it sheds and regrows each season. Runs in a low four-legged bound, ears flat, caps swept back.',
   outline:'#141d0e',
-  colors:{ body:'#6f9c4a', dark:'#41602b', belly:'#d3e3ab', cap:'#c2553f', gill:'#8f3a2c',
+  colors:{ body:'#6f9c4a', limb:'#5d8a3f', dark:'#41602b', belly:'#d3e3ab', cap:'#c2553f', gill:'#8f3a2c',
            inner:'#8f5348', sclera:'#f2f6e4', eye:'#1b2415', glint:'#ffffff', mouth:'#7a2f34' },
   /* Joints sit INSIDE the torso, so a limb rotating about one keeps its
      root buried in the parent and can never pull free. */
@@ -284,14 +284,22 @@ const CREATURES = [
   parts:[
     {n:'tail',       shape:'ell', role:'tail', pos:[0,-11.1,-8.6],  size:[1.9,1.9,3.3], color:'body'},
     {n:'tailTip',    shape:'ell', role:'tail', pos:[0,-12.2,-11.2], size:[1.4,1.4,1.7], color:'belly'},
-    {n:'hindLegL',   shape:'box', role:'leg', grp:'hind', phase:0.5, pos:[-3.4,-3.0,-4.8], size:[1.5,3.0,1.6], color:'dark'},
-    {n:'hindLegR',   shape:'box', role:'leg', grp:'hind', phase:0,   pos:[ 3.4,-3.0,-4.8], size:[1.5,3.0,1.6], color:'dark'},
+    // Legs run 4.2 long but only 4.7 of that shows: the top 3.7 units are buried
+    // inside the torso, so a swing never exposes a socket.
+    {n:'hindLegL',   shape:'box', role:'leg', grp:'hind', phase:0.5, pos:[-3.4,-4.2,-4.8], size:[1.5,4.2,1.6], color:'limb'},
+    {n:'hindLegR',   shape:'box', role:'leg', grp:'hind', phase:0,   pos:[ 3.4,-4.2,-4.8], size:[1.5,4.2,1.6], color:'limb'},
     {n:'hindPawL',   shape:'ell', role:'paw', grp:'hind', phase:0.5, pos:[-3.4,-0.6,-4.4], size:[1.7,0.9,2.1], color:'belly'},
     {n:'hindPawR',   shape:'ell', role:'paw', grp:'hind', phase:0,   pos:[ 3.4,-0.6,-4.4], size:[1.7,0.9,2.1], color:'belly'},
-    {n:'foreLegL',   shape:'box', role:'leg', grp:'fore', phase:0,   pos:[-3.1,-3.0,4.6], size:[1.4,3.0,1.5], color:'dark'},
-    {n:'foreLegR',   shape:'box', role:'leg', grp:'fore', phase:0.5, pos:[ 3.1,-3.0,4.6], size:[1.4,3.0,1.5], color:'dark'},
+    {n:'foreLegL',   shape:'box', role:'leg', grp:'fore', phase:0,   pos:[-3.1,-4.2,4.6], size:[1.4,4.2,1.5], color:'limb'},
+    {n:'foreLegR',   shape:'box', role:'leg', grp:'fore', phase:0.5, pos:[ 3.1,-4.2,4.6], size:[1.4,4.2,1.5], color:'limb'},
     {n:'forePawL',   shape:'ell', role:'paw', grp:'fore', phase:0,   pos:[-3.1,-0.6,5.0], size:[1.6,0.9,2.0], color:'belly'},
     {n:'forePawR',   shape:'ell', role:'paw', grp:'fore', phase:0.5, pos:[ 3.1,-0.6,5.0], size:[1.6,0.9,2.0], color:'belly'},
+    // haunch and shoulder masses sit OVER each hip socket and do not swing —
+    // this is what actually blends a limb into a body in character art
+    {n:'haunchL',    shape:'ell', role:'body', pos:[-3.5,-6.4,-4.6], size:[2.3,2.8,2.9], color:'body'},
+    {n:'haunchR',    shape:'ell', role:'body', pos:[ 3.5,-6.4,-4.6], size:[2.3,2.8,2.9], color:'body'},
+    {n:'shoulderL',  shape:'ell', role:'body', pos:[-3.2,-6.7,4.5], size:[2.0,2.4,2.4], color:'body'},
+    {n:'shoulderR',  shape:'ell', role:'body', pos:[ 3.2,-6.7,4.5], size:[2.0,2.4,2.4], color:'body'},
     {n:'torso',      shape:'ell', role:'body', pos:[0,-9.6,0],   size:[5.4,4.9,8.2], color:'body'},
     {n:'belly',      shape:'ell', role:'body', pos:[0,-7.4,0.8], size:[4.2,2.6,6.8], color:'belly'},
     {n:'stemBack',   shape:'box', role:'deco', pos:[-2.2,-15.2,-1.6], size:[0.75,1.9,0.75], color:'belly'},
@@ -317,32 +325,42 @@ const CREATURES = [
     {n:'pupilR',     shape:'ell', flat:true, role:'eye', pos:[ 2.25,-14.4,10.5], size:[0.95,1.15,0.8], color:'eye', hideIn:['back']},
     {n:'glintL',     shape:'ell', flat:true, role:'eye', pos:[-2.55,-15.1,10.8], size:[0.45,0.45,0.4], color:'glint', hideIn:['back']},
     {n:'glintR',     shape:'ell', flat:true, role:'eye', pos:[ 2.55,-15.1,10.8], size:[0.45,0.45,0.4], color:'glint', hideIn:['back']},
+    // lids are hidden until a blink, when the eye parts vanish entirely
+    {n:'lidL',       shape:'ell', role:'lid', pos:[-2.1,-14.6,10.2], size:[1.6,0.34,1.15], color:'limb', hideIn:['back']},
+    {n:'lidR',       shape:'ell', role:'lid', pos:[ 2.1,-14.6,10.2], size:[1.6,0.34,1.15], color:'limb', hideIn:['back']},
   ],
-  /* A low four-legged bound: fore pair and hind pair swing together.
-     Legs SWING about the hip rather than sliding, so they stay attached. */
+  /* A bound, in the order a real quadruped actually does it:
+       0  front feet land, hind still trailing from the last push
+       1  body rolls over the planted forefeet, hind swinging through
+       2  hind reach forward PAST the forefeet, front now pushing back
+       3  hind plant and take the weight, front lifting
+       4  hind drive back hard — the propulsive frame
+       5  airborne and fully extended, front reaching for the next landing
+     Angles stay under ~0.5 rad; bigger than that reads as flailing. */
   sprint(cr, p, f, nF){
     const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
     const r = p.role, limb = (r === 'leg' || r === 'paw');
-    // frame 3 is the contact frame — bounce zero, both leg groups mid-swing
-    const bounce = [-0.8,-1.8,-1.1, 0.0,-0.8,-1.6][f];
-    const lean   = [ 0.20, 0.12, 0.22, 0.28, 0.24, 0.16][f];
-    d.y += bounce;                                             // uniform: nothing shears apart
-    rots.push({axis:'x', ang:-lean, pivot:cr.pivots.body});     // nose down into the run
+    const bounce  = [ 0.0,-0.3,-0.7,-0.4,-1.2,-1.7][f];   // lowest on landing, highest airborne
+    const lean    = [ 0.26, 0.19, 0.11, 0.15, 0.23, 0.29][f];
+    const stretch = [ 1.00, 0.99, 0.96, 1.00, 1.03, 1.05][f];  // spine gathers, then extends
+    d.y += bounce;
+    rots.push({axis:'x', ang:-lean, pivot:cr.pivots.body});
+    if(r === 'body') sc.z = stretch;
 
-    const foreA = [ 0.74, 0.36,-0.44,-0.60,-0.20, 0.46][f];
-    const hindA = [-0.52,-0.64,-0.20, 0.52, 0.70, 0.26][f];
+    const foreA = [ 0.40, 0.05,-0.30,-0.15, 0.20, 0.45][f];
+    const hindA = [-0.35, 0.10, 0.45, 0.15,-0.40,-0.50][f];
     if(limb) rots.push({axis:'x', ang: p.grp === 'fore' ? foreA : hindA,
                         pivot: p.grp === 'fore' ? cr.pivots.hipFore : cr.pivots.hipHind});
-    if(r === 'ear')  rots.push({axis:'x', ang: 0.45, pivot:cr.pivots.ear});    // flattened back
-    if(r === 'deco') rots.push({axis:'x', ang: 0.30, pivot:cr.pivots.back});   // caps swept back
-    if(r === 'tail') rots.push({axis:'x', ang:-0.40, pivot:cr.pivots.tail});
-    if(r === 'jaw')  rots.push({axis:'x', ang:-(0.24 + 0.10*Math.sin(f/nF*Math.PI*4)), pivot:cr.pivots.jaw});
-    if(r === 'eye')  sc.y = 0.78;
+    if(r === 'ear')  rots.push({axis:'x', ang: 0.42, pivot:cr.pivots.ear});    // flattened back
+    if(r === 'deco') rots.push({axis:'x', ang: 0.26, pivot:cr.pivots.back});   // caps swept back
+    if(r === 'tail') rots.push({axis:'x', ang:-0.22 - 0.14*stretch, pivot:cr.pivots.tail});
+    if(r === 'jaw')  rots.push({axis:'x', ang:-(0.18 + 0.08*Math.sin(f/nF*Math.PI*4)), pivot:cr.pivots.jaw});
+    if(r === 'eye')  sc.y = 0.82;
     return {d, sc, rots};
   }
 },
 {
-  id:'cindercrow', name:'Cindercrow', types:['ember','gale'],
+  id:'cindercrow', name:'Cindercrow', types:['ember'],  // starters are always single-element
   plan:'Winged biped · thermal scavenger',
   blurb:'Nests in cooling ash and rides the updraft off burnt ground. Sprints pitched hard forward with its wings held out as counterweights and its head thrust level.',
   outline:'#24100a',
@@ -381,6 +399,9 @@ const CREATURES = [
     {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 2.0,-20.7,3.05], size:[0.8,0.95,0.7], color:'eye', hideIn:['back']},
     {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-2.3,-21.2,3.3], size:[0.4,0.4,0.35], color:'glint', hideIn:['back']},
     {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 2.3,-21.2,3.3], size:[0.4,0.4,0.35], color:'glint', hideIn:['back']},
+    // lids cover the whole eye, so a blink reads as fully shut
+    {n:'lidL',      shape:'ell', role:'lid', pos:[-1.85,-20.8,2.75], size:[1.38,0.32,0.96], color:'body', hideIn:['back']},
+    {n:'lidR',      shape:'ell', role:'lid', pos:[ 1.85,-20.8,2.75], size:[1.38,0.32,0.96], color:'body', hideIn:['back']},
   ],
   /* pitched hard forward, head counter-rotated level, wings out as counterweights */
   sprint(cr, p, f, nF){
@@ -417,7 +438,8 @@ function baseAnim(cr, p, anim, f, nF){
   const hip = grounded
     ? (p.grp === 'hind' ? cr.pivots.hipHind : (cr.pivots.hipFore || cr.pivots.hip))
     : null;
-  const UPPER = ['head','beak','jaw','eye','deco','mouth','ear','neck'];
+  const UPPER = ['head','beak','jaw','eye','deco','mouth','ear','neck','lid'];
+  if(r === 'lid') sc.y = 0;        // lids stay hidden until a blink swaps them in
 
   if(anim === 'idle'){
     // Breathing is the chest EXPANDING, not the creature bobbing up and down.
@@ -426,7 +448,7 @@ function baseAnim(cr, p, anim, f, nF){
     if(r === 'body'){ sc.x = 1+br; sc.y = 1+br*0.6; sc.z = 1+br; }
     if(UPPER.includes(r)) d.y -= br*22;                     // head rides up as the chest fills
     if(r === 'wing') d.y -= br*14;
-    if(r === 'eye' && f === 4) sc.y = 0.12;                 // one brief blink per breath
+    // no blink baked into the cycle — blinking is driven at runtime instead
 
   } else if(anim === 'walk'){
     const t = f/nF, s = Math.sin((t + (p.phase||0))*Math.PI*2);
@@ -521,12 +543,16 @@ function outlinePass(buf, rgb){
   }
 }
 
-function renderFrame(cr, view, anim, f, nF){
+function renderFrame(cr, view, anim, f, nF, blink){
   const buf = makeBuffer();
   const items = [];
   for(const p of cr.parts){
     if(p.hideIn && p.hideIn.includes(view)) continue;
     const A = getAnim(cr, p, anim, f, nF);
+    if(blink){
+      if(p.role === 'eye') A.sc.y = 0;   // eye vanishes completely — no half-shut sliver
+      if(p.role === 'lid') A.sc.y = 1;   // and the lid takes its place
+    }
 
     let pos = [p.pos[0], p.pos[1], p.pos[2]];
     let netAxis = null, netAng = 0;
@@ -615,13 +641,16 @@ function measure(buf){
 for(const cr of CREATURES){
   cr.pal = buildPalette(cr.colors);
   cr.outlineRGB = hex2rgb(cr.outline);
-  cr.frames = {}; cr.buffers = {};
+  cr.frames = {}; cr.buffers = {}; cr.blinkFrames = {};
   for(const v of VIEWS){
-    cr.frames[v] = {}; cr.buffers[v] = {};
+    cr.frames[v] = {}; cr.buffers[v] = {}; cr.blinkFrames[v] = {};
     for(const a in ANIMS){
       const n = ANIMS[a].frames, bufs=[], cans=[];
-      for(let f=0; f<n; f++){ const b = renderFrame(cr,v,a,f,n); bufs.push(b); cans.push(bufferToCanvas(b)); }
+      for(let f=0; f<n; f++){ const b = renderFrame(cr,v,a,f,n,false); bufs.push(b); cans.push(bufferToCanvas(b)); }
       cr.buffers[v][a]=bufs; cr.frames[v][a]=cans;
+      // a blinking twin of each resting frame, swapped in at runtime
+      if(a === 'idle' || a === 'walk')
+        cr.blinkFrames[v][a] = Array.from({length:n}, (_,f) => bufferToCanvas(renderFrame(cr,v,a,f,n,true)));
     }
   }
   let headTop=0, eyeY=null;
@@ -691,7 +720,8 @@ function overlayGuides(canvas, cr, scale){
 }
 
 function buildSpecimen(cr){
-  const st = { anim:'idle', frame:0, playing:!reduced, scale:4, fps:ANIMS.idle.fps, guides:false, grid:false };
+  const st = { anim:'idle', frame:0, playing:!reduced, scale:4, fps:ANIMS.idle.fps,
+               guides:false, grid:false, blinking:false };
   const el = document.createElement('section');
   el.className = 'specimen';
 
@@ -775,9 +805,10 @@ function buildSpecimen(cr){
 
   function drawPreview(){
     const f = st.frame % ANIMS[st.anim].frames;
+    const set = (st.blinking && cr.blinkFrames[VIEWS[0]][st.anim]) ? cr.blinkFrames : cr.frames;
     for(const v of VIEWS){
       const c = pcv[v];
-      blit(c, cr.frames[v][st.anim][f], st.scale);
+      blit(c, set[v][st.anim][f], st.scale);
       if(st.grid) overlayGrid(c, st.scale);
       if(st.guides) overlayGuides(c, cr, st.scale);
     }
@@ -854,12 +885,26 @@ function buildSpecimen(cr){
 
   drawPreview(); drawCheck(); drawSheet();
 
+  // Blinks fire on their own irregular clock rather than once per breath, so
+  // the two creatures drift out of sync and neither looks metronomic.
   let acc=0, last=performance.now();
+  let untilBlink = 1.5 + Math.random()*5, blinkLeft = 0;
   (function tick(now){
     const dt=(now-last)/1000; last=now;
     if(st.playing){
-      acc+=dt;
-      if(acc >= 1/st.fps){ acc=0; st.frame=(st.frame+1)%ANIMS[st.anim].frames; drawPreview(); }
+      let dirty = false;
+      const wasBlinking = st.blinking;
+      if(blinkLeft > 0){
+        blinkLeft -= dt;
+        if(blinkLeft <= 0){ st.blinking = false; untilBlink = 2.5 + Math.random()*6.5; }
+      } else {
+        untilBlink -= dt;
+        if(untilBlink <= 0){ st.blinking = true; blinkLeft = 0.11 + Math.random()*0.06; }
+      }
+      if(st.blinking !== wasBlinking) dirty = true;
+      acc += dt;
+      if(acc >= 1/st.fps){ acc=0; st.frame=(st.frame+1)%ANIMS[st.anim].frames; dirty = true; }
+      if(dirty) drawPreview();
     }
     requestAnimationFrame(tick);
   })(performance.now());
