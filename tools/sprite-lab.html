@@ -798,7 +798,7 @@ const CREATURES = [
            inner:'#c9846a', tooth:'#ffffff',
            sclera:'#fffdf2', eye:'#231a08', glint:'#ffffff', mouth:'#8a4048' },
   /* arcs are thrown at runtime, not baked — see drawSparks */
-  sparks:{ count:[1,4], len:[3,7], color:'#ffe86b', hot:'#fffbe0' },
+  sparks:{ len:[4,8], color:'#ffe86b', hot:'#fffbe0' },
   pivots:{ body:[0,-5.0,0.2], head:[0,-11.0,1.2], jaw:[0,-12.2,3.0],
            ear:[0,-14.4,0.8], tail:[0,-3.4,-2.2], hip:[0,-3.0,0.4] },
   /* Centreline parts in ascending z so every view stacks them the same way. */
@@ -1408,22 +1408,25 @@ function edgesOf(buf){
   }
   return out;
 }
-function drawSparks(canvas, edges, cfg, scale){
-  if(!edges.length) return;
-  const g = canvas.getContext('2d');
+function makeSpark(edges, cfg){
+  if(!edges.length) return [];
   const R = (lo,hi) => lo + Math.random()*(hi-lo);
-  const n = Math.round(R(cfg.count[0], cfg.count[1]));
-  for(let i=0;i<n;i++){
-    const [sx, sy, out] = edges[(Math.random()*edges.length)|0];
-    let x = sx, y = sy, a = out + R(-0.7, 0.7);
-    const steps = Math.round(R(cfg.len[0], cfg.len[1]));
-    for(let s=0;s<steps;s++){
-      a += R(-0.9, 0.9);                       // the jitter is what makes it fork
-      x += Math.round(Math.cos(a)); y += Math.round(Math.sin(a));
-      if(x<0||y<0||x>=W||y>=H) break;
-      g.fillStyle = s < 1 ? cfg.hot : cfg.color;
-      g.fillRect(x*scale, y*scale, scale, scale);
-    }
+  const [sx, sy, out] = edges[(Math.random()*edges.length)|0];
+  let x = sx, y = sy, a = out + R(-0.7, 0.7);
+  const steps = Math.round(R(cfg.len[0], cfg.len[1])), path = [];
+  for(let s=0;s<steps;s++){
+    a += R(-0.9, 0.9);                         // the jitter is what makes it fork
+    x += Math.round(Math.cos(a)); y += Math.round(Math.sin(a));
+    if(x<0||y<0||x>=W||y>=H) break;
+    path.push([x, y, s < 1]);
+  }
+  return path;
+}
+function paintSpark(canvas, path, cfg, scale){
+  const g = canvas.getContext('2d');
+  for(const [x,y,hot] of path){
+    g.fillStyle = hot ? cfg.hot : cfg.color;
+    g.fillRect(x*scale, y*scale, scale, scale);
   }
 }
 function blit(canvas, src, scale){
@@ -1458,7 +1461,7 @@ function overlayGuides(canvas, cr, scale){
 function buildSpecimen(cr){
   const AN = animsOf(cr);
   const st = { anim:'idle', frame:0, playing:!reduced, scale:4, fps:AN.idle.fps,
-               guides:false, grid:false, blinking:false, queued:null };
+               guides:false, grid:false, blinking:false, queued:null, zap:null };
   const el = document.createElement('section');
   el.className = 'specimen';
 
@@ -1548,7 +1551,12 @@ function buildSpecimen(cr){
     for(const v of VIEWS){
       const c = pcv[v];
       blit(c, set[v][st.anim][f], st.scale);
-      if(cr.sparks) drawSparks(c, edgeCache(v, st.anim, f), cr.sparks, st.scale);
+      // a bolt is generated once when it fires and held for its short life,
+      // so it does not reshuffle itself on every repaint
+      if(cr.sparks && st.zap){
+        st.zap[v] ||= makeSpark(edgeCache(v, st.anim, f), cr.sparks);
+        paintSpark(c, st.zap[v], cr.sparks, st.scale);
+      }
       if(st.grid) overlayGrid(c, st.scale);
       if(st.guides) overlayGuides(c, cr, st.scale);
     }
@@ -1637,7 +1645,8 @@ function buildSpecimen(cr){
   // Blinks fire on their own irregular clock rather than once per breath, so
   // the two creatures drift out of sync and neither looks metronomic.
   let acc=0, last=performance.now();
-  let untilBlink = 1.5 + Math.random()*5, blinkLeft = 0, sparkLeft = 0;
+  let untilBlink = 1.5 + Math.random()*5, blinkLeft = 0;
+  let untilZap = 0.8 + Math.random()*3.0, zapLeft = 0;
   (function tick(now){
     const dt=(now-last)/1000; last=now;
     if(st.playing){
@@ -1652,7 +1661,15 @@ function buildSpecimen(cr){
       }
       if(st.blinking !== wasBlinking) dirty = true;
       acc += dt;
-      if(cr.sparks){ sparkLeft -= dt; if(sparkLeft <= 0){ sparkLeft = 0.06 + Math.random()*0.12; dirty = true; } }
+      if(cr.sparks){
+        if(st.zap){
+          zapLeft -= dt;
+          if(zapLeft <= 0){ st.zap = null; untilZap = 1.4 + Math.random()*4.0; dirty = true; }
+        } else {
+          untilZap -= dt;
+          if(untilZap <= 0){ st.zap = {}; zapLeft = 0.07 + Math.random()*0.10; dirty = true; }
+        }
+      }
       if(acc >= 1/st.fps){
         acc = 0; dirty = true;
         const n = AN[st.anim].frames;
