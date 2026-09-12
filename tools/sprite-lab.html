@@ -191,15 +191,36 @@ const VIEW_LABEL = {front:'FRONT', right:'RIGHT', back:'BACK', left:'LEFT'};
 const ANIMS = { idle:{frames:6,fps:3}, walk:{frames:4,fps:7}, sprint:{frames:6,fps:12},
                 attack:{frames:5,fps:8}, call:{frames:4,fps:5} };
 const ANIM_LABEL = { idle:'Idle', walk:'Walk', sprint:'Sprint', attack:'Attack', call:'Call',
-                     takeoff:'Take off', tuck:'Tuck in', untuck:'Unfurl' };
+                     takeoff:'Take off', landing:'Land', tuck:'Tuck in', untuck:'Unfurl',
+                     rouse:'Set off', settle:'Settle' };
 // A creature may carry transitions nobody else has — taking off, shutting a
 // shell. They are listed only on the creature that defines them.
-const animsOf = cr => Object.assign({}, ANIMS, cr.extraAnims || {});
-// A creature can declare that going from one animation to another has to pass
-// through a third — taking off before it can fly, folding up before it rolls.
-// The roster plays the bridge once, then drops into the animation you asked for.
+/* Nothing goes from standing still to moving in one frame. Every creature
+   gets a gather before it sets off and a settle when it stops; a creature
+   that has something more specific to do — a bird taking off, an armadillo
+   folding up — declares it, and its own bridge wins for those pairs. */
+const BRIDGE_ANIMS = { rouse:{frames:4, fps:10}, settle:{frames:4, fps:10} };
+const DEFAULT_BRIDGES = [
+  { from:['idle'], to:['walk','sprint'], via:'rouse'  },
+  { from:['walk','sprint'], to:['idle'], via:'settle' },
+];
+function bridgesOf(cr){
+  if(cr._bridges) return cr._bridges;
+  const own = cr.transitions || [];
+  const covered = (f,t) => own.some(x => x.from.includes(f) && x.to.includes(t));
+  const extra = [];
+  for(const b of DEFAULT_BRIDGES)
+    for(const f of b.from) for(const t of b.to)
+      if(!covered(f,t)) extra.push({ from:[f], to:[t], via:b.via });
+  return (cr._bridges = own.concat(extra));
+}
+function animsOf(cr){
+  const out = Object.assign({}, ANIMS, cr.extraAnims || {});
+  for(const b of bridgesOf(cr)) if(BRIDGE_ANIMS[b.via]) out[b.via] = BRIDGE_ANIMS[b.via];
+  return out;
+}
 function bridgeFor(cr, from, to){
-  for(const t of (cr.transitions || []))
+  for(const t of bridgesOf(cr))
     if(t.from.includes(from) && t.to.includes(to)) return t.via;
   return null;
 }
@@ -298,12 +319,45 @@ function flightPose(cr, p, f, nF, o){
     rots.push({axis:'x', ang:o.pitch*0.45, pivot:cr.pivots.tail});
   }
   // head counter-rotates most of the pitch back out, so the beak stays level
-  const lvl = o.pitch*0.75 + (o.headUp||0);
+  const lvl = o.pitch*(o.level === undefined ? 0.75 : o.level) + (o.headUp||0);
   if(['head','beak','jaw','eye','deco','mouth','lid'].includes(r))
     rots.push({axis:'x', ang:lvl, pivot:cr.pivots.head});
   if(r === 'neck') rots.push({axis:'x', ang:lvl*0.5, pivot:cr.pivots.head});
   if(r === 'jaw')  rots.push({axis:'x', ang:-(o.gape||0), pivot:cr.pivots.jaw});
   if(r === 'eye' && o.squint) sc.y = o.squint;
+  return {d, sc, rots};
+}
+
+/* The default bridge, run forwards to set off and backwards to settle. It is
+   written against roles rather than any one body plan, and every joint it
+   reaches for is optional, so it works on a bird, a quadruped and a sitting
+   rodent without knowing which it has. The weight drops before it goes —
+   that dip is what stops it reading as a slow fade between two poses. */
+function gatherPose(cr, p, f, nF, dir){
+  const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+  const r = p.role, P = cr.pivots;
+  if(r === 'ball'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
+  if(r === 'lid') sc.y = 0;
+  const i = dir > 0 ? f : 3 - f;
+  const k   = [0, 0.42, 0.80, 1][i];       // how far into the moving pose
+  const dip = [0, 1.00, 0.45, 0][i];       // the crouch it passes through
+  const lean = 0.26*k;
+  d.y += dip*1.7;
+  rots.push({axis:'x', ang:-lean, pivot:P.body});
+  if(r === 'leg' || r === 'foot' || r === 'paw'){
+    const hip = p.grp === 'hind' ? P.hipHind : (P.hipFore || P.hip);
+    if(hip) rots.push({axis:'x', ang:((p.phase||0) ? -1 : 1)*0.58*k, pivot:hip});
+  }
+  if(r === 'tail' && P.tail) rots.push({axis:'x', ang:-0.26*k, pivot:P.tail});
+  if(r === 'ear'  && P.ear)  rots.push({axis:'x', ang:0.34*k, pivot:P.ear});
+  if(P.head){
+    if(['head','beak','jaw','eye','deco','mouth','lid','ear'].includes(r))
+      rots.push({axis:'x', ang:lean*0.6, pivot:P.head});
+    if(r === 'neck') rots.push({axis:'x', ang:lean*0.3, pivot:P.head});
+  }
+  if(r === 'wing' && p.pivot) rots.push({axis:'z', ang:-(p.side||1)*0.52*k, pivot:p.pivot});
+  if((r === 'arm' || r === 'hand') && P.shoulder)
+    rots.push({axis:'x', ang:-0.42*k, pivot:P.shoulder});
   return {d, sc, rots};
 }
 
@@ -786,7 +840,21 @@ const CREATURES = [
   landing(cr,p,f,nF){ return cr.takeoff(cr, p, 5-f, nF); },
   walk  (cr,p,f,nF){ return flightPose(cr,p,f,nF,{lift:7.0,  bob:0.9, pitch:0.55, spread:1.56, beat:0.34}); },
   sprint(cr,p,f,nF){ return flightPose(cr,p,f,nF,{lift:8.5,  bob:0.6, pitch:0.86, spread:1.46, beat:0.62, squint:0.80}); },
-  attack(cr,p,f,nF){ return flightPose(cr,p,f,nF,{lift:6.0,  bob:1.6, pitch:1.02, spread:1.10, beat:0.50, gape:0.45, squint:0.62}); },
+  /* A tern does not swipe at things, it plunges. Rise and hang, roll over,
+     fold the wings right back and fall beak-first, snap, then flare out and
+     climb away. The head stops counter-rotating partway down — on a stoop the
+     bird is not holding its beak level, it is aiming with it. */
+  attack(cr,p,f,nF){
+    const LIFT   = [10.2, 9.6, 6.0, 3.8, 7.8][f];
+    const PITCH  = [ 0.30, 0.92, 1.46, 1.38, 0.62][f];
+    const SPREAD = [ 1.74, 0.80, 0.36, 0.44, 1.66][f];   // folded right back for the fall
+    const LEVEL  = [ 0.80, 0.50, 0.12, 0.08, 0.62][f];   // stops levelling, starts aiming
+    const GAPE   = [ 0,    0.14, 0.30, 0.64, 0.18][f];
+    return flightPose(cr, p, f, nF, {
+      lift:LIFT, bob:0, pitch:PITCH, spread:SPREAD, beat:0,
+      level:LEVEL, gape:GAPE, squint:[1,0.8,0.62,0.55,0.85][f],
+    });
+  },
   call  (cr,p,f,nF){ return flightPose(cr,p,f,nF,{lift:7.4,  bob:0.5, pitch:0.40, spread:1.62, beat:0.22, gape:0.60, headUp:0.22}); },
 },
 {
@@ -1153,6 +1221,8 @@ function genericSprint(cr, p, f, nF){
    name; the shared rigs below are only the fallback. */
 function getAnim(cr, p, anim, f, nF){
   if(typeof cr[anim] === 'function') return cr[anim](cr, p, f, nF);
+  if(anim === 'rouse')  return gatherPose(cr, p, f, nF,  1);
+  if(anim === 'settle') return gatherPose(cr, p, f, nF, -1);
   if(anim === 'sprint') return genericSprint(cr, p, f, nF);
   return baseAnim(cr, p, anim, f, nF);
 }
