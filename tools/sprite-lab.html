@@ -190,9 +190,10 @@ const VIEW_LABEL = {front:'FRONT', right:'RIGHT', back:'BACK', left:'LEFT'};
 // Each animation carries its own natural rate — a breath is not a sprint.
 const ANIMS = { idle:{frames:6,fps:3}, walk:{frames:4,fps:7}, sprint:{frames:6,fps:12},
                 attack:{frames:5,fps:8}, call:{frames:4,fps:5} };
+const SERPENT_DROP = [2.60, 9.60, 4.60];   // coiled head -> strung head
 const ANIM_LABEL = { idle:'Idle', walk:'Walk', sprint:'Sprint', attack:'Attack', call:'Call',
                      takeoff:'Take off', landing:'Land', tuck:'Tuck in', untuck:'Unfurl',
-                     rouse:'Set off', settle:'Settle' };
+                     rouse:'Set off', settle:'Settle', uncoil:'Uncoil', recoil:'Coil up' };
 // A creature may carry transitions nobody else has — taking off, shutting a
 // shell. They are listed only on the creature that defines them.
 /* Nothing goes from standing still to moving in one frame. Every creature
@@ -336,7 +337,7 @@ function flightPose(cr, p, f, nF, o){
 function gatherPose(cr, p, f, nF, dir){
   const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
   const r = p.role, P = cr.pivots;
-  if(r === 'ball'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
+  if(r === 'ball' || r === 'strung'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
   if(r === 'lid') sc.y = 0;
   const i = dir > 0 ? f : 3 - f;
   const k   = [0, 0.42, 0.80, 1][i];       // how far into the moving pose
@@ -358,6 +359,59 @@ function gatherPose(cr, p, f, nF, dir){
   if(r === 'wing' && p.pivot) rots.push({axis:'z', ang:-(p.side||1)*0.52*k, pivot:p.pivot});
   if((r === 'arm' || r === 'hand') && P.shoulder)
     rots.push({axis:'x', ang:-0.42*k, pivot:P.shoulder});
+  return {d, sc, rots};
+}
+
+/* A serpent has two bodies: a stack of coils with the head up, and a strung
+   line with the head down. Same swap as the armadillo — no frame draws both —
+   but the head is shared between them, so it has to ARRIVE at the strung
+   position rather than cut to it. Up to the swap it swings down about the base
+   of the neck (a rotation, so the neck can never pull loose) while the whole
+   coil sinks; by the last coiled frame it is low and forward enough that the
+   cut reads as the last of the uncoiling rather than as a jump. */
+function serpentUncoil(cr, p, step, back){
+  const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+  const r = p.role, strung = step >= 3;
+  if(r === 'lid') sc.y = 0;
+  if(r === 'strung' ? !strung : ((r === 'coil' || r === 'neck') && strung)){
+    sc.x = sc.y = sc.z = 0; return {d, sc, rots};
+  }
+  if(strung){
+    const i = step - 3;
+    if(r !== 'strung'){ d.x += SERPENT_DROP[0]; d.y += SERPENT_DROP[1]; d.z += SERPENT_DROP[2]; }
+    d.x += (back ? -1 : 1)*[1.6, 0.6, 0][i];      // the line still settling
+    return {d, sc, rots};
+  }
+  const SWING = [0, -0.75, -1.62][step];
+  const SINK  = [0,  1.00,  2.40][step];
+  if(r === 'coil'){ d.y += SINK*0.75; return {d, sc, rots}; }
+  rots.push({axis:'x', ang:SWING, pivot:cr.pivots.neck});
+  d.y += SINK;
+  return {d, sc, rots};
+}
+
+/* The travelling wave that moves a limbless animal: every segment slides
+   sideways on the same sine, phase-shifted by how far down the body it sits,
+   so the S runs from head to tail instead of the whole snake wagging. */
+function serpentSlither(cr, p, f, nF, amp){
+  const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+  const r = p.role, t = f/nF*Math.PI*2;
+  if(r === 'coil' || r === 'neck'){ sc.x=sc.y=sc.z=0; return {d,sc,rots}; }
+  if(r === 'lid') sc.y = 0;
+  if(r === 'tongue'){ sc.x=sc.y=sc.z=0; return {d,sc,rots}; }
+  // A real snake's S lies flat, which means it is edge-on and invisible from
+  // the side. A second, smaller wave in y costs nothing and is what makes the
+  // body visibly ripple from every angle instead of sliding as a rigid line.
+  const ph = t - p.pos[2]*0.42;
+  if(r === 'strung'){
+    d.x += Math.sin(ph)*amp;
+    d.y += Math.sin(ph + 1.1)*amp*0.52;
+    return {d, sc, rots};
+  }
+  const hp = t - 9.2*0.42;
+  d.x += SERPENT_DROP[0] + Math.sin(hp)*amp*0.8;
+  d.y += SERPENT_DROP[1] + Math.sin(hp + 1.1)*amp*0.42;
+  d.z += SERPENT_DROP[2];
   return {d, sc, rots};
 }
 
@@ -1050,41 +1104,136 @@ const CREATURES = [
   }
 },
 {
-  id:'murklet', name:'Murklet', types:['venom'], plan:'Amphibian · low sprawling gait',
-  blurb:'A newt the colour of standing water. Its skin is unpleasant rather than dangerous, which it considers an insult.',
-  outline:'#140b20',
-  colors:{ body:'#7f5f9e', limb:'#6a4d86', dark:'#4d3663', belly:'#d9c8e8', spot:'#b98fd6',
-           sclera:'#f6f0fb', eye:'#1f1430', glint:'#ffffff', mouth:'#5c2740' },
-  pivots:{ body:[0,-2.6,0], head:[0,-5.4,3.0], jaw:[0,-6.0,4.4], ear:[0,-8.0,3.0],
-           tail:[0,-4.4,-3.0], hipFore:[0,-3.6,2.4], hipHind:[0,-3.6,-2.2] },
+  id:'fangcoil', name:'Fangcoil', types:['venom'], scale:1.0,
+  plan:'Serpent · limbless, coiled at rest and strung out to travel',
+  blurb:'Sits wound in a stack of its own loops with the head up and the tongue reading the air, and does not move at all until it does. The banding is a warning and an honest one: there are two fangs folded against the roof of its mouth and it is not shy about them.',
+  outline:'#241635',
+  colors:{ body:'#6f4f96', band:'#9b7bc4', belly:'#c9d98a', dark:'#3a2752',
+           hood:'#8a63b0', fang:'#f4f0e4', tongue:'#c9456a',
+           sclera:'#e8d96a', eye:'#140c1c', glint:'#ffffff', mouth:'#6b2436' },
+  pivots:{ body:[0,-4.6,0], head:[0,-11.6,3.4], jaw:[0,-12.6,5.0],
+           neck:[0,-7.6,2.6], tail:[-3.4,-2.2,-4.2] },
   parts:[
-    {n:'tail',      shape:'ell', role:'tail', pos:[0,-4.4,-5.2], size:[1.1,1.1,3.0], color:'body'},
-    {n:'tailTip',   shape:'ell', role:'tail', pos:[0,-4.3,-8.0], size:[0.75,0.75,2.0], color:'belly'},
-    {n:'hindLegL',  shape:'ell', role:'leg', grp:'hind', phase:0.5, pos:[-2.6,-2.2,-2.2], size:[1.5,2.2,1.05], color:'limb'},
-    {n:'hindLegR',  shape:'ell', role:'leg', grp:'hind', phase:0,   pos:[ 2.6,-2.2,-2.2], size:[1.5,2.2,1.05], color:'limb'},
-    {n:'hindFootL', shape:'ell', role:'foot', grp:'hind', phase:0.5, pos:[-3.5,-0.45,-2.2], size:[1.1,0.5,1.3], color:'dark'},
-    {n:'hindFootR', shape:'ell', role:'foot', grp:'hind', phase:0,   pos:[ 3.5,-0.45,-2.2], size:[1.1,0.5,1.3], color:'dark'},
-    {n:'foreLegL',  shape:'ell', role:'leg', grp:'fore', phase:0,   pos:[-2.5,-2.2,2.4], size:[1.45,2.2,1.05], color:'limb'},
-    {n:'foreLegR',  shape:'ell', role:'leg', grp:'fore', phase:0.5, pos:[ 2.5,-2.2,2.4], size:[1.45,2.2,1.05], color:'limb'},
-    {n:'foreFootL', shape:'ell', role:'foot', grp:'fore', phase:0,   pos:[-3.4,-0.45,2.6], size:[1.1,0.5,1.3], color:'dark'},
-    {n:'foreFootR', shape:'ell', role:'foot', grp:'fore', phase:0.5, pos:[ 3.4,-0.45,2.6], size:[1.1,0.5,1.3], color:'dark'},
-    {n:'body',      shape:'ell', role:'body', pos:[0,-5.6,0],   size:[2.7,3.0,5.0], color:'body'},
-    {n:'belly',     shape:'ell', role:'body', pos:[0,-4.0,0.3], size:[2.2,1.5,4.4], color:'belly'},
-    {n:'spotA',     shape:'ell', role:'deco', pos:[-1.0,-7.8,-1.4], size:[0.85,0.5,0.95], color:'spot'},
-    {n:'spotB',     shape:'ell', role:'deco', pos:[ 1.2,-7.7,1.0], size:[0.75,0.45,0.85], color:'spot'},
-    {n:'head',      shape:'ell', role:'head', pos:[0,-6.6,4.6], size:[2.6,2.5,2.6], color:'body'},
-    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-5.6,4.6], size:[1.6,0.6,1.2], color:'mouth', hideIn:['back']},
-    {n:'jaw',       shape:'ell', role:'jaw', pos:[0,-5.2,5.0], size:[2.1,0.8,2.0], color:'belly', hideIn:['back']},
-    {n:'nostril',   shape:'ell', flat:true, role:'head', pos:[0,-7.0,6.9], size:[0.45,0.35,0.4], color:'eye', hideIn:['back']},
-    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-1.55,-8.2,4.8], size:[1.1,1.1,1.05], color:'sclera', hideIn:['back']},
-    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 1.55,-8.2,4.8], size:[1.1,1.1,1.05], color:'sclera', hideIn:['back']},
-    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-1.67,-8.3,5.1], size:[0.65,0.65,0.62], color:'eye', hideIn:['back']},
-    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 1.67,-8.3,5.1], size:[0.65,0.65,0.62], color:'eye', hideIn:['back']},
-    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-1.9,-8.6,5.3], size:[0.31,0.31,0.29], color:'glint', hideIn:['back']},
-    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 1.9,-8.6,5.3], size:[0.31,0.31,0.29], color:'glint', hideIn:['back']},
-    {n:'lidL',      shape:'ell', role:'lid', pos:[-1.55,-8.2,4.85], size:[1.16,0.25,1.1], color:'body', hideIn:['back']},
-    {n:'lidR',      shape:'ell', role:'lid', pos:[ 1.55,-8.2,4.85], size:[1.16,0.25,1.1], color:'body', hideIn:['back']},
-  ]
+    /* ---- the coil: three loops stacked and tapering, plus a tail laid out
+           behind. Segments alternate tone so the banding reads. ---- */
+    {n:'coilA1', shape:'ell', role:'coil', pos:[ 4.40,-2.20, 0.00], size:[2.60,1.95,2.60], color:'body'},
+    {n:'coilA2', shape:'ell', role:'coil', pos:[ 2.20,-2.20, 3.81], size:[2.60,1.95,2.60], color:'band'},
+    {n:'coilA3', shape:'ell', role:'coil', pos:[-2.20,-2.20, 3.81], size:[2.60,1.95,2.60], color:'body'},
+    {n:'coilA4', shape:'ell', role:'coil', pos:[-4.40,-2.20, 0.00], size:[2.60,1.95,2.60], color:'band'},
+    {n:'coilA5', shape:'ell', role:'coil', pos:[-2.20,-2.20,-3.81], size:[2.60,1.95,2.60], color:'body'},
+    {n:'coilA6', shape:'ell', role:'coil', pos:[ 2.20,-2.20,-3.81], size:[2.60,1.95,2.60], color:'band'},
+    {n:'tailA',  shape:'ell', role:'coil', pos:[-4.60,-1.90,-5.60], size:[1.60,1.50,2.10], color:'band'},
+    {n:'tailB',  shape:'ell', role:'coil', pos:[-3.40,-1.50,-8.00], size:[1.15,1.10,1.85], color:'body'},
+    {n:'tailC',  shape:'ell', role:'coil', pos:[-1.70,-1.25,-9.60], size:[0.78,0.75,1.45], color:'band'},
+    {n:'coilB1', shape:'ell', role:'coil', pos:[ 3.20,-4.90, 1.85], size:[2.30,1.80,2.30], color:'band'},
+    {n:'coilB2', shape:'ell', role:'coil', pos:[ 0.00,-4.90, 3.70], size:[2.30,1.80,2.30], color:'body'},
+    {n:'coilB3', shape:'ell', role:'coil', pos:[-3.20,-4.90, 1.85], size:[2.30,1.80,2.30], color:'band'},
+    {n:'coilB4', shape:'ell', role:'coil', pos:[-3.20,-4.90,-1.85], size:[2.30,1.80,2.30], color:'body'},
+    {n:'coilB5', shape:'ell', role:'coil', pos:[ 0.00,-4.90,-3.70], size:[2.30,1.80,2.30], color:'band'},
+    {n:'coilB6', shape:'ell', role:'coil', pos:[ 3.20,-4.90,-1.85], size:[2.30,1.80,2.30], color:'body'},
+    {n:'coilC1', shape:'ell', role:'coil', pos:[ 2.90,-7.10, 0.00], size:[2.00,1.65,2.00], color:'body'},
+    {n:'coilC2', shape:'ell', role:'coil', pos:[ 0.90,-7.10, 2.76], size:[2.00,1.65,2.00], color:'band'},
+    {n:'coilC3', shape:'ell', role:'coil', pos:[-2.35,-7.10, 1.70], size:[2.00,1.65,2.00], color:'body'},
+    {n:'coilC4', shape:'ell', role:'coil', pos:[-2.35,-7.10,-1.70], size:[2.00,1.65,2.00], color:'band'},
+    {n:'coilC5', shape:'ell', role:'coil', pos:[ 0.90,-7.10,-2.76], size:[2.00,1.65,2.00], color:'body'},
+    {n:'neckA',  shape:'ell', role:'neck', pos:[ 0.20,-8.80, 2.60], size:[1.85,1.90,1.85], color:'band'},
+    {n:'neckB',  shape:'ell', role:'neck', pos:[ 0.10,-10.80,3.00], size:[1.70,1.80,1.70], color:'body'},
+
+    /* ---- the strung body: one line in a shallow S, drawn only while it is
+           actually going somewhere. The wave travels down it by phase. ---- */
+    {n:'sg1', shape:'ell', role:'strung', pos:[ 0.60,-1.70,-11.00], size:[1.15,1.10,1.55], color:'band'},
+    {n:'sg2', shape:'ell', role:'strung', pos:[ 1.50,-1.80, -9.00], size:[1.25,1.20,1.60], color:'body'},
+    {n:'sg3', shape:'ell', role:'strung', pos:[ 2.10,-1.85, -6.70], size:[1.45,1.40,1.70], color:'band'},
+    {n:'sg4', shape:'ell', role:'strung', pos:[ 1.10,-1.90, -4.40], size:[1.60,1.55,1.75], color:'body'},
+    {n:'sg5', shape:'ell', role:'strung', pos:[-0.60,-1.90, -2.20], size:[1.70,1.65,1.80], color:'band'},
+    {n:'sg6', shape:'ell', role:'strung', pos:[-1.70,-1.90,  0.10], size:[1.75,1.70,1.85], color:'body'},
+    {n:'sg7', shape:'ell', role:'strung', pos:[-1.50,-1.90,  2.40], size:[1.75,1.70,1.85], color:'band'},
+    {n:'sg8', shape:'ell', role:'strung', pos:[-0.20,-1.90,  4.70], size:[1.70,1.65,1.80], color:'body'},
+    {n:'sg9', shape:'ell', role:'strung', pos:[ 1.40,-1.90,  6.90], size:[1.60,1.55,1.75], color:'band'},
+
+    /* ---- the head travels between the two bodies, so it belongs to neither ---- */
+    {n:'hoodL',      shape:'ell', role:'deco', pos:[-2.40,-12.60,3.00], size:[1.30,2.40,1.50], color:'hood'},
+    {n:'hoodR',      shape:'ell', role:'deco', pos:[ 2.40,-12.60,3.00], size:[1.30,2.40,1.50], color:'hood'},
+    {n:'head',       shape:'ell', role:'head', pos:[0,-13.30,4.70], size:[2.70,2.25,3.20], color:'body'},
+    {n:'browL',      shape:'ell', role:'head', pos:[-1.55,-14.90,5.00], size:[1.05,0.60,1.45], color:'dark'},
+    {n:'browR',      shape:'ell', role:'head', pos:[ 1.55,-14.90,5.00], size:[1.05,0.60,1.45], color:'dark'},
+    {n:'jaw',        shape:'ell', role:'jaw', pos:[0,-12.30,6.10], size:[2.25,0.90,2.50], color:'belly', hideIn:['back']},
+    {n:'mouthInner', shape:'ell', flat:true, role:'mouth', pos:[0,-12.80,6.30], size:[1.50,0.55,1.30], color:'mouth', hideIn:['back']},
+    {n:'snout',      shape:'ell', role:'head', pos:[0,-13.35,7.30], size:[1.80,1.55,1.85], color:'body', hideIn:['back']},
+    /* fangs hang below the jaw line — the one thing that has to read at 32px */
+    {n:'fangL',      shape:'ell', role:'head', pos:[-0.88,-11.85,6.80], size:[0.36,1.45,0.38], color:'fang', hideIn:['back']},
+    {n:'fangR',      shape:'ell', role:'head', pos:[ 0.88,-11.85,6.80], size:[0.36,1.45,0.38], color:'fang', hideIn:['back']},
+    {n:'tongue',     shape:'ell', role:'tongue', pos:[0,-12.30,8.40], size:[0.26,0.20,1.40], color:'tongue', hideIn:['back']},
+    /* yellow eye, vertical slit — the whole warning in two pixels of pupil */
+    {n:'eyeWhiteL',  shape:'ell', role:'eye', pos:[-1.72,-14.05,5.70], size:[1.10,1.15,0.85], color:'sclera', hideIn:['back']},
+    {n:'eyeWhiteR',  shape:'ell', role:'eye', pos:[ 1.72,-14.05,5.70], size:[1.10,1.15,0.85], color:'sclera', hideIn:['back']},
+    {n:'pupilL',     shape:'ell', flat:true, role:'eye', pos:[-1.84,-14.00,6.02], size:[0.32,0.96,0.56], color:'eye', hideIn:['back']},
+    {n:'pupilR',     shape:'ell', flat:true, role:'eye', pos:[ 1.84,-14.00,6.02], size:[0.32,0.96,0.56], color:'eye', hideIn:['back']},
+    {n:'glintL',     shape:'ell', flat:true, role:'eye', pos:[-2.04,-14.42,6.18], size:[0.30,0.30,0.28], color:'glint', hideIn:['back']},
+    {n:'glintR',     shape:'ell', flat:true, role:'eye', pos:[ 2.04,-14.42,6.18], size:[0.30,0.30,0.28], color:'glint', hideIn:['back']},
+    {n:'lidL',       shape:'ell', role:'lid', pos:[-1.72,-14.05,5.76], size:[1.18,0.28,0.91], color:'body', hideIn:['back']},
+    {n:'lidR',       shape:'ell', role:'lid', pos:[ 1.72,-14.05,5.76], size:[1.18,0.28,0.91], color:'body', hideIn:['back']},
+  ],
+  extraAnims:{ idle:{frames:8, fps:4}, uncoil:{frames:6, fps:10}, recoil:{frames:6, fps:10} },
+  transitions:[
+    { from:['idle','attack','call'], to:['walk','sprint'], via:'uncoil' },
+    { from:['walk','sprint'], to:['idle','attack','call'], via:'recoil' },
+  ],
+  uncoil(cr,p,f,nF){ return serpentUncoil(cr, p, f, false); },
+  recoil(cr,p,f,nF){ return serpentUncoil(cr, p, 5-f, true); },
+  /* Coiled and almost entirely still. The tongue is the only thing that
+     moves on most frames, and it only comes out for two of the eight. */
+  idle(cr, p, f, nF){
+    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+    const r = p.role;
+    if(r === 'strung'){ sc.x=sc.y=sc.z=0; return {d,sc,rots}; }
+    if(r === 'lid') sc.y = 0;
+    if(r === 'tongue'){
+      const OUT = [0,0,0,1,0.55,0,0,0][f];
+      if(!OUT){ sc.x=sc.y=sc.z=0; return {d,sc,rots}; }
+      sc.z = OUT; d.z += (OUT-1)*1.4;
+      return {d,sc,rots};
+    }
+    const BR = [0,0.008,0.015,0.018,0.012,0.006,0.012,0.006][f];
+    if(r === 'coil'){ sc.x = 1+BR; sc.z = 1+BR; }
+    const SWAY = [0,0.02,0.04,0.03,0,-0.03,-0.04,-0.02][f];
+    if(r !== 'coil') rots.push({axis:'z', ang:SWAY, pivot:cr.pivots.neck});
+    return {d, sc, rots};
+  },
+  walk  (cr,p,f,nF){ return serpentSlither(cr,p,f,nF,1.10); },
+  sprint(cr,p,f,nF){ return serpentSlither(cr,p,f,nF,1.90); },
+  /* Draw back over the coil, then throw the whole head forward and down.
+     The strike is a rotation about the base of the neck, never a slide, so
+     the neck comes with it instead of being left behind. */
+  attack(cr, p, f, nF){
+    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+    const r = p.role;
+    if(r === 'strung'){ sc.x=sc.y=sc.z=0; return {d,sc,rots}; }
+    if(r === 'lid') sc.y = 0;
+    if(r === 'tongue'){ sc.x=sc.y=sc.z=0; return {d,sc,rots}; }
+    const SWING = [0.34, 0.52, -0.92, -0.62, -0.06][f];
+    const GAPE  = [0.05, 0.02,  0.95,  0.70,  0.12][f];
+    if(r !== 'coil') rots.push({axis:'x', ang:SWING, pivot:cr.pivots.neck});
+    if(r === 'jaw' || r === 'mouth') rots.push({axis:'x', ang:-GAPE, pivot:cr.pivots.jaw});
+    if(r === 'deco') sc.x = 1 + [0.1,0.3,0.9,0.7,0.2][f];     // hood snaps wide
+    if(r === 'eye')  sc.y = f >= 1 && f <= 3 ? 0.7 : 1;
+    return {d, sc, rots};
+  },
+  /* Reared back, hood out, mouth open: a hiss is a whole-body threat. */
+  call(cr, p, f, nF){
+    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+    const r = p.role;
+    if(r === 'strung'){ sc.x=sc.y=sc.z=0; return {d,sc,rots}; }
+    if(r === 'lid') sc.y = 0;
+    if(r === 'tongue'){ sc.x=sc.y=sc.z=0; return {d,sc,rots}; }
+    const REAR = [0.06, 0.30, 0.40, 0.16][f];
+    const GAPE = [0.10, 0.55, 0.72, 0.30][f];
+    if(r !== 'coil') rots.push({axis:'x', ang:REAR, pivot:cr.pivots.neck});
+    if(r === 'jaw' || r === 'mouth') rots.push({axis:'x', ang:-GAPE, pivot:cr.pivots.jaw});
+    if(r === 'deco') sc.x = 1 + [0.15,0.75,1.05,0.45][f];
+    if(r === 'coil'){ sc.x = 1+[0,0.02,0.03,0.01][f]; sc.z = 1+[0,0.02,0.03,0.01][f]; }
+    return {d, sc, rots};
+  }
 },
 {
   id:'gloamlet', name:'Gloamlet', types:['umbra'], scale:0.92, plan:'Quadruped · vulpine ambusher',
@@ -1189,7 +1338,7 @@ function baseAnim(cr, p, anim, f, nF){
     ? (p.grp === 'hind' ? cr.pivots.hipHind : (cr.pivots.hipFore || cr.pivots.hip))
     : null;
   // a rolled-up form is separate geometry that only the roll uses
-  if(r === 'ball'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
+  if(r === 'ball' || r === 'strung'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
   const UPPER = ['head','beak','jaw','eye','deco','mouth','ear','neck','lid'];
   // arms swing from a shoulder joint buried in the chest, the same way legs
   // swing from a buried hip — a creature without one simply has no arms.
@@ -1248,7 +1397,7 @@ function baseAnim(cr, p, anim, f, nF){
 function genericSprint(cr, p, f, nF){
   const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
   const r = p.role, grounded = (r === 'leg' || r === 'foot' || r === 'paw');
-  if(r === 'ball'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
+  if(r === 'ball' || r === 'strung'){ sc.x = sc.y = sc.z = 0; return {d, sc, rots}; }
   const armed = (r === 'arm' || r === 'hand');
   const hip = grounded ? (p.grp === 'hind' ? cr.pivots.hipHind : (cr.pivots.hipFore || cr.pivots.hip)) : null;
   const t = f/nF, s = Math.sin((t + (p.phase||0))*Math.PI*2);
