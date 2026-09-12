@@ -433,9 +433,8 @@ const CREATURES = [
 }
 ,
 {
-  /* NAME PENDING — the tide starter is designed but not christened yet. */
-  id:'tide_starter', name:'Tide Starter', types:['tide'], plan:'Upright fish · standing river hunter',
-  blurb:'A river fish that learned to stand. Broad at the shoulder and narrow at the waist, it walks the shallows upright with its arms loose at its sides, gills working the whole time. The tail fan behind it is a rudder, not a leg.',
+  id:'brookfin', name:'Brookfin', types:['tide'], plan:'Upright fish · standing river hunter',
+  blurb:'A river fish that learned to stand. Slight and streamlined rather than strong, it wades the shallows upright with its arms loose at its sides and its gills working the whole time. The tail fan behind it is a rudder, not a leg.',
   outline:'#0c2233',
   colors:{ body:'#3282b4', back:'#1d5780', limb:'#24628d', dark:'#123c5c',
            belly:'#e2f2fa', fin:'#86d4f0',
@@ -450,35 +449,36 @@ const CREATURES = [
     /* ---- legs: thigh and shin stay body-coloured and overlap deep into the
            pelvis, so the leg reads as the torso narrowing rather than as a
            stick bolted on underneath ---- */
-    {n:'thighL',    shape:'ell', role:'leg',  phase:0,   pos:[-1.65,-4.60,0.10], size:[1.55,2.35,1.65], color:'body'},
-    {n:'thighR',    shape:'ell', role:'leg',  phase:0.5, pos:[ 1.65,-4.60,0.10], size:[1.55,2.35,1.65], color:'body'},
-    {n:'shinL',     shape:'ell', role:'leg',  phase:0,   pos:[-1.70,-2.20,0.25], size:[1.20,1.75,1.30], color:'body'},
-    {n:'shinR',     shape:'ell', role:'leg',  phase:0.5, pos:[ 1.70,-2.20,0.25], size:[1.20,1.75,1.30], color:'body'},
-    {n:'footL',     shape:'ell', role:'foot', phase:0,   pos:[-1.75,-0.50,1.40], size:[1.55,0.60,2.30], color:'fin'},
-    {n:'footR',     shape:'ell', role:'foot', phase:0.5, pos:[ 1.75,-0.50,1.40], size:[1.55,0.60,2.30], color:'fin'},
+    {n:'thighL',    shape:'ell', role:'leg',  phase:0,   pos:[-1.40,-4.60,0.10], size:[1.25,2.35,1.35], color:'body'},
+    {n:'thighR',    shape:'ell', role:'leg',  phase:0.5, pos:[ 1.40,-4.60,0.10], size:[1.25,2.35,1.35], color:'body'},
+    {n:'shinL',     shape:'ell', role:'leg',  phase:0,   pos:[-1.45,-2.20,0.25], size:[1.00,1.75,1.10], color:'body'},
+    {n:'shinR',     shape:'ell', role:'leg',  phase:0.5, pos:[ 1.45,-2.20,0.25], size:[1.00,1.75,1.10], color:'body'},
+    {n:'footL',     shape:'ell', role:'foot', phase:0,   pos:[-1.50,-0.50,1.40], size:[1.35,0.58,2.20], color:'fin'},
+    {n:'footR',     shape:'ell', role:'foot', phase:0.5, pos:[ 1.50,-0.50,1.40], size:[1.35,0.58,2.20], color:'fin'},
 
-    /* ---- torso: wide at the shoulder, narrow at the waist, flared at the hip ---- */
-    {n:'pelvis',    shape:'ell', role:'body', pos:[0,-6.50,0.10], size:[3.05,2.00,2.60], color:'body'},
-    {n:'waist',     shape:'ell', role:'body', pos:[0,-8.80,0.20], size:[2.55,2.10,2.40], color:'body'},
-    {n:'chest',     shape:'ell', role:'body', pos:[0,-11.00,0.10], size:[3.65,2.60,3.00], color:'body'},
-    {n:'belly',     shape:'ell', role:'body', pos:[0,-9.40,1.90], size:[1.70,2.45,1.70], color:'belly', hideIn:['back']},
+    /* ---- torso: a swimmer's build, not a brawler's. Narrow and even the
+           whole way down so the head stays the biggest thing on it. ---- */
+    {n:'pelvis',    shape:'ell', role:'body', pos:[0,-6.50,0.10], size:[2.55,2.00,2.35], color:'body'},
+    {n:'waist',     shape:'ell', role:'body', pos:[0,-8.80,0.20], size:[2.25,2.10,2.15], color:'body'},
+    {n:'chest',     shape:'ell', role:'body', pos:[0,-11.00,0.10], size:[2.95,2.70,2.70], color:'body'},
+    {n:'belly',     shape:'ell', role:'body', pos:[0,-9.40,1.55], size:[1.55,2.45,1.35], color:'belly', hideIn:['back']},
     /* countershaded like a real fish — dark over the back, pale underneath.
-       The yoke also gives the shoulders a hard top edge to read against. */
-    {n:'shoulderYoke',shape:'ell', role:'body', pos:[0,-12.40,-0.30], size:[3.45,1.40,2.80], color:'back'},
-    {n:'hipFinL',   shape:'ell', role:'body', pos:[-3.15,-6.30,-0.90], size:[0.90,1.25,1.35], color:'fin'},
-    {n:'hipFinR',   shape:'ell', role:'body', pos:[ 3.15,-6.30,-0.90], size:[0.90,1.25,1.35], color:'fin'},
+       The yoke is a shading band across the shoulders, not bulk on them. */
+    {n:'shoulderYoke',shape:'ell', role:'body', pos:[0,-12.30,-0.30], size:[2.65,1.20,2.45], color:'back'},
+    {n:'hipFinL',   shape:'ell', role:'body', pos:[-2.55,-6.30,-0.90], size:[0.80,1.15,1.30], color:'fin'},
+    {n:'hipFinR',   shape:'ell', role:'body', pos:[ 2.55,-6.30,-0.90], size:[0.80,1.15,1.30], color:'fin'},
     {n:'backFin',   shape:'ell', role:'body', pos:[0,-12.30,-3.10], size:[0.42,2.30,1.35], color:'fin'},
 
-    /* ---- arms: darker than the torso so the side view does not collapse into
-           one blob. Trailing blade on the forearm is the pectoral fin. ---- */
-    {n:'armUpL',    shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-3.75,-10.20,0.10], size:[1.25,2.20,1.35], color:'limb'},
-    {n:'armUpR',    shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 3.75,-10.20,0.10], size:[1.25,2.20,1.35], color:'limb'},
-    {n:'armLoL',    shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-4.05,-7.20,0.40], size:[1.10,2.00,1.20], color:'limb'},
-    {n:'armLoR',    shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 4.05,-7.20,0.40], size:[1.10,2.00,1.20], color:'limb'},
-    {n:'finArmL',   shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-5.10,-7.50,-0.60], size:[1.10,2.30,1.60], color:'fin'},
-    {n:'finArmR',   shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 5.10,-7.50,-0.60], size:[1.10,2.30,1.60], color:'fin'},
-    {n:'handL',     shape:'ell', role:'hand', side:-1, phase:0.5, pos:[-4.20,-4.90,0.70], size:[1.30,1.20,1.35], color:'limb'},
-    {n:'handR',     shape:'ell', role:'hand', side: 1, phase:0,   pos:[ 4.20,-4.90,0.70], size:[1.30,1.20,1.35], color:'limb'},
+    /* ---- arms: thin, darker than the torso so the side view does not collapse
+           into one blob. Trailing blade on the forearm is the pectoral fin. ---- */
+    {n:'armUpL',    shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-2.95,-10.20,0.10], size:[0.95,2.20,1.05], color:'limb'},
+    {n:'armUpR',    shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 2.95,-10.20,0.10], size:[0.95,2.20,1.05], color:'limb'},
+    {n:'armLoL',    shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-3.15,-7.20,0.40], size:[0.85,2.00,0.95], color:'limb'},
+    {n:'armLoR',    shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 3.15,-7.20,0.40], size:[0.85,2.00,0.95], color:'limb'},
+    {n:'finArmL',   shape:'ell', role:'arm',  side:-1, phase:0.5, pos:[-3.95,-7.50,-0.60], size:[0.85,2.30,1.55], color:'fin'},
+    {n:'finArmR',   shape:'ell', role:'arm',  side: 1, phase:0,   pos:[ 3.95,-7.50,-0.60], size:[0.85,2.30,1.55], color:'fin'},
+    {n:'handL',     shape:'ell', role:'hand', side:-1, phase:0.5, pos:[-3.25,-4.90,0.70], size:[1.00,1.10,1.10], color:'limb'},
+    {n:'handR',     shape:'ell', role:'hand', side: 1, phase:0,   pos:[ 3.25,-4.90,0.70], size:[1.00,1.10,1.10], color:'limb'},
 
     /* ---- head: sits straight on the shoulders, no neck ---- */
     {n:'head',      shape:'ell', role:'head', pos:[0,-14.40,0.30], size:[3.10,2.70,3.05], color:'body'},
