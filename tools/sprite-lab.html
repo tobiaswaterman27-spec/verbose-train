@@ -346,7 +346,10 @@ function gatherPose(cr, p, f, nF, dir){
   d.y += dip*1.7;
   rots.push({axis:'x', ang:-lean, pivot:P.body});
   if(r === 'leg' || r === 'foot' || r === 'paw'){
-    const hip = p.grp === 'hind' ? P.hipHind : (P.hipFore || P.hip);
+    // A limb that carries its own joint swings about THAT, not the body's
+    // single hip — eight legs rotated about one point at the centre throw
+    // themselves over the creature's back.
+    const hip = p.pivot || (p.grp === 'hind' ? P.hipHind : (P.hipFore || P.hip));
     if(hip) rots.push({axis:'x', ang:((p.phase||0) ? -1 : 1)*0.58*k, pivot:hip});
   }
   if(r === 'tail' && P.tail) rots.push({axis:'x', ang:-0.26*k, pivot:P.tail});
@@ -1275,22 +1278,22 @@ const CREATURES = [
     {n:'pedicel',    shape:'ell', role:'body', pos:[0,-7.40,-0.60], size:[1.00,1.00,1.30], color:'dark'},
     {n:'thorax',     shape:'ell', role:'body', pos:[0,-7.00,1.90], size:[3.00,2.40,3.95], color:'body'},
     {n:'carapace',   shape:'ell', role:'body', pos:[0,-8.60,2.00], size:[2.60,1.40,3.25], color:'dark'},
-    {n:'femurL1', shape:'ell', role:'leg', side:-1, phase:0.00, pivot:[-1.50,-8.40,5.00], pos:[ -3.90,-10.00,  5.15], size:[2.88,0.32,0.41], color:'leg', tilt:{axis:'z', ang:-2.554}},
-    {n:'tibiaL1', shape:'ell', role:'leg', side:-1, phase:0.00, pivot:[-1.50,-8.40,5.00], pos:[ -7.35, -5.90,  5.60], size:[5.80,0.27,0.56], color:'legDark', tilt:{axis:'z', ang:1.753}},
-    {n:'femurR1', shape:'ell', role:'leg', side:1, phase:0.00, pivot:[1.50,-8.40,5.00], pos:[  3.90,-10.00,  5.15], size:[2.88,0.32,0.41], color:'leg', tilt:{axis:'z', ang:-0.588}},
-    {n:'tibiaR1', shape:'ell', role:'leg', side:1, phase:0.00, pivot:[1.50,-8.40,5.00], pos:[  7.35, -5.90,  5.60], size:[5.80,0.27,0.56], color:'legDark', tilt:{axis:'z', ang:1.389}},
-    {n:'femurL2', shape:'ell', role:'leg', side:-1, phase:0.25, pivot:[-1.50,-8.40,3.00], pos:[ -4.20, -9.85,  3.05], size:[3.06,0.32,0.31], color:'leg', tilt:{axis:'z', ang:-2.649}},
-    {n:'tibiaL2', shape:'ell', role:'leg', side:-1, phase:0.25, pivot:[-1.50,-8.40,3.00], pos:[ -8.00, -5.75,  3.25], size:[5.66,0.27,0.41], color:'legDark', tilt:{axis:'z', ang:1.766}},
-    {n:'femurR2', shape:'ell', role:'leg', side:1, phase:0.25, pivot:[1.50,-8.40,3.00], pos:[  4.20, -9.85,  3.05], size:[3.06,0.32,0.31], color:'leg', tilt:{axis:'z', ang:-0.493}},
-    {n:'tibiaR2', shape:'ell', role:'leg', side:1, phase:0.25, pivot:[1.50,-8.40,3.00], pos:[  8.00, -5.75,  3.25], size:[5.66,0.27,0.41], color:'legDark', tilt:{axis:'z', ang:1.375}},
-    {n:'femurL3', shape:'ell', role:'leg', side:-1, phase:0.50, pivot:[-1.50,-8.40,0.90], pos:[ -4.20, -9.65,  0.80], size:[2.98,0.32,0.36], color:'leg', tilt:{axis:'z', ang:-2.708}},
-    {n:'tibiaL3', shape:'ell', role:'leg', side:-1, phase:0.50, pivot:[-1.50,-8.40,0.90], pos:[ -8.00, -5.55,  0.50], size:[5.46,0.27,0.46], color:'legDark', tilt:{axis:'z', ang:1.774}},
-    {n:'femurR3', shape:'ell', role:'leg', side:1, phase:0.50, pivot:[1.50,-8.40,0.90], pos:[  4.20, -9.65,  0.80], size:[2.98,0.32,0.36], color:'leg', tilt:{axis:'z', ang:-0.434}},
-    {n:'tibiaR3', shape:'ell', role:'leg', side:1, phase:0.50, pivot:[1.50,-8.40,0.90], pos:[  8.00, -5.55,  0.50], size:[5.46,0.27,0.46], color:'legDark', tilt:{axis:'z', ang:1.368}},
-    {n:'femurL4', shape:'ell', role:'leg', side:-1, phase:0.75, pivot:[-1.50,-8.40,-1.10], pos:[ -3.90, -9.40, -1.25], size:[2.60,0.32,0.41], color:'leg', tilt:{axis:'z', ang:-2.747}},
-    {n:'tibiaL4', shape:'ell', role:'leg', side:-1, phase:0.75, pivot:[-1.50,-8.40,-1.10], pos:[ -7.30, -5.30, -1.70], size:[5.20,0.27,0.56], color:'legDark', tilt:{axis:'z', ang:1.764}},
-    {n:'femurR4', shape:'ell', role:'leg', side:1, phase:0.75, pivot:[1.50,-8.40,-1.10], pos:[  3.90, -9.40, -1.25], size:[2.60,0.32,0.41], color:'leg', tilt:{axis:'z', ang:-0.395}},
-    {n:'tibiaR4', shape:'ell', role:'leg', side:1, phase:0.75, pivot:[1.50,-8.40,-1.10], pos:[  7.30, -5.30, -1.70], size:[5.20,0.27,0.56], color:'legDark', tilt:{axis:'z', ang:1.377}},
+    {n:'femurL1', shape:'ell', role:'leg', side:-1, phase:0.00, pivot:[-1.50,-8.40,5.00], pos:[ -3.90,-10.00,  5.15], size:[2.88,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-2.554}},
+    {n:'tibiaL1', shape:'ell', role:'leg', side:-1, phase:0.00, pivot:[-1.50,-8.40,5.00], pos:[ -7.35, -5.90,  5.49], size:[5.80,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.753}},
+    {n:'femurR1', shape:'ell', role:'leg', side:1, phase:0.00, pivot:[1.50,-8.40,5.00], pos:[  3.90,-10.00,  5.15], size:[2.88,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-0.588}},
+    {n:'tibiaR1', shape:'ell', role:'leg', side:1, phase:0.00, pivot:[1.50,-8.40,5.00], pos:[  7.35, -5.90,  5.49], size:[5.80,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.389}},
+    {n:'femurL2', shape:'ell', role:'leg', side:-1, phase:0.25, pivot:[-1.50,-8.40,3.00], pos:[ -4.20, -9.85,  3.15], size:[3.06,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-2.649}},
+    {n:'tibiaL2', shape:'ell', role:'leg', side:-1, phase:0.25, pivot:[-1.50,-8.40,3.00], pos:[ -8.00, -5.75,  3.50], size:[5.66,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.766}},
+    {n:'femurR2', shape:'ell', role:'leg', side:1, phase:0.25, pivot:[1.50,-8.40,3.00], pos:[  4.20, -9.85,  3.15], size:[3.06,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-0.493}},
+    {n:'tibiaR2', shape:'ell', role:'leg', side:1, phase:0.25, pivot:[1.50,-8.40,3.00], pos:[  8.00, -5.75,  3.50], size:[5.66,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.375}},
+    {n:'femurL3', shape:'ell', role:'leg', side:-1, phase:0.50, pivot:[-1.50,-8.40,0.90], pos:[ -4.20, -9.65,  0.75], size:[2.98,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-2.708}},
+    {n:'tibiaL3', shape:'ell', role:'leg', side:-1, phase:0.50, pivot:[-1.50,-8.40,0.90], pos:[ -8.00, -5.55,  0.41], size:[5.46,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.774}},
+    {n:'femurR3', shape:'ell', role:'leg', side:1, phase:0.50, pivot:[1.50,-8.40,0.90], pos:[  4.20, -9.65,  0.75], size:[2.98,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-0.434}},
+    {n:'tibiaR3', shape:'ell', role:'leg', side:1, phase:0.50, pivot:[1.50,-8.40,0.90], pos:[  8.00, -5.55,  0.41], size:[5.46,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.368}},
+    {n:'femurL4', shape:'ell', role:'leg', side:-1, phase:0.75, pivot:[-1.50,-8.40,-1.10], pos:[ -3.90, -9.40, -1.25], size:[2.60,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-2.747}},
+    {n:'tibiaL4', shape:'ell', role:'leg', side:-1, phase:0.75, pivot:[-1.50,-8.40,-1.10], pos:[ -7.30, -5.30, -1.60], size:[5.20,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.764}},
+    {n:'femurR4', shape:'ell', role:'leg', side:1, phase:0.75, pivot:[1.50,-8.40,-1.10], pos:[  3.90, -9.40, -1.25], size:[2.60,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-0.395}},
+    {n:'tibiaR4', shape:'ell', role:'leg', side:1, phase:0.75, pivot:[1.50,-8.40,-1.10], pos:[  7.30, -5.30, -1.60], size:[5.20,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.377}},
 
     /* pedipalps: the short pair up front it feels the world with */
     {n:'palpL',      shape:'ell', role:'jaw', pos:[-1.90,-5.40,5.40], size:[0.50,1.50,0.70], color:'leg', tilt:{axis:'z', ang:0.34}, hideIn:['back']},
@@ -1335,6 +1338,13 @@ const CREATURES = [
   },
   walk  (cr,p,f,nF){ return spiderStep(cr,p,f,nF,0.26,0.16,0.0); },
   sprint(cr,p,f,nF){ return spiderStep(cr,p,f,nF,0.40,0.26,0.9); },
+  /* The shared gather swings a limb on the fore/aft axis, which is right for
+     a leg that hangs down and wrong for one that splays sideways — on this
+     body it throws the knees straight up over the back. So this one gathers
+     with the same axes its own walk uses, ramping the stride up out of a
+     crouch instead. */
+  rouse (cr,p,f,nF){ return spiderStep(cr,p,f,4,0.26*[0,0.45,0.80,1][f], 0.16*[0,0.45,0.80,1][f], [1.7,0.9,0.3,0][f]); },
+  settle(cr,p,f,nF){ return spiderStep(cr,p,3-f,4,0.26*[0,0.45,0.80,1][3-f], 0.16*[0,0.45,0.80,1][3-f], [1.7,0.9,0.3,0][3-f]); },
   /* Rears back on the hind legs with the front pair up and the fangs out —
      a spider's threat and its strike are the same movement. */
   attack(cr, p, f, nF){
