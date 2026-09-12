@@ -116,358 +116,406 @@ td.mu{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--faint);
 
 footer{margin-top:58px; padding-top:20px; border-top:1px solid var(--rule); font-size:13px; color:var(--faint);}
 @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+
+/* systems */
+.sys{background:var(--paper); border:1px solid var(--line); padding:16px 18px; margin-bottom:12px;}
+.sys h3{font-size:17px; margin:0 0 6px;}
+.sys p{margin:0 0 10px; font-size:14.5px; color:var(--dim); max-width:none;} .sys p:last-child{margin:0}
+.fields{display:grid; grid-template-columns:repeat(auto-fill,minmax(228px,1fr)); gap:2px; background:var(--rule); border:1px solid var(--rule); margin:14px 0;}
+.fld{background:var(--paper); padding:10px 13px;}
+.fld b{font-family:Fraunces,serif; font-size:15px; font-weight:600; display:block;}
+.fld span{font-size:13px; color:var(--dim);}
+.pull{border-left:3px solid var(--accent); background:var(--sunk); padding:14px 18px; margin:14px 0; font-size:15px; color:var(--ink); max-width:64ch;}
+.rule-list{counter-reset:r; list-style:none; padding:0; margin:14px 0 0; display:grid; gap:2px; background:var(--rule); border:1px solid var(--rule);}
+.rule-list li{counter-increment:r; background:var(--paper); padding:11px 14px 11px 44px; position:relative; font-size:14.5px; color:var(--dim);}
+.rule-list li::before{content:counter(r); position:absolute; left:14px; top:11px; font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--accent);}
+.rule-list li b{color:var(--ink); font-weight:700;}
+/* built entries */
+.entry{background:var(--paper); border:1px solid var(--line); margin-bottom:12px;}
+.entry-head{display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line-soft); flex-wrap:wrap;}
+.entry-head .en{font-family:Fraunces,serif; font-weight:600; font-size:17px;}
+.entry-head .plan{font-size:13px; color:var(--faint); margin-left:auto;}
+.entry dl{margin:0; padding:12px 16px; display:grid; grid-template-columns:max-content 1fr; gap:6px 16px; font-size:14px;}
+.entry dt{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); padding-top:3px;}
+.entry dd{margin:0; color:var(--dim);}
+@media (max-width:560px){ .entry dl{grid-template-columns:1fr; gap:2px 0} .entry dd{margin-bottom:8px} }
+/* region list */
+.regions{display:grid; gap:2px; background:var(--rule); border:1px solid var(--rule);}
+.rgn{background:var(--paper); padding:11px 14px; display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;}
+.rgn .rn{font-family:Fraunces,serif; font-weight:600; font-size:15.5px; min-width:150px;}
+.rgn .rs{font-size:13.5px; color:var(--dim); flex:1; min-width:240px;}
+.rgn .rc{width:9px; height:9px; border-radius:2px; flex:0 0 9px;}
 </style>
 
 <div class="page">
 <header>
-  <div class="eyebrow">Wildhollow · design bible · draft one</div>
+  <div class="eyebrow">Wildhollow · design bible · draft two</div>
   <h1>The Wildhollow Register</h1>
-  <p class="lede">A valley, a school, ten elements and one hundred Kith. Everything the game needs
-  to be written down before it can be built.</p>
+  <p class="lede">A valley, a school, ten elements and one hundred Kith. Everything that has to be
+  decided before a single sprite is worth drawing.</p>
 </header>
 
 <section>
   <div class="sec-head"><span class="num">I</span><h2>Premise</h2></div>
   <div class="premise">
     <p class="kicker">Mutation is supposed to take a lifetime. In Wildhollow it has started taking a season.</p>
-    <p>The valley sits over ten <em class="term">Wellsprings</em> — places where a single element runs close enough to
-    the surface to touch. The creatures of the valley, called <em class="term">Kith</em>, change slowly and in step with
-    the Wellspring nearest where they were born. That rhythm has held for as long as anyone has kept records.</p>
-    <p>Three years ago it began to accelerate.</p>
+    <p>The valley sits over ten <em class="term">Wellsprings</em> — places where a single element runs close
+    enough to the surface to touch. The creatures of the valley, called <em class="term">Kith</em>, change
+    slowly and in step with the Wellspring nearest where they were born. That rhythm has held for as long as
+    anyone has kept records. Three years ago it began to accelerate.</p>
   </div>
-  <p>You arrive at <em class="term">Hollowbrook Academy</em> as a first-year <em class="term">Binder</em>, in a class of ten. Each of
-  you is entrusted with a Kith drawn from a different Wellspring line. The work is ordinary at first —
-  catalogue the valley, learn the ten elements, keep your Kith alive through winter.</p>
-  <p>Then your class finds the Verdant Wellspring drained to grey mud, and the things living around it
-  wearing shapes the register has no names for.</p>
+  <p>You arrive at Hollowbrook Academy as a first-year <em class="term">Binder</em>. You are given one Kith, a
+  blank register and a route. The work is ordinary at first: walk the valley, watch what lives in it, write
+  down what you see. Then your class reaches the Verdant Wellspring for a routine sample, finds it drained to
+  grey mud, and finds something living beside it wearing a shape the register has no name for.</p>
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">II</span><h2>The three acts</h2></div>
+  <div class="sec-head"><span class="num">II</span><h2>The spine</h2></div>
+  <div class="pull">Forced growth against growth in its own time.</div>
+  <p>Every system in the game is a version of that sentence. You cannot take a Kith, only be accepted by
+  one — and you can rush that, and rushing costs you. A Kith changes when it has done the thing it is for —
+  and there is a way to skip the doing, and it leaves the creature hollow. Headmaster Vosk found that way,
+  and he found it out of kindness.</p>
+  <p>The design consequence is not negotiable: <b>the player must be able to make Vosk's mistake themselves,
+  at the scale of one animal, in the first hour.</b> If the game has not let them force something and feel
+  what came back, the ending is a lecture.</p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">III</span><h2>The three acts</h2></div>
   <div class="acts">
     <div class="act">
       <div class="an">Act I — Enrolment</div>
-      <h3>Ten students, ten Wellsprings</h3>
-      <p>Choose your Kith and meet the nine classmates who take the others. Learn the element wheel through
-      field practicals in Thistlemoor and Duskwood — the tutorial is a syllabus, so teaching never has to
-      stop the story. The act closes on the drained Verdant Wellspring and the first unrecorded mutation.</p>
+      <h3>Three Kith, ten students, one blank book</h3>
+      <p>You choose one of three Kith and meet the nine classmates who carry the other lines. The tutorial is
+      a syllabus — field practicals in Thistlemoor and Duskwood teach the element wheel because your tutor is
+      teaching it, so instruction never has to stop the story. You learn to observe before you learn to
+      fight: the first binding in the game is done entirely by watching, and the second one the game quietly
+      lets you rush.</p>
+      <p><b>The turn.</b> The class walks to the Verdant Wellspring for a sample every first-year takes, and
+      finds grey mud and an animal with no entry.</p>
     </div>
     <div class="act">
       <div class="an">Act II — The Survey</div>
       <h3>One region per element, one arc per classmate</h3>
-      <p>The class is sent to survey all ten Wellsprings. Each is a region, a dungeon and a classmate's
-      story at once, so the roster and the cast advance on the same track. You learn the Wellsprings are not
-      failing — they are being <em class="term">tapped</em>. Ives Kalder vanishes for a week and returns with a Kith three
-      mutations ahead of schedule and no account of how.</p>
+      <p>The class is sent to survey all ten Wellsprings. Each is a region, a dungeon and a classmate's story
+      at once, so the roster, the map and the cast advance on a single track. Four things accumulate: the
+      Wellsprings are not failing but being tapped; whoever is tapping them has the Academy's permission;
+      Ives Kalder disappears for a week and returns with a Kith three mutations ahead of where it should be
+      and no account of how; and Ren Casimir, who has known for two years, starts leaving pages where you
+      will find them.</p>
+      <p><b>The turn.</b> You are offered the means to force a mutation yourself — plainly, without
+      framing, at the exact point in the act where you most want it.</p>
     </div>
     <div class="act">
       <div class="an">Act III — Forced Growth</div>
       <h3>The cost of not waiting</h3>
-      <p>Headmaster Vosk has been draining the Wellsprings to induce mutation on demand. He is not cruel —
-      he lost a Kith to a change that arrived too late to save it, and has spent twenty years making certain
-      no student of his ever waits again. The ending asks one question: reseal the Wellsprings and lose every
-      forced mutation in the valley, your classmates' Kith among them — or leave them open and accept a
-      valley that never stops changing.</p>
+      <p>Vosk does not hide and does not deny it. He lost a Kith to a change that arrived too late to save
+      it, and has spent twenty years making certain no student of his ever waits again. He is the best
+      teacher in the building. He is emptying the valley to keep a promise he made to a dead animal.</p>
+      <p><b>The ending is one question with no good answer.</b> Reseal the Wellsprings and every forced
+      mutation in the valley reverts to the form it honestly earned — your classmates lose years and get back
+      partners that can act on their own. Or leave them open, and the valley never stops accelerating:
+      nothing settles, nothing can be catalogued, and the register becomes a record of a world that has
+      already moved on.</p>
+      <p>You are a cataloguer. The game spends forty hours teaching you to love a knowable world, and then
+      asks whether you have the right to keep it one.</p>
     </div>
   </div>
-  <p class="small" style="margin-top:16px"><b>Theme.</b> Forced growth against growth in its own time.
-  Vosk is what happens when a teacher decides a student cannot afford to develop at their own pace — which
-  makes him wrong in a way the player can recognise from the inside, rather than a villain to be defeated.</p>
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">III</span><h2>The ten elements</h2></div>
-  <p class="small" style="margin-bottom:16px">Each element has a Wellspring, and each Wellspring is a region.
+  <div class="sec-head"><span class="num">IV</span><h2>The ten elements</h2></div>
+  <p class="small" style="margin:0 0 16px">Each element has a Wellspring, and each Wellspring is a region.
   The map is the type chart — learning where things live <em>is</em> learning what beats what.</p>
   <div class="el-strip" id="elStrip"></div>
+  <div style="margin-top:18px" id="chartWrap"></div>
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">IV</span><h2>Hollowbrook Academy</h2></div>
+  <div class="sec-head"><span class="num">V</span><h2>The valley</h2></div>
+  <p>Ten regions ring the valley in the order of the element wheel, so the two things a new Binder has to
+  learn — where things live, and what beats what — are the same lesson. Walk clockwise and you walk into
+  what your Kith is strong against. Counter-clockwise, into what it fears.</p>
+  <div class="regions" id="regions" style="margin-top:16px"></div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">VI</span><h2>Hollowbrook Academy</h2></div>
   <h3 style="margin-bottom:10px; font-size:14px; text-transform:uppercase; letter-spacing:.08em; color:var(--faint); font-family:'IBM Plex Mono',monospace; font-weight:500">Faculty</h3>
-  <div class="cast faculty" id="faculty" style="margin-bottom:26px"></div>
+  <div class="cast faculty" id="faculty" style="margin-bottom:22px"></div>
   <h3 style="margin-bottom:10px; font-size:14px; text-transform:uppercase; letter-spacing:.08em; color:var(--faint); font-family:'IBM Plex Mono',monospace; font-weight:500">The class of ten</h3>
-  <p class="small" style="margin:-4px 0 14px">You take one of these ten lines. Whichever you choose, that
-  classmate takes the next line over — so the cohort always covers all ten elements, and your pick changes
-  who your natural rival is.</p>
+  <p class="small" style="margin:0 0 12px">You take one of the three starter lines. The rest belong to the
+  cast — each classmate's Kith is built to be <em>theirs</em>, not a slot on a selection screen.</p>
   <div class="cast" id="classmates"></div>
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">V</span><h2>The starter lines</h2></div>
-  <p class="small" style="margin-bottom:18px">Ten lines, three forms each. <b>Starters and their mutations
-  hold a single element for all three forms</b> — it is what marks a Wellspring line apart from wild Kith,
-  who may carry two.</p>
-  <div id="lines"></div>
+  <div class="sec-head"><span class="num">VII</span><h2>Binding</h2></div>
+  <div class="pull">You cannot catch a Kith. You can only be accepted by one.</div>
+  <div class="sys">
+    <h3>The entry is the mechanic</h3>
+    <p>Every Kith in the valley has a register entry and every entry starts blank. Binding is finishing the
+    entry. What you write in it — and how you came to know it — is the whole system.</p>
+  </div>
+  <div class="fields" id="fields"></div>
+  <div class="sys">
+    <h3>Watched or pressed</h3>
+    <p>Every observation is recorded one of two ways. You can learn a Flinch by leaving a Kith near a cold
+    spring and watching it move away, or by hitting it with Frost until it flinches. Both fill the field.
+    The entry records which.</p>
+    <p><b>The offer.</b> With the entry full you may offer. The Kith weighs the page. Mostly watched and it
+    comes with you. Mostly pressed and it refuses — and the next offer needs a cleaner page than the last.</p>
+  </div>
+  <div class="sys">
+    <h3>Pressing is faster, and that is the point</h3>
+    <p>A Binder in a hurry can fill an entry inside a single encounter. The game will let them. The Kith will
+    not come. This is the first hour's lesson and the last hour's question, and it has to arrive in that
+    order: force something small, lose it, and only then be shown a man who did the same thing to a valley.</p>
+  </div>
 </section>
 
 <section>
-  <div class="sec-head"><span class="num">VI</span><h2>The register</h2></div>
-  <div class="stats" id="stats"></div>
-  <div class="tools">
-    <input type="search" id="q" placeholder="Search the register…" aria-label="Search creatures">
-    <div class="filt" id="elFilt"></div>
-    <div class="filt" id="muFilt"></div>
-    <span class="count" id="count"></span>
+  <div class="sec-head"><span class="num">VIII</span><h2>Mutation</h2></div>
+  <div class="sys">
+    <h3>The Rite</h3>
+    <p>A Kith does not change at a number. Every line carries a <em class="term">Rite</em> — a condition of
+    use rather than a level, and always something the creature already does. Sporelet's caps have to be shed
+    and regrown. Cindercrow has to come off a thermal it should never have caught. A Binder who plays with a
+    Kith honestly will meet its Rite without being told; one who reads it in a book still has to go and do
+    it.</p>
   </div>
-  <div class="tbl-wrap">
-    <table class="reg">
-      <thead><tr><th>№</th><th>Name</th><th>Elements</th><th>Region</th><th>Mutation</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <div class="empty" id="empty" hidden>Nothing in the register matches that.</div>
+  <div class="sys">
+    <h3>Branching</h3>
+    <p>Most lines fork at the second form on <em>how</em> the Rite was met — early and hard down one path,
+    late and careful down another. The same starter, played by two people, finishes the game as two
+    different creatures.</p>
+  </div>
+  <div class="sys">
+    <h3>Forcing</h3>
+    <p>Wellspring water taken directly mutates a Kith in an afternoon. It works. The creature gets the form,
+    the size and the numbers. What it does not get is whatever would have come from the doing — so a forced
+    Kith never acts on its own initiative, and it <em class="term">stalls</em>: now and then it loses a
+    moment, standing in a body it has not grown into.</p>
+    <p>Forced Kith are stronger on paper and worse to have. That is not a punishment. It is the argument.</p>
   </div>
 </section>
 
+<section>
+  <div class="sec-head"><span class="num">IX</span><h2>Battle</h2></div>
+  <div class="sys">
+    <h3>Resolve, not health</h3>
+    <p>A battle is not fought to unconsciousness. It is a contest of <em class="term">Resolve</em> — how long
+    a creature is willing to keep going. At zero a Kith breaks off. Yours comes back to you; a wild one
+    leaves, and takes its unfinished entry with it.</p>
+    <p>Winning quickly is therefore often the wrong move. The encounter is where most observation happens,
+    and a Kith you flatten in two turns is a page you did not finish.</p>
+  </div>
+  <div class="sys">
+    <h3>Stance</h3>
+    <p>Each turn you set a stance before choosing an action. <b>Press</b> hits harder and drops their Resolve
+    faster, ending the encounter sooner than you may want. <b>Hold</b> gives ground, takes less, and keeps
+    them in front of you. <b>Read</b> does not attack at all: it reveals their Tell and fills one field as
+    watched.</p>
+    <p>Read is how the game is actually played, and it costs a turn every single time.</p>
+  </div>
+  <div class="sys">
+    <h3>Initiative is the only thing Trust does</h3>
+    <p>A Kith you have had a long time will occasionally act before you have told it to, and be right —
+    sidestepping something it has seen before, moving on a Tell it read faster than you did. That is Trust.
+    It is not a damage bonus. Your partner starts making decisions.</p>
+    <p>Forced Kith never do this. They wait to be told, every time, for the rest of the game.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">X</span><h2>The hundred</h2></div>
+  <div class="stats" id="stats"></div>
+  <div class="sys">
+    <h3>Three starters, not ten</h3>
+    <p>An earlier draft offered all ten lines to the player. Three is the better number — a choice you can
+    hold in your head — and it frees the other seven to belong to somebody. Ives Kalder's Umbra line can be
+    built to be <em>Ives's</em>: a creature with a person attached, rather than a slot on a menu.</p>
+  </div>
+  <div class="sys">
+    <h3>The standard</h3>
+    <p>The first attempt at this roster produced eight creatures in an afternoon and seven were thrown away.
+    They failed for the same three reasons every time: the body plan was one already on the roster, the
+    element showed up as a colour instead of as a shape, and there was no answer to what the animal did when
+    nobody was looking.</p>
+    <p>Nothing enters the register until all six of these are written down — in words, before any geometry
+    is placed.</p>
+    <ol class="rule-list">
+      <li><b>A body plan no other Kith uses.</b> Not a variation. A different animal.</li>
+      <li><b>A living.</b> What it eats, where it sleeps, what it is afraid of.</li>
+      <li><b>Its element in its shape.</b> Colour is the last five per cent, never the first.</li>
+      <li><b>Three observations a Binder could actually make.</b> If you cannot say what watching it would
+      teach you, it is not finished — and it cannot be bound, because binding runs on exactly this.</li>
+      <li><b>A Rite that is the thing it already does.</b> Not a level, not an item.</li>
+      <li><b>One fact with no gameplay purpose whatsoever.</b></li>
+    </ol>
+    <p style="margin-top:12px"><b>And one rule about process: one at a time.</b> The seven that were cut were
+    designed in a batch, and a batch converges — the second borrows from the first, and the eighth is a
+    recolour of the third.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">XI</span><h2>Built so far</h2></div>
+  <p class="small" style="margin:0 0 16px">Three of one hundred. Sprite models exist and validate in all four
+  views. Entries written to the standard above, as the worked example of it.</p>
+  <div id="built"></div>
+</section>
+
 <footer>
-  One hundred Kith: thirty across ten starter lines, seventy wild. Names, elements, regions and mutation
-  lines are original to this project. Sprite models exist for Sporelet and Cindercrow; the remaining
-  ninety-eight are specified here and not yet built.
+  <p style="margin:0">Wildhollow · draft two · names, elements, regions, systems and cast are original to
+  this project. Ninety-seven entries remain, and will be written one at a time.</p>
 </footer>
 </div>
 
 <script>
 "use strict";
-
 const EL = {
-  verdant:{n:'Verdant', c:'#5d8a3c', region:'Thistlemoor',      gloss:'root, leaf and patient growth'},
-  ember  :{n:'Ember',   c:'#c2552b', region:'Emberreach',       gloss:'flame, ash and rising heat'},
-  tide   :{n:'Tide',    c:'#2f7fae', region:'The Sluice',       gloss:'current, rain and undertow'},
-  stone  :{n:'Stone',   c:'#8a7355', region:'Cairnfell',        gloss:'rock, soil and sheer weight'},
-  gale   :{n:'Gale',    c:'#5f8799', region:'The Aerie Steps',  gloss:'wind, altitude and open sky'},
-  spark  :{n:'Spark',   c:'#b8891f', region:'The Gantry',       gloss:'charge, arc and static'},
-  frost  :{n:'Frost',   c:'#5f9bba', region:'Rimehollow',       gloss:'ice, stillness and deep cold'},
-  venom  :{n:'Venom',   c:'#7d5a9e', region:'Mycelia Deep',     gloss:'spore, rot and slow toxin'},
-  umbra  :{n:'Umbra',   c:'#514a61', region:'Duskwood',         gloss:'shadow and everything unlit'},
-  lumen  :{n:'Lumen',   c:'#a08a2c', region:'The Lantern Field',gloss:'dawn, clarity and revelation'},
+  verdant:{n:'Verdant', c:'#5d8a3c', region:'Thistlemoor',      gloss:'root, leaf and patient growth',
+    sense:'Waist-high thistle and standing water. The Academy’s teaching ground, mapped to death, and it still surprises people.'},
+  ember  :{n:'Ember',   c:'#c2552b', region:'Emberreach',       gloss:'flame, ash and rising heat',
+    sense:'A slope of warm ash that has not cooled in living memory. Nothing grows on it. Everything visits.'},
+  tide   :{n:'Tide',    c:'#2f7fae', region:'The Sluice',       gloss:'current, rain and undertow',
+    sense:'A river forced through stone channels by people who are no longer here and left no account of why.'},
+  stone  :{n:'Stone',   c:'#8a7355', region:'Cairnfell',        gloss:'rock, soil and sheer weight',
+    sense:'Scree and cairns, and more of the cairns were raised by Kith than by hands.'},
+  gale   :{n:'Gale',    c:'#5f8799', region:'The Aerie Steps',  gloss:'wind, altitude and open sky',
+    sense:'A stair of ledges up the valley’s north wall. Climbed in a single day by nobody, twice.'},
+  spark  :{n:'Spark',   c:'#b8891f', region:'The Gantry',       gloss:'charge, arc and static',
+    sense:'A dead lightning-works. Copper, rust, and a standing charge the Academy still cannot account for.'},
+  frost  :{n:'Frost',   c:'#5f9bba', region:'Rimehollow',       gloss:'ice, stillness and deep cold',
+    sense:'A bowl that does not thaw. The only Wellspring you can see the bottom of, which is why it was measured first.'},
+  venom  :{n:'Venom',   c:'#7d5a9e', region:'Mycelia Deep',     gloss:'spore, rot and slow toxin',
+    sense:'Underneath the others. Less a region than the space between them, and it connects places that should not connect.'},
+  umbra  :{n:'Umbra',   c:'#514a61', region:'Duskwood',         gloss:'shadow and everything unlit',
+    sense:'Old growth so dense the floor has never been lit. Teaching ground number two, for the opposite lesson.'},
+  lumen  :{n:'Lumen',   c:'#a08a2c', region:'The Lantern Field',gloss:'dawn, clarity and revelation',
+    sense:'Flat, open, east-facing. First light reaches it before anywhere else in the valley, and things gather to be there when it does.'},
 };
 const EK = Object.keys(EL);
+const STRONG = {
+  verdant:['tide','stone'],   ember:['verdant','frost','venom'], tide:['ember','stone'],
+  stone:['ember','spark','frost'], gale:['verdant','venom'],     spark:['tide','gale'],
+  frost:['verdant','gale'],   venom:['verdant','lumen'],         umbra:['lumen','spark'],
+  lumen:['umbra','venom'],
+};
 
 const FACULTY = [
   ['Aurelian Vosk','Headmaster · Bond Theory','Warm, generous and genuinely the best teacher any of them will have. He is also draining the Wellsprings. He lost a Kith to a mutation that came too late and has spent twenty years making sure no student of his ever waits again.','ember'],
   ['Marda Thistlewait','Field Studies','Blunt, unimpressed, faintly contemptuous of theory. Takes the class into weather nobody should be out in. The only member of staff who teaches you anything you actually use.','stone'],
   ['Bix Orrery','Groundskeeper','Knows every Kith in the valley by sight, gait and smell, and not one word of the taxonomy. Has been on the grounds longer than the Headmaster and notices more.','verdant'],
-  ['Ren Casimir','Bond Theory, junior','Young, anxious, Vosk\'s former student and his first success. Knows exactly what is happening and has spent two years deciding whether to say so.','lumen'],
+  ['Ren Casimir','Bond Theory, junior','Young, anxious, Vosk’s former student and his first success. Knows exactly what is happening and has spent two years deciding whether to say so.','lumen'],
 ];
 
 const CLASS = [
-  ['Odile Fen','verdant','Sporelet','Four hundred pages of field notes and counting. Slow to speak, impossible to surprise, and the first to spot that the Verdant record no longer matches the valley.'],
-  ['Bram Kettle','ember','Cindercrow','Loud, generous, cannot lose gracefully and never pretends otherwise. First to put himself between a classmate and something with teeth.'],
-  ['Nerissa Quill','tide','Brookfin','Competitive swimmer, coldly precise, warms to people roughly twenty hours after they have given up on her.'],
-  ['Tobin Ward','stone','—','Built like a door. Slow to trust and has never once broken a promise, including the ones he should not have made.'],
-  ['Sable Aery','gale','—','Brilliant, permanently late, has read everything in the library and will admit to none of it.'],
-  ['Pico Vance','spark','—','Builds things that explode, then iterates. Talks at roughly twice the speed of comprehension and is usually right.'],
-  ['Wren Holloway','frost','—','Quiet and exact. The one who notices you are struggling a full week before you do.'],
-  ['Cassius Mor','venom','—','Sardonic and unexpectedly principled — the class conscience. Asks the question everyone else has decided not to.'],
-  ['Ives Kalder','umbra','—','Your rival. Talented, overlooked at home, and wants this more than is good for him. Vosk\'s favourite, which is the worst thing that ever happened to him.'],
-  ['Juno Petrel','lumen','—','Prefect, earnest to a fault, believes in the Academy completely — right up until the evening she cannot any more.'],
+  ['Odile Fen','verdant','Sporelet','Four hundred pages of field notes and counting. Slow to speak, impossible to surprise, and the first to spot that the Verdant record no longer matches the valley.',true],
+  ['Bram Kettle','ember','Cindercrow','Loud, generous, cannot lose gracefully and never pretends otherwise. First to put himself between a classmate and something with teeth.',true],
+  ['Nerissa Quill','tide','Brookfin','Competitive swimmer, coldly precise, warms to people roughly twenty hours after they have given up on her.',true],
+  ['Tobin Ward','stone','—','Built like a door. Slow to trust and has never once broken a promise, including the ones he should not have made.',false],
+  ['Sable Aery','gale','—','Brilliant, permanently late, has read everything in the library and will admit to none of it.',false],
+  ['Pico Vance','spark','—','Builds things that explode, then iterates. Talks at roughly twice the speed of comprehension and is usually right.',false],
+  ['Wren Holloway','frost','—','Quiet and exact. The one who notices you are struggling a full week before you do.',false],
+  ['Cassius Mor','venom','—','Sardonic and unexpectedly principled — the class conscience. Asks the question everyone else has decided not to.',false],
+  ['Ives Kalder','umbra','—','Your rival. Talented, overlooked at home, and wants this more than is good for him. Vosk’s favourite, which is the worst thing that ever happened to him.',false],
+  ['Juno Petrel','lumen','—','Prefect, earnest to a fault, believes in the Academy completely — right up until the evening she cannot any more.',false],
 ];
 
-// ten lines × three forms. Starters hold ONE element across all forms.
-const LINES = [
-  ['verdant','Quadruped · mycelial symbiont',[
-    ['Sporelet','Two caps ride its spine. It sheds and regrows them each season and sulks for a week afterward.'],
-    ['Shroudpaw','The caps have spread into a low canopy. It shelters smaller Kith underneath and charges rent in insects.'],
-    ['Mycelith','A walking grove. The mycelium under a mature Mycelith can cover a whole meadow, and it is no longer clear which of the two is the animal.']]],
-  ['ember','Winged biped · thermal scavenger',[
-    ['Cindercrow','Nests in cooling ash and rides the updraft off burnt ground. Its crest brightens as it warms.'],
-    ['Pyrenn','Feathers crust over into cooling lava crust that flakes when it stoops. Hunts by starting small fires and waiting.'],
-    ['Ashmonarch','Carries its own weather. The crown is a standing thermal, and everything that flies in the valley gives it the ridge.']]],
-  ['tide','Serpentine swimmer',[
-    ['Brookfin','A river fish that learned to stand. Slight and streamlined rather than strong, it wades the shallows upright with its gills working the whole time.'],
-    ['Sluicefin','Learns the shape of a watercourse by heart and will not be baited out of it.'],
-    ['Maelstride','Walks upright in a standing column of its own water. Where it comes ashore, the river follows for a while.']]],
-  ['stone','Accretive golem',[
-    ['—','First form not yet designed.'],
-    ['Cairnox','Stacked like a trail marker and just as deliberate. Rearranges itself to fit through gaps, slowly, with dignity.'],
-    ['Bastilith','A moving piece of the ridge. Sleeps for decades and is routinely mapped as terrain.']]],
-  ['gale','Seed-borne flier',[
-    ['—','First form not yet designed.'],
-    ['Skirlwing','Rides thermals in a thin whistling note you can hear a valley away.'],
-    ['Zephyrant','Flies so high it is only visible as weather. Comes down once a year, for reasons nobody at the Academy has established.']]],
-  ['spark','Arachnid conductor',[
-    ['—','First form not yet designed.'],
-    ['Arcnid','Spins conductive line between rocks and reads the valley through the vibration in it.'],
-    ['Voltarch','Its web spans a gorge and stores a season of charge. The Gantry was built around one and eventually for one.']]],
-  ['frost','Cervine forager',[
-    ['—','First form not yet designed.'],
-    ['Rimehart','Grows antlers of clear ice that ring when struck and regrow every thaw.'],
-    ['Glacierne','Its antlers hold a permanent hoarfrost. Where a herd winters, the hollow does not thaw until they leave.']]],
-  ['venom','Amphibian · toxin-brewer',[
-    ['—','First form not yet designed.'],
-    ['Venomire','Brews a different toxin for every prey animal it has met and remembers all of them.'],
-    ['Pestilarch','Carries an ecosystem in its hide — spores, mites and three things with no name. Nothing that bites one bites a second.']]],
-  ['umbra','Vulpine ambusher',[
-    ['—','First form not yet designed.'],
-    ['Nightmaw','Steps out of one shadow and into another with the intervening distance left out.'],
-    ['Eclipsarch','Puts out light in a radius it chooses. Hunting Eclipsarchs is done by lantern, in pairs, or not at all.']]],
-  ['lumen','Felid · radiant',[
-    ['—','First form not yet designed.'],
-    ['Halolynx','Wears a ring of steady light. Follows lost travellers at a distance until they are found, then leaves.'],
-    ['Solarch','Holds a fragment of the first sunrise the valley ever saw. Looking at it directly is discouraged in the syllabus.']]],
+const FIELDS = [
+  ['Diet','What it will take from your hand, and what it spits out.'],
+  ['Ground','Where it sleeps. Found by following it at dusk and not being noticed.'],
+  ['Flinch','The one element it will not stand.'],
+  ['Tell','What it does in the half-second before it acts.'],
+  ['Want','What it comes toward when nobody is watching.'],
+  ['Kin','What it tolerates, and what it will not share a clearing with.'],
 ];
 
-// seventy wild Kith, grouped into mutation lines. [names…], types, region
-const WILD = [
-  [['Nibbleaf','Thornhare'],[['verdant'],['verdant','stone']],'Thistlemoor'],
-  [['Pollenox','Bloomhorn'],[['verdant','gale'],['verdant','gale']],'The Aerie Steps'],
-  [['Crickadence','Chirrowind'],[['gale'],['gale','spark']],'The Aerie Steps'],
-  [['Meadowisp'],[['lumen']],'The Lantern Field'],
-
-  [['Mossback','Lichenlord'],[['verdant','stone'],['verdant','stone']],'Duskwood'],
-  [['Owlumen','Strigine'],[['lumen','gale'],['lumen','gale']],'The Lantern Field'],
-  [['Rootrat','Snarlgnaw'],[['verdant','umbra'],['verdant','umbra']],'Duskwood'],
-  [['Gloamoth','Duskwing'],[['umbra'],['umbra','gale']],'Duskwood'],
-  [['Hollowstag'],[['verdant','umbra']],'Duskwood'],
-
-  [['Pebbleshell','Curranshell','Bastionback'],[['tide','stone'],['tide','stone'],['tide','stone']],'The Sluice'],
-  [['Nixiefin','Naiadra'],[['tide'],['tide','lumen']],'The Sluice'],
-  [['Croakling','Bullmire'],[['tide','venom'],['tide','venom']],'The Sluice'],
-  [['Silthe','Deepcoil'],[['tide','umbra'],['tide','umbra']],'The Sluice'],
-  [['Reedwhisk'],[['tide','verdant']],'The Sluice'],
-
-  [['Screeling','Talusaur'],[['stone'],['stone']],'Cairnfell'],
-  [['Ironbeak','Ferrowing'],[['stone','spark'],['stone','spark']],'Cairnfell'],
-  [['Boulderhide','Monolithe'],[['stone'],['stone']],'Cairnfell'],
-  [['Geodelle','Prismatl'],[['stone','lumen'],['stone','lumen']],'Cairnfell'],
-  [['Flintfang'],[['stone','ember']],'Cairnfell'],
-
-  [['Cinderslug','Magmoil'],[['ember'],['ember','stone']],'Emberreach'],
-  [['Scorchtail','Blazewyrm','Infernix'],[['ember'],['ember'],['ember','umbra']],'Emberreach'],
-  [['Emberkit','Pyrelynx'],[['ember'],['ember']],'Emberreach'],
-  [['Ashlet'],[['ember','gale']],'Emberreach'],
-  [['Sulfurn'],[['ember','venom']],'Emberreach'],
-
-  [['Snowpip','Drifthare'],[['frost'],['frost']],'Rimehollow'],
-  [['Iciclaw','Glacierus'],[['frost'],['frost','gale']],'Rimehollow'],
-  [['Chillfin','Floefang'],[['frost','tide'],['frost','tide']],'Rimehollow'],
-  [['Frostmoth'],[['frost','gale']],'Rimehollow'],
-  [['Hoarhound'],[['frost','umbra']],'Rimehollow'],
-
-  [['Sparkmite','Voltgrub','Dynamoth'],[['spark'],['spark'],['spark','gale']],'The Gantry'],
-  [['Rustcog','Gearmaw'],[['spark','stone'],['spark','stone']],'The Gantry'],
-  [['Coilsnake','Teslash'],[['spark','venom'],['spark','venom']],'The Gantry'],
-  [['Wirewisp'],[['spark','umbra']],'The Gantry'],
-
-  [['Miasmaw','Plaguewyrm','Pandemior'],[['venom','umbra'],['venom','umbra'],['venom','umbra']],'Mycelia Deep'],
-  [['Caplet','Fungore'],[['verdant','venom'],['verdant','venom']],'Mycelia Deep'],
-  [['Grubbler','Rotmaw'],[['venom'],['venom','umbra']],'Mycelia Deep'],
-  [['Blindmole','Delvern'],[['umbra','stone'],['umbra','stone']],'Mycelia Deep'],
-  [['Glowspore'],[['lumen','venom']],'Mycelia Deep'],
+/* Three entries, written to the standard in section X. */
+const BUILT = [
+  {name:'Sporelet', el:'verdant', plan:'Quadruped · mycelial symbiont',
+   living:'Eats rotting wood, and its own shed caps. Sleeps pressed against something larger than itself. Will not cross open ground if there is a longer way round.',
+   shape:'The caps are structural, not decoration — they grow where its spine should show, and it is lower on that side for a week after shedding.',
+   obs:'<b>Diet</b> — takes rot, refuses anything fresh. <b>Ground</b> — under deadfall, never in the open. <b>Want</b> — moves toward slow water it cannot see.',
+   rite:'Sheds and regrows its caps. Mutates on the third regrowth, whenever that falls.',
+   idle:'Sulks for a week after shedding and will not be looked at.'},
+  {name:'Cindercrow', el:'ember', plan:'Winged biped · thermal scavenger',
+   living:'Eats what the fire left. Sleeps in cooling ash, as near to still-warm as it can stand. Afraid of rain, and unreasonable about it.',
+   shape:'Built to ride heat rather than make it. The wings are too large for the body, which is the whole animal in one proportion.',
+   obs:'<b>Ground</b> — cooling ash, and it will test the temperature with one foot first. <b>Flinch</b> — Tide. <b>Tell</b> — drops its crest a half-second before it moves.',
+   rite:'Must catch a thermal that lifts it past the point it can get back down from. Mutates on landing.',
+   idle:'Collects nothing, but will carry one object for weeks and then abandon it somewhere arbitrary.'},
+  {name:'Brookfin', el:'tide', plan:'Upright fish · standing river hunter',
+   living:'Eats what the current brings. Sleeps wedged under a bank where the water still moves. Distrusts still water and will not enter it.',
+   shape:'Side-set eyes, gills working on land, countershaded dark over pale — the build of something used to being looked at from above and below at once.',
+   obs:'<b>Ground</b> — under a moving bank. <b>Kin</b> — will not share a pool with another Brookfin. <b>Want</b> — comes toward running water it can only hear.',
+   rite:'Must hold position in a current strong enough to move it. Mutates when it holds through a flood.',
+   idle:'Stands up to look at things it has already identified.'},
 ];
 
-/* ---------- build the flat register ---------- */
-const REG = [];
-let n = 0;
-LINES.forEach(([el, plan, forms]) => {
-  forms.forEach(([name, desc], i) => {
-    REG.push({no:++n, name, types:[el], region:EL[el].region, stage:i+1, of:3, starter:true, desc});
-  });
-});
-WILD.forEach(([names, types, region]) => {
-  names.forEach((name, i) => {
-    REG.push({no:++n, name, types:types[i], region, stage:i+1, of:names.length, starter:false});
-  });
-});
+/* ---------- render ---------- */
+const $ = id => document.getElementById(id);
 
-/* ---------- render static sections ---------- */
-document.getElementById('elStrip').innerHTML = EK.map(k => `
+$('elStrip').innerHTML = EK.map(k => `
   <div class="el-cell">
     <div class="en"><span class="dot" style="background:${EL[k].c}"></span>${EL[k].n}</div>
     <div class="reg">${EL[k].region}</div>
     <div class="small" style="font-size:12.5px; margin-top:3px">${EL[k].gloss}</div>
   </div>`).join('');
 
-document.getElementById('faculty').innerHTML = FACULTY.map(([nm,role,bio,el]) => `
+$('chartWrap').innerHTML = `<div class="tbl-wrap"><table class="reg"><thead><tr>
+  <th>Attacker</th>${EK.map(k=>`<th style="text-align:center">${EL[k].n.slice(0,3)}</th>`).join('')}
+  </tr></thead><tbody>${EK.map(a=>`<tr><td class="nm">${EL[a].n}</td>${EK.map(d=>{
+    const s = STRONG[a].includes(d), w = STRONG[d].includes(a);
+    const t = s ? '2×' : w ? '½' : '·';
+    const c = s ? 'var(--accent)' : w ? 'var(--faint)' : 'var(--line)';
+    return `<td style="text-align:center; color:${c}; font-family:'IBM Plex Mono',monospace; font-size:11.5px">${t}</td>`;
+  }).join('')}</tr>`).join('')}</tbody></table></div>`;
+
+$('regions').innerHTML = EK.map(k => `
+  <div class="rgn"><span class="rc" style="background:${EL[k].c}"></span>
+    <span class="rn">${EL[k].region}</span><span class="rs">${EL[k].sense}</span></div>`).join('');
+
+$('faculty').innerHTML = FACULTY.map(([nm,role,bio,el]) => `
   <div class="person"><div class="sig" style="background:${EL[el].c}"></div>
     <div><div class="nm">${nm}</div><div class="role">${role}</div><p>${bio}</p></div>
   </div>`).join('');
 
-document.getElementById('classmates').innerHTML = CLASS.map(([nm,el,kith,bio]) => `
+$('classmates').innerHTML = CLASS.map(([nm,el,kith,bio,done]) => `
   <div class="person"><div class="sig" style="background:${EL[el].c}"></div>
     <div><div class="nm">${nm}</div>
-      <div class="role"><span style="color:${EL[el].c}">${EL[el].n}</span> · ${kith}</div>
+      <div class="role"><span style="color:${EL[el].c}">${EL[el].n}</span> · ${done ? kith : 'Kith not yet designed'}</div>
       <p>${bio}</p></div>
   </div>`).join('');
 
-document.getElementById('lines').innerHTML = LINES.map(([el, plan, forms]) => `
-  <div class="line">
-    <div class="line-head">
-      <span class="el-chip" style="background:${EL[el].c}">${EL[el].n}</span>
-      <span class="small" style="color:var(--dim)">${EL[el].region}</span>
-      <span class="plan">${plan}</span>
+$('fields').innerHTML = FIELDS.map(([n,d]) =>
+  `<div class="fld"><b>${n}</b><span>${d}</span></div>`).join('');
+
+$('stats').innerHTML = [
+  ['9','starter forms · 3 lines'],
+  ['21','classmate forms · 7 lines'],
+  ['70','wild Kith'],
+  ['100','total'],
+  ['3','written and built'],
+].map(([b,s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+
+$('built').innerHTML = BUILT.map(k => `
+  <div class="entry">
+    <div class="entry-head">
+      <span class="el-chip" style="background:${EL[k.el].c}">${EL[k.el].n}</span>
+      <span class="en">${k.name}</span>
+      <span class="plan">${k.plan}</span>
     </div>
-    <div class="forms">
-      ${forms.map(([nm,desc],i) => `
-        <div class="form">
-          <div class="meta">Form ${i+1}</div>
-          <div class="fn">${nm}</div>
-          <p>${desc}</p>
-        </div>${i < 2 ? '<div class="arrow">→</div>' : ''}`).join('')}
-    </div>
+    <dl>
+      <dt>Living</dt><dd>${k.living}</dd>
+      <dt>Element</dt><dd>${k.shape}</dd>
+      <dt>Observations</dt><dd>${k.obs}</dd>
+      <dt>Rite</dt><dd>${k.rite}</dd>
+      <dt>No purpose</dt><dd>${k.idle}</dd>
+    </dl>
   </div>`).join('');
-
-/* ---------- register: stats, filters, table ---------- */
-const lineCount = LINES.length + WILD.length;
-const soloCount = WILD.filter(w => w[0].length === 1).length;
-document.getElementById('stats').innerHTML = [
-  [REG.length,'Kith total'], [30,'starter forms'], [70,'wild Kith'],
-  [lineCount,'mutation lines'], [soloCount,'never mutate'], [10,'elements'], [10,'regions'],
-].map(([v,l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
-
-let fEl = null, fMu = null, fQ = '';
-
-document.getElementById('elFilt').innerHTML =
-  `<button data-el="" aria-pressed="true">All</button>` +
-  EK.map(k => `<button class="el" data-el="${k}" aria-pressed="false">${EL[k].n}</button>`).join('');
-document.getElementById('muFilt').innerHTML =
-  [['','Any'],['starter','Starters'],['wild','Wild'],['mutates','Mutates'],['solo','No mutation']]
-  .map(([v,l],i) => `<button data-mu="${v}" aria-pressed="${i===0}">${l}</button>`).join('');
-
-function paint(){
-  document.querySelectorAll('#elFilt button').forEach(b => {
-    const on = (b.dataset.el || null) === fEl;
-    b.setAttribute('aria-pressed', String(on));
-    b.style.background = on && b.dataset.el ? EL[b.dataset.el].c : '';
-    b.style.borderColor = on && b.dataset.el ? EL[b.dataset.el].c : '';
-  });
-  document.querySelectorAll('#muFilt button').forEach(b =>
-    b.setAttribute('aria-pressed', String((b.dataset.mu || null) === fMu)));
-
-  const rows = REG.filter(r => {
-    if(fEl && !r.types.includes(fEl)) return false;
-    if(fMu === 'starter' && !r.starter) return false;
-    if(fMu === 'wild' && r.starter) return false;
-    if(fMu === 'mutates' && r.of === 1) return false;
-    if(fMu === 'solo' && r.of !== 1) return false;
-    if(fQ && !(r.name.toLowerCase().includes(fQ) || r.region.toLowerCase().includes(fQ))) return false;
-    return true;
-  });
-
-  document.getElementById('count').textContent = `${rows.length} of ${REG.length}`;
-  document.getElementById('empty').hidden = rows.length > 0;
-  document.getElementById('rows').innerHTML = rows.map(r => `
-    <tr>
-      <td class="no">${String(r.no).padStart(3,'0')}</td>
-      <td class="nm">${r.name}</td>
-      <td class="ty">${r.types.map(t => `<span class="t" style="background:${EL[t].c}">${EL[t].n}</span>`).join('')}</td>
-      <td class="rg">${r.region}</td>
-      <td class="mu">${r.of === 1
-        ? '<span class="solo">does not mutate</span>'
-        : Array.from({length:r.of},(_,i)=>`<span class="stg${i+1===r.stage?' on':''}">${i+1}</span>`).join('')
-          + (r.starter ? ' <span class="solo">line</span>' : '')}</td>
-    </tr>`).join('');
-}
-
-document.getElementById('elFilt').addEventListener('click', e => {
-  const b = e.target.closest('button'); if(!b) return;
-  fEl = b.dataset.el || null; paint();
-});
-document.getElementById('muFilt').addEventListener('click', e => {
-  const b = e.target.closest('button'); if(!b) return;
-  fMu = b.dataset.mu || null; paint();
-});
-document.getElementById('q').addEventListener('input', e => { fQ = e.target.value.trim().toLowerCase(); paint(); });
-
-paint();
 </script>
