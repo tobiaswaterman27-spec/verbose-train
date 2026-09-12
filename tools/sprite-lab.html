@@ -956,50 +956,98 @@ const CREATURES = [
   }
 },
 {
-  id:'frimble', name:'Frimble', types:['frost'], plan:'Quadruped · cervine forager',
-  blurb:'Small, round, and radiates cold the way most things radiate warmth. Sleeps in snowbanks by preference.',
-  outline:'#0d2029',
-  colors:{ body:'#8fc0da', limb:'#74a7c4', dark:'#4f7f9c', belly:'#eaf6fb', antler:'#dff0f8',
-           inner:'#7d5560', sclera:'#f4fbff', eye:'#16303f', glint:'#ffffff', mouth:'#6d3a48' },
-  pivots:{ body:[0,-4.2,0], head:[0,-9.6,2.8], jaw:[0,-10.6,4.8], ear:[0,-12.6,3.4],
-           tail:[0,-7.6,-3.2], hipFore:[0,-5.2,2.6], hipHind:[0,-5.2,-2.6] },
+  id:'floepup', name:'Floepup', types:['frost'], scale:0.78,
+  plan:'Pinniped · propped up at rest, flat out when moving',
+  blurb:'Ice blue, round, and built entirely wrong for land — which does not stop it. At rest it props the front half up on its fore flippers and looks at you. To go anywhere it drops onto its belly and humps along, and on anything slick it stops bothering with that and just slides.',
+  outline:'#1b3243',
+  colors:{ body:'#8fb9d6', back:'#5d8cae', belly:'#e6f2f8', flipper:'#6f9dc0',
+           dark:'#24455c', whisker:'#dceaf2',
+           sclera:'#dceef7', eye:'#101f2b', glint:'#ffffff', mouth:'#8a4a56' },
+  pivots:{ body:[0,-5.0,-2.0], head:[0,-12.6,4.6], jaw:[0,-14.2,7.6],
+           tail:[0,-3.0,-8.0], hip:[0,-3.0,-8.5] },
+  /* Centreline parts in ascending z so every view stacks them the same way. */
   parts:[
-    {n:'tail',      shape:'ell', role:'tail', pos:[0,-7.6,-4.6], size:[1.1,1.2,1.4], color:'belly'},
-    {n:'hindLegL',  shape:'box', role:'leg', grp:'hind', phase:0.5, pos:[-2.2,-2.6,-2.6], size:[1.05,2.6,1.1], color:'limb'},
-    {n:'hindLegR',  shape:'box', role:'leg', grp:'hind', phase:0,   pos:[ 2.2,-2.6,-2.6], size:[1.05,2.6,1.1], color:'limb'},
-    {n:'hindPawL',  shape:'ell', role:'paw', grp:'hind', phase:0.5, pos:[-2.2,-0.5,-2.4], size:[1.25,0.7,1.5], color:'dark'},
-    {n:'hindPawR',  shape:'ell', role:'paw', grp:'hind', phase:0,   pos:[ 2.2,-0.5,-2.4], size:[1.25,0.7,1.5], color:'dark'},
-    {n:'foreLegL',  shape:'box', role:'leg', grp:'fore', phase:0,   pos:[-2.0,-2.6,2.6], size:[1.0,2.6,1.05], color:'limb'},
-    {n:'foreLegR',  shape:'box', role:'leg', grp:'fore', phase:0.5, pos:[ 2.0,-2.6,2.6], size:[1.0,2.6,1.05], color:'limb'},
-    {n:'forePawL',  shape:'ell', role:'paw', grp:'fore', phase:0,   pos:[-2.0,-0.5,2.9], size:[1.2,0.7,1.45], color:'dark'},
-    {n:'forePawR',  shape:'ell', role:'paw', grp:'fore', phase:0.5, pos:[ 2.0,-0.5,2.9], size:[1.2,0.7,1.45], color:'dark'},
-    {n:'torso',     shape:'ell', role:'body', pos:[0,-7.0,0],   size:[3.2,3.0,4.6], color:'body'},
-    {n:'belly',     shape:'ell', role:'body', pos:[0,-5.6,0.4], size:[2.5,1.7,3.9], color:'belly'},
-    {n:'haunchL',   shape:'ell', role:'body', pos:[-2.3,-5.0,-2.5], size:[1.6,1.9,1.9], color:'body'},
-    {n:'haunchR',   shape:'ell', role:'body', pos:[ 2.3,-5.0,-2.5], size:[1.6,1.9,1.9], color:'body'},
-    {n:'shoulderL', shape:'ell', role:'body', pos:[-2.1,-5.2,2.5], size:[1.45,1.75,1.75], color:'body'},
-    {n:'shoulderR', shape:'ell', role:'body', pos:[ 2.1,-5.2,2.5], size:[1.45,1.75,1.75], color:'body'},
-    {n:'neck',      shape:'ell', role:'neck', pos:[0,-9.2,2.8], size:[1.5,1.6,1.5], color:'body'},
-    {n:'head',      shape:'ell', role:'head', pos:[0,-11.6,4.2], size:[2.8,2.7,2.9], color:'body'},
-    {n:'earL',      shape:'ell', role:'ear', pos:[-2.0,-13.4,3.4], size:[1.0,1.3,0.75], color:'limb'},
-    {n:'earR',      shape:'ell', role:'ear', pos:[ 2.0,-13.4,3.4], size:[1.0,1.3,0.75], color:'limb'},
-    {n:'earInnerL', shape:'ell', role:'ear', pos:[-2.1,-13.3,3.8], size:[0.55,0.85,0.45], color:'inner', hideIn:['back']},
-    {n:'earInnerR', shape:'ell', role:'ear', pos:[ 2.1,-13.3,3.8], size:[0.55,0.85,0.45], color:'inner', hideIn:['back']},
-    {n:'antlerL',   shape:'box', role:'deco', pos:[-1.2,-14.8,3.2], size:[0.45,1.4,0.5], color:'antler'},
-    {n:'antlerR',   shape:'box', role:'deco', pos:[ 1.2,-14.8,3.2], size:[0.45,1.4,0.5], color:'antler'},
-    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-10.5,5.8], size:[1.0,0.6,0.8], color:'mouth', hideIn:['back']},
-    {n:'jaw',       shape:'ell', role:'jaw', pos:[0,-10.1,6.2], size:[1.3,0.7,1.25], color:'belly', hideIn:['back']},
-    {n:'muzzle',    shape:'ell', role:'head', pos:[0,-10.9,6.5], size:[1.5,1.1,1.4], color:'belly', hideIn:['back']},
-    {n:'nose',      shape:'ell', flat:true, role:'head', pos:[0,-11.4,7.6], size:[0.5,0.42,0.42], color:'eye', hideIn:['back']},
-    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-1.45,-12.3,5.9], size:[1.05,1.2,0.75], color:'sclera', hideIn:['back']},
-    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 1.45,-12.3,5.9], size:[1.05,1.2,0.75], color:'sclera', hideIn:['back']},
-    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-1.57,-12.15,6.2], size:[0.65,0.78,0.57], color:'eye', hideIn:['back']},
-    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 1.57,-12.15,6.2], size:[0.65,0.78,0.57], color:'eye', hideIn:['back']},
-    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-1.8,-12.65,6.4], size:[0.32,0.32,0.28], color:'glint', hideIn:['back']},
-    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 1.8,-12.65,6.4], size:[0.32,0.32,0.28], color:'glint', hideIn:['back']},
-    {n:'lidL',      shape:'ell', role:'lid', pos:[-1.45,-12.3,5.95], size:[1.12,0.26,0.8], color:'limb', hideIn:['back']},
-    {n:'lidR',      shape:'ell', role:'lid', pos:[ 1.45,-12.3,5.95], size:[1.12,0.26,0.8], color:'limb', hideIn:['back']},
-  ]
+    /* hind flippers: splayed flat behind, the way a hauled-out seal leaves them */
+    {n:'hindFlipL',  shape:'ell', role:'tail', pos:[-2.40,-1.10,-14.20], size:[1.70,0.75,3.00], color:'flipper'},
+    {n:'hindFlipR',  shape:'ell', role:'tail', pos:[ 2.40,-1.10,-14.20], size:[1.70,0.75,3.00], color:'flipper'},
+    {n:'tailTip',    shape:'ell', role:'tail', pos:[0,-2.00,-12.40], size:[2.00,1.90,2.20], color:'body'},
+    {n:'bodyRear',   shape:'ell', role:'body', pos:[0,-3.00,-8.60], size:[3.40,3.00,4.40], color:'body'},
+    {n:'bodyMid',    shape:'ell', role:'body', pos:[0,-5.00,-2.60], size:[4.40,4.60,5.20], color:'body'},
+    /* countershaded: dark over the back, pale underneath, like anything that
+       spends its life being looked at from above and below */
+    {n:'dorsalMid',  shape:'ell', role:'body', pos:[0,-8.20,-2.40], size:[4.10,2.00,4.80], color:'back'},
+    {n:'bellyPad',   shape:'ell', role:'body', pos:[0,-2.60,0.20], size:[3.30,1.90,5.40], color:'belly'},
+    {n:'chest',      shape:'ell', role:'body', pos:[0,-8.60,2.60], size:[4.20,5.20,4.20], color:'body'},
+    {n:'dorsalFore', shape:'ell', role:'body', pos:[0,-12.40,2.40], size:[3.90,2.00,3.80], color:'back'},
+    {n:'speckA',     shape:'ell', flat:true, role:'body', pos:[-1.60,-9.60,-3.40], size:[0.55,0.45,0.70], color:'back'},
+    {n:'speckB',     shape:'ell', flat:true, role:'body', pos:[ 1.90,-9.20,-0.80], size:[0.50,0.42,0.62], color:'back'},
+    {n:'speckC',     shape:'ell', flat:true, role:'body', pos:[-0.80,-13.60,1.60], size:[0.48,0.40,0.60], color:'back'},
+
+    /* fore flippers: planted, propping the front half clear of the ground.
+       They carry the 'wing' role because that is exactly what the rig calls a
+       side-mounted limb that swings about a shoulder. */
+    {n:'foreFlipL',  shape:'ell', role:'wing', side:-1, pos:[-3.85,-2.20,3.00], size:[1.20,2.40,2.60], color:'flipper', pivot:[-2.60,-5.60,2.20]},
+    {n:'foreFlipR',  shape:'ell', role:'wing', side: 1, pos:[ 3.85,-2.20,3.00], size:[1.20,2.40,2.60], color:'flipper', pivot:[ 2.60,-5.60,2.20]},
+    {n:'foreFootL',  shape:'ell', role:'wing', side:-1, pos:[-4.30,-0.50,4.60], size:[1.65,0.58,2.40], color:'flipper', pivot:[-2.60,-5.60,2.20]},
+    {n:'foreFootR',  shape:'ell', role:'wing', side: 1, pos:[ 4.30,-0.50,4.60], size:[1.65,0.58,2.40], color:'flipper', pivot:[ 2.60,-5.60,2.20]},
+
+    /* head: no external ears at all — a seal has holes, not flaps, and the
+       roster has nothing else without them */
+    {n:'head',       shape:'ell', role:'head', pos:[0,-15.00,6.00], size:[3.50,3.30,3.70], color:'body'},
+    {n:'headCap',    shape:'ell', role:'head', pos:[0,-17.00,5.40], size:[3.20,1.60,3.40], color:'back'},
+    {n:'jaw',        shape:'ell', role:'jaw', pos:[0,-13.50,8.90], size:[1.90,0.90,1.90], color:'belly', hideIn:['back']},
+    {n:'mouthInner', shape:'ell', flat:true, role:'mouth', pos:[0,-13.90,9.40], size:[1.50,0.50,1.10], color:'mouth', hideIn:['back']},
+    {n:'muzzle',     shape:'ell', role:'head', pos:[0,-14.60,8.80], size:[2.30,1.90,2.10], color:'belly', hideIn:['back']},
+    {n:'whiskerL1',  shape:'ell', flat:true, role:'head', pos:[-2.25,-14.30,9.40], size:[1.75,0.17,0.55], color:'whisker', hideIn:['back']},
+    {n:'whiskerR1',  shape:'ell', flat:true, role:'head', pos:[ 2.25,-14.30,9.40], size:[1.75,0.17,0.55], color:'whisker', hideIn:['back']},
+    {n:'whiskerL2',  shape:'ell', flat:true, role:'head', pos:[-2.05,-13.65,9.20], size:[1.55,0.17,0.50], color:'whisker', hideIn:['back']},
+    {n:'whiskerR2',  shape:'ell', flat:true, role:'head', pos:[ 2.05,-13.65,9.20], size:[1.55,0.17,0.50], color:'whisker', hideIn:['back']},
+    {n:'nose',       shape:'ell', flat:true, role:'head', pos:[0,-15.20,10.60], size:[0.62,0.52,0.50], color:'dark', hideIn:['back']},
+
+    /* huge, almost entirely pupil — the one feature everyone knows about seals */
+    {n:'eyeWhiteL',  shape:'ell', role:'eye', pos:[-1.95,-16.00,8.00], size:[1.35,1.45,1.00], color:'sclera', hideIn:['back']},
+    {n:'eyeWhiteR',  shape:'ell', role:'eye', pos:[ 1.95,-16.00,8.00], size:[1.35,1.45,1.00], color:'sclera', hideIn:['back']},
+    {n:'pupilL',     shape:'ell', flat:true, role:'eye', pos:[-2.05,-15.90,8.34], size:[1.06,1.18,0.80], color:'eye', hideIn:['back']},
+    {n:'pupilR',     shape:'ell', flat:true, role:'eye', pos:[ 2.05,-15.90,8.34], size:[1.06,1.18,0.80], color:'eye', hideIn:['back']},
+    {n:'glintL',     shape:'ell', flat:true, role:'eye', pos:[-2.34,-16.44,8.54], size:[0.38,0.38,0.34], color:'glint', hideIn:['back']},
+    {n:'glintR',     shape:'ell', flat:true, role:'eye', pos:[ 2.34,-16.44,8.54], size:[0.38,0.38,0.34], color:'glint', hideIn:['back']},
+    {n:'lidL',       shape:'ell', role:'lid', pos:[-1.95,-16.00,8.06], size:[1.44,0.32,1.07], color:'body', hideIn:['back']},
+    {n:'lidR',       shape:'ell', role:'lid', pos:[ 1.95,-16.00,8.06], size:[1.44,0.32,1.07], color:'body', hideIn:['back']},
+  ],
+  /* A seal on land does not walk, it galumphs: plants the hind end, rocks the
+     whole front half up and forward off the fore flippers, and drops. The
+     rock happens about the HIP, not the body centre, which is what makes the
+     back end stay put while the front travels. */
+  walk(cr, p, f, nF){
+    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+    const r = p.role;
+    if(r === 'lid') sc.y = 0;
+    const PITCH = [0.04, 0.30, 0.14, 0.00][f];
+    d.y += [0, -0.9, -0.3, 0][f];
+    rots.push({axis:'x', ang:PITCH, pivot:cr.pivots.hip});
+    if(r === 'wing' && p.pivot) rots.push({axis:'x', ang:[-0.30,0.52,0.20,-0.18][f], pivot:p.pivot});
+    if(r === 'tail') rots.push({axis:'x', ang:[0.08,-0.22,-0.06,0.06][f], pivot:cr.pivots.tail});
+    if(['head','jaw','eye','mouth','lid'].includes(r))
+      rots.push({axis:'x', ang:-PITCH*0.45, pivot:cr.pivots.head});
+    return {d, sc, rots};
+  },
+  /* On anything slick it stops galumphing and slides: the prop comes down,
+     the whole body goes flat and streamlined, flippers swept back against the
+     flanks, and only a slow wave down the spine says it is moving at all. */
+  sprint(cr, p, f, nF){
+    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+    const r = p.role;
+    if(r === 'lid') sc.y = 0;
+    const wave = Math.sin(f/nF*Math.PI*2);
+    rots.push({axis:'x', ang:-0.42, pivot:cr.pivots.body});   // the front comes down
+    d.y += 1.5 + wave*0.25;
+    if(r === 'wing' && p.pivot) rots.push({axis:'z', ang:-(p.side||1)*0.90, pivot:p.pivot});
+    if(r === 'tail') rots.push({axis:'x', ang:wave*0.16, pivot:cr.pivots.tail});
+    if(['head','jaw','eye','mouth','lid'].includes(r))
+      rots.push({axis:'x', ang:0.38, pivot:cr.pivots.head});   // chin up out of the snow
+    if(r === 'eye') sc.y = 0.82;
+    return {d, sc, rots};
+  }
 },
 {
   id:'murklet', name:'Murklet', types:['venom'], plan:'Amphibian · low sprawling gait',
