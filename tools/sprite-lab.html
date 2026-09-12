@@ -1,0 +1,780 @@
+<title>Wildhollow Sprite Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#eceee6;
+  --surface:#f8f9f4;
+  --surface2:#e2e6d8;
+  --ink:#171c15;
+  --dim:#616b5c;
+  --line:#d0d5c6;
+  --line-soft:#e0e4d6;
+  --accent:#8a6114;
+  --accent-soft:#e8d7ac;
+  --guide:#0b7f8e;
+  --good:#3d7a38;
+  --bad:#a8342a;
+  --canvas-bg:#dee3d2;
+  --canvas-alt:#d6dbc9;
+  --shadow:rgba(40,50,35,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12160f;
+    --surface:#1a1f16;
+    --surface2:#232a1d;
+    --ink:#eaeee3;
+    --dim:#98a290;
+    --line:#2f382a;
+    --line-soft:#252d21;
+    --accent:#d9a441;
+    --accent-soft:#4a3a16;
+    --guide:#2fc9da;
+    --good:#7fc46a;
+    --bad:#e0705f;
+    --canvas-bg:#0c0f09;
+    --canvas-alt:#12160e;
+    --shadow:rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12160f;
+  --surface:#1a1f16;
+  --surface2:#232a1d;
+  --ink:#eaeee3;
+  --dim:#98a290;
+  --line:#2f382a;
+  --line-soft:#252d21;
+  --accent:#d9a441;
+  --accent-soft:#4a3a16;
+  --guide:#2fc9da;
+  --good:#7fc46a;
+  --bad:#e0705f;
+  --canvas-bg:#0c0f09;
+  --canvas-alt:#12160e;
+  --shadow:rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  line-height:1.55;
+}
+.page{max-width:1040px; margin:0 auto; padding-inline:20px; padding-block:40px 64px;}
+
+/* ---------- header ---------- */
+.eyebrow{
+  font-family:"Silkscreen","Courier New",monospace; font-size:11px;
+  letter-spacing:.14em; color:var(--accent); text-transform:uppercase;
+}
+h1{
+  font-family:"Silkscreen","Courier New",monospace;
+  font-size:clamp(26px,5vw,40px); line-height:1.15; margin:10px 0 0;
+  text-wrap:balance; letter-spacing:.01em;
+}
+.lede{max-width:64ch; color:var(--dim); margin:14px 0 0; font-size:15.5px;}
+header{border-bottom:1px solid var(--line); padding-bottom:28px;}
+
+/* ---------- brief ---------- */
+.brief{
+  margin-top:28px; display:grid; gap:18px;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+}
+.brief-item h3{
+  font-family:"Silkscreen","Courier New",monospace; font-size:11px; letter-spacing:.1em;
+  margin:0 0 7px; color:var(--ink); text-transform:uppercase;
+}
+.brief-item p{margin:0; font-size:13.5px; color:var(--dim);}
+.brief-item code{
+  font-family:"IBM Plex Mono",monospace; font-size:12px;
+  background:var(--surface2); padding:1px 5px; border-radius:3px; color:var(--ink);
+}
+
+/* ---------- specimen panel ---------- */
+.specimen{
+  margin-top:40px; background:var(--surface);
+  border:1px solid var(--line); border-radius:10px; overflow:hidden;
+}
+.spec-head{
+  display:flex; align-items:flex-start; gap:14px; flex-wrap:wrap;
+  padding:18px 20px; border-bottom:1px solid var(--line-soft);
+}
+.spec-id{flex:1; min-width:180px;}
+.spec-name{
+  font-family:"Silkscreen","Courier New",monospace; font-size:19px; margin:0;
+  display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+}
+.chip{
+  font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.08em;
+  text-transform:uppercase; padding:3px 8px; border-radius:999px;
+  color:#fff; font-weight:500;
+}
+.spec-sub{font-size:13px; color:var(--dim); margin:5px 0 0;}
+.spec-stats{
+  display:flex; gap:18px; flex-wrap:wrap;
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--dim);
+  font-variant-numeric:tabular-nums;
+}
+.spec-stats b{display:block; color:var(--ink); font-size:15px; font-weight:500;}
+
+/* ---------- controls ---------- */
+.controls{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:12px 20px; background:var(--surface2); border-bottom:1px solid var(--line-soft);
+}
+.seg{display:flex; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.seg button{
+  font-family:"Silkscreen","Courier New",monospace; font-size:10px; letter-spacing:.06em;
+  padding:7px 11px; border:0; background:var(--surface); color:var(--dim);
+  cursor:pointer; border-right:1px solid var(--line);
+}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent); color:var(--bg);}
+.ctl{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--dim);}
+.ctl label{font-family:"IBM Plex Mono",monospace; font-size:11px;}
+.ctl input[type=range]{width:78px; accent-color:var(--accent);}
+.ctl input[type=checkbox]{accent-color:var(--accent);}
+button.mini{
+  font-family:"Silkscreen","Courier New",monospace; font-size:10px;
+  padding:7px 11px; border:1px solid var(--line); border-radius:6px;
+  background:var(--surface); color:var(--ink); cursor:pointer;
+}
+button.mini:hover{border-color:var(--accent); color:var(--accent);}
+button:focus-visible, input:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+/* ---------- preview ---------- */
+.preview{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+  background:var(--line-soft);
+}
+.cell{
+  background:var(--canvas-bg); padding:14px 8px 10px;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.cell canvas{display:block; max-width:100%; height:auto; image-rendering:pixelated;}
+.cell .dir{
+  font-family:"Silkscreen","Courier New",monospace; font-size:10px;
+  letter-spacing:.08em; color:var(--dim);
+}
+@media (max-width:680px){ .preview{grid-template-columns:repeat(2,1fr)} }
+
+/* ---------- proportion check ---------- */
+.section-label{
+  font-family:"Silkscreen","Courier New",monospace; font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--dim); padding:16px 20px 0; display:block;
+}
+.check{padding:10px 20px 20px;}
+.check-flex{display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;}
+.check-canvas{
+  background:var(--canvas-alt); border:1px solid var(--line); border-radius:6px;
+  padding:10px; overflow-x:auto;
+}
+.check-canvas canvas{display:block; image-rendering:pixelated;}
+table.meas{
+  border-collapse:collapse; font-family:"IBM Plex Mono",monospace; font-size:11.5px;
+  font-variant-numeric:tabular-nums; min-width:230px;
+}
+table.meas th{
+  text-align:right; font-weight:500; color:var(--dim); padding:4px 9px;
+  border-bottom:1px solid var(--line); font-size:10px; letter-spacing:.06em; text-transform:uppercase;
+}
+table.meas th:first-child{text-align:left}
+table.meas td{text-align:right; padding:4px 9px; border-bottom:1px solid var(--line-soft);}
+table.meas td:first-child{text-align:left; color:var(--dim);}
+.verdict{
+  display:inline-flex; align-items:center; gap:7px; margin-top:12px;
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; padding:6px 11px;
+  border-radius:5px; border:1px solid;
+}
+.verdict.ok{color:var(--good); border-color:var(--good); background:color-mix(in srgb, var(--good) 9%, transparent);}
+.verdict.no{color:var(--bad); border-color:var(--bad); background:color-mix(in srgb, var(--bad) 9%, transparent);}
+.check-note{font-size:12.5px; color:var(--dim); max-width:34ch; margin:0;}
+
+/* ---------- frame sheet ---------- */
+.sheet{padding:10px 20px 22px; overflow-x:auto;}
+.sheet-row{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+.sheet-row .rlab{
+  font-family:"Silkscreen","Courier New",monospace; font-size:9px; color:var(--dim);
+  width:44px; flex:0 0 44px; letter-spacing:.06em;
+}
+.sheet-frames{display:flex; gap:5px;}
+.frame-box{
+  background:var(--canvas-alt); border:1px solid var(--line-soft); border-radius:4px;
+  padding:3px; position:relative;
+}
+.frame-box canvas{display:block; image-rendering:pixelated;}
+.frame-box .fnum{
+  position:absolute; bottom:1px; right:3px; font-family:"IBM Plex Mono",monospace;
+  font-size:8px; color:var(--dim); opacity:.7;
+}
+
+footer{
+  margin-top:44px; padding-top:20px; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--dim);
+}
+footer code{font-family:"IBM Plex Mono",monospace; background:var(--surface2); padding:1px 5px; border-radius:3px;}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Wildhollow · art pipeline · build 001</div>
+    <h1>Sprite Lab</h1>
+    <p class="lede">
+      Two test creatures run through the procedural sprite generator. Every frame below is drawn from code —
+      no image files. The question this page exists to answer: <b>do the four directions stay on-model?</b>
+    </p>
+  </header>
+
+  <div class="brief">
+    <div class="brief-item">
+      <h3>One model, four views</h3>
+      <p>Each creature is defined once as body parts in 3D space — <code>pos[x,y,z]</code> and <code>size</code>. Front, back, left and right are <em>projections</em> of that single model, so proportions can't drift between them.</p>
+    </div>
+    <div class="brief-item">
+      <h3>Animation in model space</h3>
+      <p>A walk cycle swings legs along the creature's own forward axis. Because the motion is defined before projection, all four directions inherit a correct cycle for free.</p>
+    </div>
+    <div class="brief-item">
+      <h3>Verified, not asserted</h3>
+      <p>The generator measures each rendered view's pixel bounds and compares them. The proportion table below reports real numbers, so a drift shows up as a failure rather than something you have to spot by eye.</p>
+    </div>
+  </div>
+
+  <div id="specimens"></div>
+
+  <footer>
+    Rendered at <code>44×40</code> px per frame with a hand-written rasterizer — no anti-aliasing, hue-shifted
+    three-step shading ramps, and a one-pixel outline pass. Creature designs, names and palettes are original to this project.
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* ════════════════════════════════════════════════════════════════════
+   WILDHOLLOW SPRITE GENERATOR
+   A creature is one 3D part model. Views are projections of it.
+   ════════════════════════════════════════════════════════════════════ */
+
+const W = 44, H = 40;          // frame buffer size, shared by every creature
+const GROUND = H - 6;          // y row the creature's feet rest on
+const VIEWS = ['front','right','back','left'];
+const VIEW_LABEL = {front:'FRONT', right:'RIGHT', back:'BACK', left:'LEFT'};
+const ANIMS = { idle:{frames:2}, walk:{frames:4}, attack:{frames:4} };
+
+/* ---------- color helpers ---------- */
+const clamp255 = v => v<0?0:v>255?255:Math.round(v);
+function hex2rgb(h){
+  h = h.replace('#','');
+  return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+}
+// Hue-shifted ramp: highlights drift warm, shadows drift cool. Reads as
+// deliberate pixel art rather than a flat brightness multiply.
+function ramp(hex){
+  const [r,g,b] = hex2rgb(hex);
+  return {
+    light:[clamp255(r*1.08+36), clamp255(g*1.08+30), clamp255(b*1.02+6)],
+    base :[r,g,b],
+    dark :[clamp255(r*0.60),    clamp255(g*0.59+3),  clamp255(b*0.74+10)]
+  };
+}
+function buildPalette(colors){
+  const out = {};
+  for(const k in colors) out[k] = ramp(colors[k]);
+  return out;
+}
+
+/* ---------- creature definitions ---------- */
+/* Coordinate system: +x = right, +y = DOWN (ground plane at y=0),
+   +z = the direction the creature faces in the front view.          */
+
+const CREATURES = [
+{
+  id:'sporelet', name:'Sporelet', type:'Verdant', typeColor:'#5d8a3c',
+  plan:'Quadruped · mycelial symbiont',
+  blurb:'Grows a pair of caps along its spine that it sheds and regrows each season. The caps glow faintly when it is startled.',
+  outline:'#141d0e',
+  colors:{ body:'#6f9c4a', dark:'#41602b', belly:'#d3e3ab', cap:'#c2553f', eye:'#1b2415' },
+  parts:[
+    {n:'tail',  shape:'ell', role:'tail', pos:[0,-13.5,-8.5], size:[1.9,1.9,3.2], color:'body'},
+    {n:'legBL', shape:'box', role:'leg', phase:0.5, pos:[-3.4,-4,-4.6], size:[1.5,4,1.5], color:'dark'},
+    {n:'legBR', shape:'box', role:'leg', phase:0,   pos:[ 3.4,-4,-4.6], size:[1.5,4,1.5], color:'dark'},
+    {n:'legFL', shape:'box', role:'leg', phase:0,   pos:[-3.2,-4, 4.4], size:[1.5,4,1.5], color:'dark'},
+    {n:'legFR', shape:'box', role:'leg', phase:0.5, pos:[ 3.2,-4, 4.4], size:[1.5,4,1.5], color:'dark'},
+    {n:'torso', shape:'ell', role:'body', pos:[0,-12,0],    size:[5.4,5,8],     color:'body'},
+    {n:'belly', shape:'ell', role:'body', pos:[0,-9.6,0.6], size:[4.2,2.6,6.6], color:'belly'},
+    {n:'stem1', shape:'box', role:'deco', pos:[-2.2,-17.6,-1.5], size:[0.7,1.6,0.7], color:'belly'},
+    {n:'cap1',  shape:'ell', role:'deco', pos:[-2.2,-19.0,-1.5], size:[2.5,1.4,2.5], color:'cap'},
+    {n:'stem2', shape:'box', role:'deco', pos:[1.9,-17.2,1.6],   size:[0.6,1.4,0.6], color:'belly'},
+    {n:'cap2',  shape:'ell', role:'deco', pos:[1.9,-18.4,1.6],   size:[1.9,1.1,1.9], color:'cap'},
+    {n:'head',  shape:'ell', role:'head', pos:[0,-15.4,7.2],  size:[4.4,4.1,4.4], color:'body'},
+    {n:'earL',  shape:'ell', role:'ear',  pos:[-2.9,-19.4,6.4], size:[1.5,2.5,1.1], color:'dark'},
+    {n:'earR',  shape:'ell', role:'ear',  pos:[ 2.9,-19.4,6.4], size:[1.5,2.5,1.1], color:'dark'},
+    {n:'snout', shape:'ell', role:'head', pos:[0,-14.2,10.6], size:[2.1,1.7,1.8], color:'belly', hideIn:['back']},
+    {n:'eyeL',  shape:'ell', role:'head', flat:true, pos:[-1.9,-16.6,10.0], size:[0.85,1.0,0.8], color:'eye', hideIn:['back']},
+    {n:'eyeR',  shape:'ell', role:'head', flat:true, pos:[ 1.9,-16.6,10.0], size:[0.85,1.0,0.8], color:'eye', hideIn:['back']},
+    {n:'nose',  shape:'ell', role:'head', flat:true, pos:[0,-14.6,12.1],   size:[0.7,0.55,0.6], color:'eye', hideIn:['back']}
+  ]
+},
+{
+  id:'cindercrow', name:'Cindercrow', type:'Ember', typeColor:'#c2552b',
+  plan:'Winged biped · thermal scavenger',
+  blurb:'Nests in cooling ash and rides the updraft off burnt ground. Its crest brightens as its body temperature rises.',
+  outline:'#24100a',
+  colors:{ body:'#d4552e', dark:'#94301a', belly:'#f6cf96', accent:'#f2b134', eye:'#2a1310' },
+  parts:[
+    {n:'tailF', shape:'ell', role:'tail', pos:[0,-9,-4.6], size:[2.6,1.5,3.2], color:'accent'},
+    {n:'legL',  shape:'box', role:'leg',  phase:0,   pos:[-1.9,-3.6,0], size:[0.9,3.6,0.9], color:'accent'},
+    {n:'legR',  shape:'box', role:'leg',  phase:0.5, pos:[ 1.9,-3.6,0], size:[0.9,3.6,0.9], color:'accent'},
+    {n:'footL', shape:'box', role:'foot', phase:0,   pos:[-1.9,-0.5,1.0], size:[1.4,0.6,1.9], color:'accent'},
+    {n:'footR', shape:'box', role:'foot', phase:0.5, pos:[ 1.9,-0.5,1.0], size:[1.4,0.6,1.9], color:'accent'},
+    {n:'body',  shape:'ell', role:'body', pos:[0,-11.5,0],  size:[4.4,6,4.0], color:'body'},
+    {n:'chest', shape:'ell', role:'body', pos:[0,-11,2.0],  size:[3.0,4.2,2.6], color:'belly', hideIn:['back']},
+    {n:'wingL', shape:'ell', role:'wing', pos:[-5.0,-12.5,-0.3], size:[1.3,4.6,3.4], color:'dark'},
+    {n:'wingR', shape:'ell', role:'wing', pos:[ 5.0,-12.5,-0.3], size:[1.3,4.6,3.4], color:'dark'},
+    {n:'head',  shape:'ell', role:'head', pos:[0,-19.6,0.4], size:[3.5,3.3,3.5], color:'body'},
+    {n:'crest', shape:'ell', role:'deco', pos:[0,-23.2,-1.0], size:[1.1,2.4,2.7], color:'accent'},
+    {n:'beak',  shape:'ell', role:'beak', pos:[0,-19.2,3.6], size:[1.2,1.0,1.9], color:'accent', hideIn:['back']},
+    {n:'eyeL',  shape:'ell', role:'head', flat:true, pos:[-1.7,-20.6,2.9], size:[0.8,0.95,0.7], color:'eye', hideIn:['back']},
+    {n:'eyeR',  shape:'ell', role:'head', flat:true, pos:[ 1.7,-20.6,2.9], size:[0.8,0.95,0.7], color:'eye', hideIn:['back']}
+  ]
+}
+];
+
+/* ---------- animation, defined in MODEL space ----------
+   Because offsets are applied before projection, one definition
+   produces a correct cycle in all four directions.                */
+function animOffset(p, anim, f, nF){
+  const r = p.role || 'body';
+  const o = {x:0, y:0, z:0};
+
+  if(anim === 'idle'){
+    const bob = (f % 2) * 0.8;
+    if(r !== 'leg' && r !== 'foot') o.y = -bob;
+    if(r === 'wing') o.y -= bob * 0.7;
+    if(r === 'deco') o.y -= bob * 0.4;
+
+  } else if(anim === 'walk'){
+    const t  = f / nF;
+    const ph = p.phase || 0;
+    const s  = Math.sin((t + ph) * Math.PI * 2);
+    if(r === 'leg' || r === 'foot'){
+      o.z = s * 2.4;
+      o.y = -Math.max(0, s) * 1.3;
+    } else {
+      o.y = -Math.abs(Math.sin(t * Math.PI * 2 + Math.PI/2)) * 0.8;
+    }
+    if(r === 'tail') o.x = s * 1.4;
+    if(r === 'wing') o.y -= Math.abs(s) * 1.6;
+    if(r === 'ear')  o.y -= Math.abs(s) * 0.5;
+
+  } else if(anim === 'attack'){
+    const LZ = [-2, 2.5, 4.5, 1];     // wind up, lunge, strike, recover
+    const LY = [0.6, -1.4, -0.6, 0];
+    const i  = Math.min(f, LZ.length - 1);
+    const kz = LZ[i], ky = LY[i];
+    o.z = kz; o.y = ky;
+    if(r === 'head' || r === 'beak') o.z += kz * 0.45;
+    if(r === 'leg'  || r === 'foot'){ o.z = kz * 0.35; o.y = 0; }
+    if(r === 'wing'){ o.y += ky * 1.5; o.z += kz * 0.3; }
+    if(r === 'tail') o.z = kz * 0.3;
+  }
+  return o;
+}
+
+/* ---------- projection: model space → one view ---------- */
+function project(view, x, y, z, sx, sy, sz){
+  switch(view){
+    case 'front': return {u: x, v:y, ru:sx, rv:sy, depth: z};
+    case 'back' : return {u:-x, v:y, ru:sx, rv:sy, depth:-z};
+    case 'right': return {u: z, v:y, ru:sz, rv:sy, depth:-x};
+    case 'left' : return {u:-z, v:y, ru:sz, rv:sy, depth: x};
+  }
+}
+
+/* ---------- pixel buffer ---------- */
+function makeBuffer(){ return new Uint8ClampedArray(W * H * 4); }
+function setPx(buf, x, y, c){
+  if(x < 0 || y < 0 || x >= W || y >= H) return;
+  const i = (y * W + x) * 4;
+  buf[i] = c[0]; buf[i+1] = c[1]; buf[i+2] = c[2]; buf[i+3] = 255;
+}
+function alphaAt(buf, x, y){
+  if(x < 0 || y < 0 || x >= W || y >= H) return 0;
+  return buf[(y * W + x) * 4 + 3];
+}
+
+/* Light comes from upper-left-front, so shading agrees across views. */
+const LIGHT = [-0.55, -0.62, 0.56];
+
+function rasterize(buf, item, pal){
+  const p = item.p;
+  const cx = W/2 + item.u, cy = GROUND + item.v;
+  const ru = item.ru, rv = item.rv;
+  if(ru <= 0 || rv <= 0) return;
+  const rmp = pal[p.color];
+  const x0 = Math.floor(cx - ru), x1 = Math.ceil(cx + ru);
+  const y0 = Math.floor(cy - rv), y1 = Math.ceil(cy + rv);
+  const isBox = p.shape === 'box';
+
+  for(let py = y0; py <= y1; py++){
+    for(let px = x0; px <= x1; px++){
+      const dx = (px + 0.5 - cx) / ru;
+      const dy = (py + 0.5 - cy) / rv;
+      const inside = isBox ? (Math.abs(dx) <= 1 && Math.abs(dy) <= 1)
+                           : (dx*dx + dy*dy <= 1);
+      if(!inside) continue;
+
+      let col;
+      if(p.flat){
+        col = rmp.base;
+      } else if(isBox){
+        const lum = dx*LIGHT[0] + dy*LIGHT[1] + 0.5;
+        col = lum > 0.72 ? rmp.light : lum > 0.34 ? rmp.base : rmp.dark;
+      } else {
+        const nz  = Math.sqrt(Math.max(0, 1 - dx*dx - dy*dy));
+        const lum = dx*LIGHT[0] + dy*LIGHT[1] + nz*LIGHT[2];
+        col = lum > 0.50 ? rmp.light : lum > 0.02 ? rmp.base : rmp.dark;
+      }
+      setPx(buf, px, py, col);
+    }
+  }
+}
+
+function outlinePass(buf, outlineRGB){
+  const snapshot = buf.slice();
+  const A = (x,y) => (x<0||y<0||x>=W||y>=H) ? 0 : snapshot[(y*W+x)*4+3];
+  for(let y = 0; y < H; y++){
+    for(let x = 0; x < W; x++){
+      if(A(x,y) > 0) continue;
+      if(A(x-1,y) || A(x+1,y) || A(x,y-1) || A(x,y+1)) setPx(buf, x, y, outlineRGB);
+    }
+  }
+}
+
+/* ---------- render one frame ---------- */
+function renderFrame(creature, view, anim, f, nF){
+  const buf = makeBuffer();
+  const items = [];
+
+  for(const p of creature.parts){
+    if(p.hideIn && p.hideIn.includes(view)) continue;
+    const o = animOffset(p, anim, f, nF);
+    const x = p.pos[0] + o.x, y = p.pos[1] + o.y, z = p.pos[2] + o.z;
+    const pr = project(view, x, y, z, p.size[0], p.size[1], p.size[2]);
+
+    // A forward lunge is pure depth in front/back, which would be invisible.
+    // Scale it into apparent size so the attack reads from every angle.
+    let sc = 1;
+    if(view === 'front')      sc = 1 + o.z * 0.035;
+    else if(view === 'back')  sc = Math.max(0.65, 1 - o.z * 0.035);
+
+    items.push({p, u:pr.u, v:pr.v, ru:pr.ru*sc, rv:pr.rv*sc, depth:pr.depth});
+  }
+
+  items.sort((a,b) => a.depth - b.depth);   // far parts first
+  for(const it of items) rasterize(buf, it, creature.pal);
+  outlinePass(buf, creature.outlineRGB);
+  return buf;
+}
+
+function bufferToCanvas(buf){
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  c.getContext('2d').putImageData(new ImageData(buf, W, H), 0, 0);
+  return c;
+}
+
+/* ---------- measurement: the actual proportion check ---------- */
+function measure(buf){
+  let top = H, bottom = -1, left = W, right = -1;
+  for(let y = 0; y < H; y++){
+    for(let x = 0; x < W; x++){
+      if(alphaAt(buf, x, y) > 0){
+        if(y < top) top = y;
+        if(y > bottom) bottom = y;
+        if(x < left) left = x;
+        if(x > right) right = x;
+      }
+    }
+  }
+  if(bottom < 0) return {top:0, bottom:0, height:0, width:0, left:0, right:0};
+  return {top, bottom, left, right, height: bottom - top + 1, width: right - left + 1};
+}
+
+/* ---------- build every frame up front ---------- */
+for(const cr of CREATURES){
+  cr.pal = buildPalette(cr.colors);
+  cr.outlineRGB = hex2rgb(cr.outline);
+  cr.frames = {};   // frames[view][anim] = [canvas...]
+  cr.buffers = {};
+  for(const v of VIEWS){
+    cr.frames[v] = {}; cr.buffers[v] = {};
+    for(const a in ANIMS){
+      const n = ANIMS[a].frames;
+      const bufs = [], cans = [];
+      for(let f = 0; f < n; f++){
+        const b = renderFrame(cr, v, a, f, n);
+        bufs.push(b); cans.push(bufferToCanvas(b));
+      }
+      cr.buffers[v][a] = bufs;
+      cr.frames[v][a] = cans;
+    }
+  }
+  // model-derived guide lines
+  let headTop = 0, eyeY = null;
+  for(const p of cr.parts){
+    headTop = Math.min(headTop, p.pos[1] - p.size[1]);
+    if(p.n === 'eyeL') eyeY = p.pos[1];
+  }
+  cr.guides = {headTop, eyeY, ground:0};
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   UI
+   ════════════════════════════════════════════════════════════════════ */
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const host = document.getElementById('specimens');
+
+function blitTo(canvas, src, scale){
+  canvas.width = W * scale; canvas.height = H * scale;
+  const g = canvas.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.clearRect(0, 0, canvas.width, canvas.height);
+  // grounding shadow, drawn in the viewer rather than baked into the sprite
+  g.save();
+  g.globalAlpha = 0.16; g.fillStyle = '#000';
+  g.beginPath();
+  g.ellipse(canvas.width/2, (GROUND + 1.5) * scale, 8 * scale, 2.2 * scale, 0, 0, Math.PI*2);
+  g.fill(); g.restore();
+  g.drawImage(src, 0, 0, canvas.width, canvas.height);
+}
+
+function drawGrid(canvas, scale){
+  const g = canvas.getContext('2d');
+  g.save();
+  g.strokeStyle = 'rgba(128,128,128,.22)'; g.lineWidth = 1;
+  for(let x = 0; x <= W; x++){ g.beginPath(); g.moveTo(x*scale+.5, 0); g.lineTo(x*scale+.5, H*scale); g.stroke(); }
+  for(let y = 0; y <= H; y++){ g.beginPath(); g.moveTo(0, y*scale+.5); g.lineTo(W*scale, y*scale+.5); g.stroke(); }
+  g.restore();
+}
+
+function drawGuides(canvas, cr, scale){
+  const g = canvas.getContext('2d');
+  const guideColor = getComputedStyle(document.documentElement).getPropertyValue('--guide').trim() || '#0b7f8e';
+  const rows = [
+    {y: GROUND + cr.guides.headTop, label:'crown'},
+    {y: cr.guides.eyeY != null ? GROUND + cr.guides.eyeY : null, label:'eye'},
+    {y: GROUND, label:'ground'}
+  ];
+  g.save();
+  g.strokeStyle = guideColor; g.lineWidth = 1; g.setLineDash([3,3]);
+  for(const r of rows){
+    if(r.y == null) continue;
+    const py = Math.round(r.y * scale) + .5;
+    g.beginPath(); g.moveTo(0, py); g.lineTo(canvas.width, py); g.stroke();
+  }
+  g.restore();
+}
+
+function buildSpecimen(cr){
+  const state = { anim:'idle', frame:0, playing:!prefersReduced, scale:5, fps:6, guides:false, grid:false };
+
+  const el = document.createElement('section');
+  el.className = 'specimen';
+
+  const totalFrames = VIEWS.length * Object.values(ANIMS).reduce((a,b)=>a+b.frames, 0);
+  const modelH = Math.round(-cr.guides.headTop);
+
+  el.innerHTML = `
+    <div class="spec-head">
+      <div class="spec-id">
+        <h2 class="spec-name">${cr.name}
+          <span class="chip" style="background:${cr.typeColor}">${cr.type}</span>
+        </h2>
+        <p class="spec-sub">${cr.plan} — ${cr.blurb}</p>
+      </div>
+      <div class="spec-stats">
+        <div>model height<b>${modelH} px</b></div>
+        <div>parts<b>${cr.parts.length}</b></div>
+        <div>frames<b>${totalFrames}</b></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Animation">
+        <button data-anim="idle"   aria-pressed="true">Idle</button>
+        <button data-anim="walk"   aria-pressed="false">Walk</button>
+        <button data-anim="attack" aria-pressed="false">Attack</button>
+      </div>
+      <button class="mini" data-act="play">${state.playing ? '❚❚ Pause' : '▶ Play'}</button>
+      <button class="mini" data-act="step">Step ›</button>
+      <div class="ctl"><label for="${cr.id}-spd">fps</label>
+        <input id="${cr.id}-spd" type="range" min="1" max="14" value="6"></div>
+      <div class="ctl"><label for="${cr.id}-scl">zoom</label>
+        <input id="${cr.id}-scl" type="range" min="3" max="9" value="5"></div>
+      <div class="ctl"><input id="${cr.id}-gd" type="checkbox"><label for="${cr.id}-gd">guides</label></div>
+      <div class="ctl"><input id="${cr.id}-gr" type="checkbox"><label for="${cr.id}-gr">grid</label></div>
+    </div>
+
+    <div class="preview">
+      ${VIEWS.map(v => `
+        <div class="cell">
+          <canvas data-view="${v}"></canvas>
+          <span class="dir">${VIEW_LABEL[v]}</span>
+        </div>`).join('')}
+    </div>
+
+    <span class="section-label">Proportion check — idle frame 0, all views</span>
+    <div class="check">
+      <div class="check-flex">
+        <div class="check-canvas"><canvas data-role="check"></canvas></div>
+        <div>
+          <table class="meas">
+            <thead><tr><th>View</th><th>Crown</th><th>Ground</th><th>Height</th><th>Width</th></tr></thead>
+            <tbody data-role="meas"></tbody>
+          </table>
+          <div data-role="verdict"></div>
+        </div>
+      </div>
+    </div>
+
+    <span class="section-label">Frame sheet — <span data-role="sheetanim">idle</span></span>
+    <div class="sheet" data-role="sheet"></div>
+  `;
+
+  host.appendChild(el);
+
+  const previewCanvases = {};
+  VIEWS.forEach(v => previewCanvases[v] = el.querySelector(`canvas[data-view="${v}"]`));
+  const checkCanvas = el.querySelector('canvas[data-role="check"]');
+  const measBody    = el.querySelector('[data-role="meas"]');
+  const verdictEl   = el.querySelector('[data-role="verdict"]');
+  const sheetEl     = el.querySelector('[data-role="sheet"]');
+  const sheetAnim   = el.querySelector('[data-role="sheetanim"]');
+  const playBtn     = el.querySelector('[data-act="play"]');
+
+  function renderPreview(){
+    const n = ANIMS[state.anim].frames;
+    const f = state.frame % n;
+    for(const v of VIEWS){
+      const c = previewCanvases[v];
+      blitTo(c, cr.frames[v][state.anim][f], state.scale);
+      if(state.grid)   drawGrid(c, state.scale);
+      if(state.guides) drawGuides(c, cr, state.scale);
+    }
+  }
+
+  function renderCheck(){
+    const scale = 4, gap = 6;
+    const cw = (W * scale + gap) * VIEWS.length + gap;
+    checkCanvas.width = cw; checkCanvas.height = H * scale + 2*gap;
+    const g = checkCanvas.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.clearRect(0,0,cw,checkCanvas.height);
+
+    // shared guide lines run across every view — misalignment is visible instantly
+    const guideColor = getComputedStyle(document.documentElement).getPropertyValue('--guide').trim() || '#0b7f8e';
+    const lines = [GROUND + cr.guides.headTop, cr.guides.eyeY != null ? GROUND + cr.guides.eyeY : null, GROUND];
+    g.save(); g.strokeStyle = guideColor; g.lineWidth = 1; g.setLineDash([4,4]);
+    for(const ly of lines){
+      if(ly == null) continue;
+      const py = Math.round(gap + ly*scale) + .5;
+      g.beginPath(); g.moveTo(0, py); g.lineTo(cw, py); g.stroke();
+    }
+    g.restore();
+
+    VIEWS.forEach((v,i) => {
+      g.drawImage(cr.frames[v]['idle'][0], gap + i*(W*scale+gap), gap, W*scale, H*scale);
+    });
+
+    // measurements from the real pixels
+    const rows = VIEWS.map(v => ({v, m: measure(cr.buffers[v]['idle'][0])}));
+    measBody.innerHTML = rows.map(r =>
+      `<tr><td>${VIEW_LABEL[r.v]}</td><td>${r.m.top}</td><td>${r.m.bottom}</td><td>${r.m.height}</td><td>${r.m.width}</td></tr>`
+    ).join('');
+
+    const heights = rows.map(r => r.m.height);
+    const tops    = rows.map(r => r.m.top);
+    const grounds = rows.map(r => r.m.bottom);
+    const spreadH = Math.max(...heights) - Math.min(...heights);
+    const spreadT = Math.max(...tops)    - Math.min(...tops);
+    const spreadG = Math.max(...grounds) - Math.min(...grounds);
+    const ok = spreadH <= 1 && spreadT <= 1 && spreadG <= 1;
+    verdictEl.innerHTML = ok
+      ? `<div class="verdict ok">✓ on-model — crown, ground and height agree across all four views (±${Math.max(spreadH,spreadT,spreadG)}px)</div>`
+      : `<div class="verdict no">✗ drift — height varies by ${spreadH}px, crown by ${spreadT}px, ground by ${spreadG}px</div>`;
+  }
+
+  function renderSheet(){
+    sheetAnim.textContent = state.anim;
+    const n = ANIMS[state.anim].frames;
+    sheetEl.innerHTML = VIEWS.map(v => `
+      <div class="sheet-row">
+        <span class="rlab">${VIEW_LABEL[v]}</span>
+        <div class="sheet-frames">
+          ${Array.from({length:n}, (_,f) => `<div class="frame-box" data-v="${v}" data-f="${f}"><span class="fnum">${f}</span></div>`).join('')}
+        </div>
+      </div>`).join('');
+    sheetEl.querySelectorAll('.frame-box').forEach(box => {
+      const v = box.dataset.v, f = +box.dataset.f;
+      const c = document.createElement('canvas');
+      const s = 2;
+      c.width = W*s; c.height = H*s;
+      const g = c.getContext('2d');
+      g.imageSmoothingEnabled = false;
+      g.drawImage(cr.frames[v][state.anim][f], 0, 0, W*s, H*s);
+      box.prepend(c);
+    });
+  }
+
+  /* controls */
+  el.querySelectorAll('[data-anim]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.anim = b.dataset.anim; state.frame = 0;
+      el.querySelectorAll('[data-anim]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+      renderPreview(); renderSheet();
+    });
+  });
+  playBtn.addEventListener('click', () => {
+    state.playing = !state.playing;
+    playBtn.textContent = state.playing ? '❚❚ Pause' : '▶ Play';
+  });
+  el.querySelector('[data-act="step"]').addEventListener('click', () => {
+    state.playing = false; playBtn.textContent = '▶ Play';
+    state.frame = (state.frame + 1) % ANIMS[state.anim].frames;
+    renderPreview();
+  });
+  el.querySelector(`#${cr.id}-spd`).addEventListener('input', e => state.fps = +e.target.value);
+  el.querySelector(`#${cr.id}-scl`).addEventListener('input', e => { state.scale = +e.target.value; renderPreview(); });
+  el.querySelector(`#${cr.id}-gd`).addEventListener('change', e => { state.guides = e.target.checked; renderPreview(); });
+  el.querySelector(`#${cr.id}-gr`).addEventListener('change', e => { state.grid = e.target.checked; renderPreview(); });
+
+  renderPreview(); renderCheck(); renderSheet();
+
+  let acc = 0, last = performance.now();
+  function tick(now){
+    const dt = (now - last) / 1000; last = now;
+    if(state.playing){
+      acc += dt;
+      const spf = 1 / state.fps;
+      if(acc >= spf){
+        acc = 0;
+        state.frame = (state.frame + 1) % ANIMS[state.anim].frames;
+        renderPreview();
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // themes change the guide color; redraw the static check when it flips
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  mq.addEventListener?.('change', () => { renderCheck(); renderPreview(); });
+}
+
+CREATURES.forEach(buildSpecimen);
+</script>
