@@ -270,7 +270,7 @@ function project(view, x,y,z, sx,sy,sz){
    ══════════════════════════════════════════════════════════════════════ */
 const CREATURES = [
 {
-  id:'sporelet', name:'Sporelet', types:['verdant'],   // starters are always single-element
+  id:'sporelet', name:'Sporelet', types:['verdant'], scale:0.80,  // starters are always single-element
   plan:'Quadruped · mycelial symbiont',
   blurb:'Grows a pair of caps along its spine that it sheds and regrows each season. Runs in a low four-legged bound, ears flat, caps swept back.',
   outline:'#141d0e',
@@ -366,53 +366,55 @@ const CREATURES = [
   outline:'#24100a',
   colors:{ body:'#d4552e', dark:'#94301a', belly:'#f6cf96', accent:'#f2b134',
            sclera:'#fdf3de', eye:'#2a1310', glint:'#ffffff', mouth:'#6e2420' },
-  pivots:{ body:[0,-6,0], head:[0,-16.5,0.3], jaw:[0,-19.0,2.0],
-           hip:[0,-7.4,0], tail:[0,-9.2,-2.8] },
+  pivots:{ body:[0,-4.0,0], head:[0,-11.2,0.3], jaw:[0,-12.8,1.6],
+           hip:[0,-4.4,0], tail:[0,-5.6,-1.8] },
   parts:[
-    {n:'tailMid',   shape:'ell', role:'tail', pos:[0,-9.0,-5.0],   size:[1.2,1.4,3.6], color:'accent'},
-    {n:'tailL',     shape:'ell', role:'tail', pos:[-1.9,-9.4,-4.4], size:[1.0,1.2,3.0], color:'dark'},
-    {n:'tailR',     shape:'ell', role:'tail', pos:[ 1.9,-9.4,-4.4], size:[1.0,1.2,3.0], color:'dark'},
-    {n:'legL',      shape:'box', role:'leg',  phase:0,   pos:[-1.9,-3.7,0], size:[0.9,3.7,0.9], color:'accent'},
-    {n:'legR',      shape:'box', role:'leg',  phase:0.5, pos:[ 1.9,-3.7,0], size:[0.9,3.7,0.9], color:'accent'},
-    {n:'footL',     shape:'box', role:'foot', phase:0,   pos:[-1.9,-0.5,1.1], size:[1.3,0.6,2.0], color:'accent'},
-    {n:'footR',     shape:'box', role:'foot', phase:0.5, pos:[ 1.9,-0.5,1.1], size:[1.3,0.6,2.0], color:'accent'},
-    {n:'talonL',    shape:'ell', role:'foot', phase:0,   pos:[-1.9,-0.4,2.6], size:[1.1,0.5,0.9], color:'dark'},
-    {n:'talonR',    shape:'ell', role:'foot', phase:0.5, pos:[ 1.9,-0.4,2.6], size:[1.1,0.5,0.9], color:'dark'},
-    {n:'body',      shape:'ell', role:'body', pos:[0,-11.6,0],   size:[4.5,6.1,4.1], color:'body'},
-    {n:'chest',     shape:'ell', role:'body', pos:[0,-11.0,2.2], size:[3.1,4.3,2.6], color:'belly', hideIn:['back']},
-    // shoulder pivots sit inside the body (rx 4.5), so a spread wing keeps its root buried
-    {n:'wingL',     shape:'ell', role:'wing', side:-1, pos:[-4.9,-13.0,-0.3], size:[1.3,4.2,3.2], color:'dark',   pivot:[-3.2,-14.0,-0.3]},
-    {n:'wingR',     shape:'ell', role:'wing', side: 1, pos:[ 4.9,-13.0,-0.3], size:[1.3,4.2,3.2], color:'dark',   pivot:[ 3.2,-14.0,-0.3]},
-    {n:'wingTipL',  shape:'ell', role:'wing', side:-1, pos:[-5.6,-8.8,-1.6], size:[1.0,2.6,2.2], color:'accent', pivot:[-3.2,-14.0,-0.3]},
-    {n:'wingTipR',  shape:'ell', role:'wing', side: 1, pos:[ 5.6,-8.8,-1.6], size:[1.0,2.6,2.2], color:'accent', pivot:[ 3.2,-14.0,-0.3]},
-    {n:'neck',      shape:'ell', role:'neck', pos:[0,-16.8,0.6], size:[2.3,2.5,2.2], color:'body'},
-    {n:'head',      shape:'ell', role:'head', pos:[0,-19.8,0.5], size:[3.7,3.5,3.6], color:'body'},
-    {n:'crestA',    shape:'ell', role:'deco', pos:[0,-23.4,-1.2],   size:[0.9,2.4,2.6], color:'accent'},
-    {n:'crestB',    shape:'ell', role:'deco', pos:[-1.4,-22.8,-1.8], size:[0.7,1.8,2.1], color:'dark'},
-    {n:'crestC',    shape:'ell', role:'deco', pos:[ 1.4,-22.8,-1.8], size:[0.7,1.8,2.1], color:'dark'},
-    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-19.2,3.0], size:[1.1,0.8,1.0], color:'mouth', hideIn:['back']},
-    {n:'beakLower', shape:'ell', role:'jaw',  pos:[0,-18.6,3.5], size:[1.05,0.7,1.7], color:'dark',   hideIn:['back']},
-    {n:'beakUpper', shape:'ell', role:'beak', pos:[0,-19.7,3.8], size:[1.25,1.0,2.1], color:'accent', hideIn:['back']},
-    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-1.85,-20.8,2.7], size:[1.3,1.45,0.9], color:'sclera', hideIn:['back']},
-    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 1.85,-20.8,2.7], size:[1.3,1.45,0.9], color:'sclera', hideIn:['back']},
-    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-2.0,-20.7,3.05], size:[0.8,0.95,0.7], color:'eye', hideIn:['back']},
-    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 2.0,-20.7,3.05], size:[0.8,0.95,0.7], color:'eye', hideIn:['back']},
-    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-2.3,-21.2,3.3], size:[0.4,0.4,0.35], color:'glint', hideIn:['back']},
-    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 2.3,-21.2,3.3], size:[0.4,0.4,0.35], color:'glint', hideIn:['back']},
-    // lids cover the whole eye, so a blink reads as fully shut
-    {n:'lidL',      shape:'ell', role:'lid', pos:[-1.85,-20.8,2.75], size:[1.38,0.32,0.96], color:'body', hideIn:['back']},
-    {n:'lidR',      shape:'ell', role:'lid', pos:[ 1.85,-20.8,2.75], size:[1.38,0.32,0.96], color:'body', hideIn:['back']},
+    {n:'tailMid',   shape:'ell', role:'tail', pos:[0,-5.2,-3.8],   size:[1.0,1.15,2.8], color:'accent'},
+    {n:'tailL',     shape:'ell', role:'tail', pos:[-1.5,-5.5,-3.3], size:[0.82,1.0,2.3], color:'dark'},
+    {n:'tailR',     shape:'ell', role:'tail', pos:[ 1.5,-5.5,-3.3], size:[0.82,1.0,2.3], color:'dark'},
+    // short legs: 3.0 units show, the top 2.4 is buried in the body
+    {n:'legL',      shape:'box', role:'leg',  phase:0,   pos:[-1.7,-2.7,0], size:[0.82,2.7,0.82], color:'accent'},
+    {n:'legR',      shape:'box', role:'leg',  phase:0.5, pos:[ 1.7,-2.7,0], size:[0.82,2.7,0.82], color:'accent'},
+    {n:'footL',     shape:'box', role:'foot', phase:0,   pos:[-1.7,-0.45,0.95], size:[1.15,0.55,1.75], color:'accent'},
+    {n:'footR',     shape:'box', role:'foot', phase:0.5, pos:[ 1.7,-0.45,0.95], size:[1.15,0.55,1.75], color:'accent'},
+    {n:'talonL',    shape:'ell', role:'foot', phase:0,   pos:[-1.7,-0.35,2.25], size:[0.95,0.45,0.8], color:'dark'},
+    {n:'talonR',    shape:'ell', role:'foot', phase:0.5, pos:[ 1.7,-0.35,2.25], size:[0.95,0.45,0.8], color:'dark'},
+    // short, round body
+    {n:'body',      shape:'ell', role:'body', pos:[0,-6.8,0],   size:[3.6,4.0,3.4], color:'body'},
+    {n:'chest',     shape:'ell', role:'body', pos:[0,-6.4,1.8], size:[2.5,2.9,2.2], color:'belly', hideIn:['back']},
+    {n:'wingL',     shape:'ell', role:'wing', side:-1, pos:[-3.4,-7.4,-0.2], size:[1.05,2.9,2.5], color:'dark',   pivot:[-2.4,-8.4,-0.2]},
+    {n:'wingR',     shape:'ell', role:'wing', side: 1, pos:[ 3.4,-7.4,-0.2], size:[1.05,2.9,2.5], color:'dark',   pivot:[ 2.4,-8.4,-0.2]},
+    {n:'wingTipL',  shape:'ell', role:'wing', side:-1, pos:[-3.9,-4.6,-1.2], size:[0.82,1.9,1.7], color:'accent', pivot:[-2.4,-8.4,-0.2]},
+    {n:'wingTipR',  shape:'ell', role:'wing', side: 1, pos:[ 3.9,-4.6,-1.2], size:[0.82,1.9,1.7], color:'accent', pivot:[ 2.4,-8.4,-0.2]},
+    {n:'neck',      shape:'ell', role:'neck', pos:[0,-10.6,0.5], size:[1.8,1.9,1.7], color:'body'},
+    {n:'head',      shape:'ell', role:'head', pos:[0,-13.4,0.4], size:[3.0,2.9,3.0], color:'body'},
+    {n:'crestA',    shape:'ell', role:'deco', pos:[0,-15.9,-0.9],   size:[0.75,1.8,2.1], color:'accent'},
+    {n:'crestB',    shape:'ell', role:'deco', pos:[-1.1,-15.5,-1.3], size:[0.58,1.35,1.7], color:'dark'},
+    {n:'crestC',    shape:'ell', role:'deco', pos:[ 1.1,-15.5,-1.3], size:[0.58,1.35,1.7], color:'dark'},
+    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-12.9,2.4], size:[0.9,0.65,0.8], color:'mouth', hideIn:['back']},
+    {n:'beakLower', shape:'ell', role:'jaw',  pos:[0,-12.5,2.85], size:[0.88,0.58,1.4], color:'dark',   hideIn:['back']},
+    {n:'beakUpper', shape:'ell', role:'beak', pos:[0,-13.3,3.05], size:[1.05,0.8,1.7], color:'accent', hideIn:['back']},
+    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-1.50,-14.2,2.15], size:[1.05,1.18,0.75], color:'sclera', hideIn:['back']},
+    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 1.50,-14.2,2.15], size:[1.05,1.18,0.75], color:'sclera', hideIn:['back']},
+    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-1.62,-14.1,2.45], size:[0.66,0.78,0.58], color:'eye', hideIn:['back']},
+    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 1.62,-14.1,2.45], size:[0.66,0.78,0.58], color:'eye', hideIn:['back']},
+    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-1.86,-14.55,2.65], size:[0.33,0.33,0.29], color:'glint', hideIn:['back']},
+    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 1.86,-14.55,2.65], size:[0.33,0.33,0.29], color:'glint', hideIn:['back']},
+    {n:'lidL',      shape:'ell', role:'lid', pos:[-1.50,-14.2,2.2], size:[1.12,0.26,0.8], color:'body', hideIn:['back']},
+    {n:'lidR',      shape:'ell', role:'lid', pos:[ 1.50,-14.2,2.2], size:[1.12,0.26,0.8], color:'body', hideIn:['back']},
   ],
   /* pitched hard forward, head counter-rotated level, wings out as counterweights */
   sprint(cr, p, f, nF){
     const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
     const r = p.role;
-    const lean = [0.44,0.50,0.42,0.44,0.50,0.42][f];
+    const lean = [0.34,0.39,0.32,0.34,0.39,0.32][f];   // eased: the short body exaggerates a lean
     d.y += [-0.5,-1.2, 0.0,-0.5,-1.2, 0.0][f];       // uniform bob: nothing shears apart
     rots.push({axis:'x', ang:-lean, pivot:cr.pivots.body});
     // the head counter-rotates to stay level — the lean alone carries it forward
-    if(r === 'head' || r === 'beak' || r === 'jaw' || r === 'eye' || r === 'deco' || r === 'mouth')
+    if(r === 'head' || r === 'beak' || r === 'jaw' || r === 'eye' || r === 'deco' || r === 'mouth' || r === 'lid')
       rots.push({axis:'x', ang: lean + 0.06, pivot:cr.pivots.head});
+    // half angle on the neck: at full angle it shears out of the body mid-stride
+    if(r === 'neck') rots.push({axis:'x', ang:(lean + 0.06)*0.5, pivot:cr.pivots.head});
     if(r === 'wing'){
       const flutter = Math.sin(f/nF*Math.PI*2)*0.13;
       rots.push({axis:'z', ang: -(p.side||1)*(0.64+flutter), pivot:p.pivot});   // spread out
@@ -473,7 +475,8 @@ function baseAnim(cr, p, anim, f, nF){
   } else if(anim === 'call'){
     const HEAD=[0.02,0.20,0.30,0.12], JAW=[0.08,0.44,0.60,0.26];
     const PUFF=[0,0.03,0.06,0.025], WING=[0.05,0.35,0.50,0.20];
-    if(UPPER.includes(r)) rots.push({axis:'x', ang:HEAD[f], pivot:cr.pivots.head});  // head thrown back
+    // the neck takes half the head's angle — at full angle it shears out of the body
+    if(UPPER.includes(r)) rots.push({axis:'x', ang:HEAD[f]*(r==='neck'?0.5:1), pivot:cr.pivots.head});
     if(r === 'jaw')  rots.push({axis:'x', ang:-JAW[f], pivot:cr.pivots.jaw});
     if(r === 'body'){ sc.x = 1+PUFF[f]; sc.z = 1+PUFF[f]; }             // chest fills
     if(r === 'wing') rots.push({axis:'z', ang:-(p.side||1)*WING[f], pivot:p.pivot});
@@ -570,8 +573,8 @@ function renderFrame(cr, view, anim, f, nF, blink){
     pos[0]+=A.d.x; pos[1]+=A.d.y; pos[2]+=A.d.z;
 
     const sz = [p.size[0]*A.sc.x, p.size[1]*A.sc.y, p.size[2]*A.sc.z];
-    const pr = project(view, pos[0]*SCALE, pos[1]*SCALE, pos[2]*SCALE,
-                             sz[0]*SCALE,  sz[1]*SCALE,  sz[2]*SCALE);
+    const S = SCALE * (cr.scale || 1);          // per-creature size, same proportions
+    const pr = project(view, pos[0]*S, pos[1]*S, pos[2]*S, sz[0]*S, sz[1]*S, sz[2]*S);
 
     // A rotation reads as in-plane turn when its axis points at the camera,
     // and as foreshortening when it doesn't.
@@ -579,11 +582,11 @@ function renderFrame(cr, view, anim, f, nF, blink){
     if(netAng !== 0 && netAxis === 'x'){
       if(view === 'right') rot = -netAng;
       else if(view === 'left') rot = netAng;
-      else pr.rv = Math.abs(sz[1]*SCALE*Math.cos(netAng)) + Math.abs(sz[2]*SCALE*Math.sin(netAng));
+      else pr.rv = Math.abs(sz[1]*S*Math.cos(netAng)) + Math.abs(sz[2]*S*Math.sin(netAng));
     } else if(netAng !== 0 && netAxis === 'z'){
       if(view === 'front') rot = netAng;
       else if(view === 'back') rot = -netAng;
-      else pr.rv = Math.abs(sz[1]*SCALE*Math.cos(netAng)) + Math.abs(sz[0]*SCALE*Math.sin(netAng));
+      else pr.rv = Math.abs(sz[1]*S*Math.cos(netAng)) + Math.abs(sz[0]*S*Math.sin(netAng));
     }
 
     // pure depth motion is invisible head-on, so scale it into apparent size
@@ -710,7 +713,7 @@ function guideColor(){ return getComputedStyle(document.documentElement).getProp
 function overlayGuides(canvas, cr, scale){
   const g=canvas.getContext('2d'); g.save();
   g.strokeStyle=guideColor(); g.lineWidth=1; g.setLineDash([3,3]);
-  const rows=[GROUND+cr.guides.headTop*SCALE, cr.guides.eyeY!=null?GROUND+cr.guides.eyeY*SCALE:null, GROUND];
+  const K=SCALE*(cr.scale||1); const rows=[GROUND+cr.guides.headTop*K, cr.guides.eyeY!=null?GROUND+cr.guides.eyeY*K:null, GROUND];
   for(const ly of rows){
     if(ly==null) continue;
     const py=Math.round(ly*scale)+.5;
@@ -726,7 +729,7 @@ function buildSpecimen(cr){
   el.className = 'specimen';
 
   const totalFrames = VIEWS.length * Object.values(ANIMS).reduce((a,b)=>a+b.frames,0);
-  const modelH = Math.round(-cr.guides.headTop * SCALE);
+  const modelH = Math.round(-cr.guides.headTop * SCALE * (cr.scale||1));
 
   const weak = EL_KEYS.filter(k => cr.defense[k] > 1).sort((a,b)=>cr.defense[b]-cr.defense[a]);
   const resist = EL_KEYS.filter(k => cr.defense[k] < 1).sort((a,b)=>cr.defense[a]-cr.defense[b]);
@@ -819,7 +822,8 @@ function buildSpecimen(cr){
     checkCv.width=cw; checkCv.height=H*s+2*gap;
     const g=checkCv.getContext('2d'); g.imageSmoothingEnabled=false; g.clearRect(0,0,cw,checkCv.height);
     g.save(); g.strokeStyle=guideColor(); g.lineWidth=1; g.setLineDash([4,4]);
-    for(const ly of [GROUND+cr.guides.headTop*SCALE, cr.guides.eyeY!=null?GROUND+cr.guides.eyeY*SCALE:null, GROUND]){
+    const K=SCALE*(cr.scale||1);
+    for(const ly of [GROUND+cr.guides.headTop*K, cr.guides.eyeY!=null?GROUND+cr.guides.eyeY*K:null, GROUND]){
       if(ly==null) continue;
       const py=Math.round(gap+ly*s)+.5;
       g.beginPath(); g.moveTo(0,py); g.lineTo(cw,py); g.stroke();
