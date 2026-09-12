@@ -393,26 +393,6 @@ function serpentUncoil(cr, p, step, back){
   return {d, sc, rots};
 }
 
-/* Eight legs is four times as many as the rig has ever had to phase. Each
-   leg swings fore and aft about its own attachment and lifts a quarter cycle
-   later, so the lift happens mid-swing rather than at the ends; the phases
-   run 0, 1/4, 1/2, 3/4 down each side so no two neighbours are ever down
-   together. The tilt that makes a leg diagonal is larger than any swing
-   angle, so a stepping leg stays bent instead of snapping straight. */
-function spiderStep(cr, p, f, nF, swing, lift, crouch){
-  const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
-  const r = p.role, t = f/nF*Math.PI*2;
-  if(r === 'lid') sc.y = 0;
-  d.y += crouch;
-  if(r === 'leg' && p.pivot){
-    const ph = t + (p.phase||0)*Math.PI*2;
-    rots.push({axis:'x', ang:Math.sin(ph)*swing, pivot:p.pivot});
-    rots.push({axis:'z', ang:-(p.side||1)*Math.max(0, Math.sin(ph + Math.PI/2))*lift, pivot:p.pivot});
-  }
-  if(r === 'tail') d.y += Math.sin(t*2)*0.25;
-  return {d, sc, rots};
-}
-
 /* The travelling wave that moves a limbless animal: every segment slides
    sideways on the same sine, phase-shifted by how far down the body it sits,
    so the S runs from head to tail instead of the whole snake wagging. */
@@ -1259,110 +1239,49 @@ const CREATURES = [
   }
 },
 {
-  id:'duskweave', name:'Duskweave', types:['umbra'], scale:1.30,
-  plan:'Eight-legged ambusher · waits where the light does not reach',
-  blurb:'Sits with its body slung between eight legs and does not move for hours at a time, which is the entire hunting strategy. Six eyes, all of them pointed at you, and none of them blinking at the same time as any of the others.',
-  outline:'#100a26',
-  colors:{ body:'#463a78', leg:'#382c66', legDark:'#2a2052', dark:'#1e1740', mark:'#cdc2ee',
-           fang:'#e6ddff', glow:'#d3c6ff',
-           sclera:'#d3c6ff', eye:'#180f34', glint:'#ffffff', mouth:'#6a2450' },
-  pivots:{ body:[0,-7.6,0], head:[0,-7.4,2.0], jaw:[0,-5.4,4.6],
-           tail:[0,-8.0,-3.6], hip:[0,-8.6,1.0] },
+  id:'gloamlet', name:'Gloamlet', types:['umbra'], scale:0.92, plan:'Quadruped · vulpine ambusher',
+  blurb:'Made of the dark under a hedge. Perfectly visible, provided you already knew it was there.',
+  outline:'#0b0812',
+  colors:{ body:'#5a5268', limb:'#4a4357', dark:'#322d3d', belly:'#c9c2d6', inner:'#6d5f7d',
+           sclera:'#f0edf6', eye:'#14101c', glint:'#ffffff', mouth:'#4a2030' },
+  pivots:{ body:[0,-4.4,0], head:[0,-9.8,2.9], jaw:[0,-10.8,5.2], ear:[0,-13.4,3.6],
+           tail:[0,-6.6,-3.4], hipFore:[0,-5.6,2.6], hipHind:[0,-5.6,-2.6] },
   parts:[
-    /* abdomen behind, cephalothorax in front, joined by a waist you can see
-       daylight through — the pinch is most of what says 'spider' in profile */
-    {n:'spinneret',  shape:'ell', role:'tail', pos:[0,-7.20,-8.60], size:[0.90,0.80,1.00], color:'dark'},
-    {n:'abdomen',    shape:'ell', role:'tail', pos:[0,-8.00,-4.80], size:[3.60,3.20,3.80], color:'body'},
-    {n:'markA',      shape:'ell', flat:true, role:'tail', pos:[0,-10.60,-4.60], size:[1.00,0.60,1.60], color:'mark'},
-    {n:'markB',      shape:'ell', flat:true, role:'tail', pos:[0,-10.00,-6.70], size:[0.70,0.50,1.10], color:'mark'},
-    {n:'pedicel',    shape:'ell', role:'body', pos:[0,-7.40,-0.60], size:[1.00,1.00,1.30], color:'dark'},
-    {n:'thorax',     shape:'ell', role:'body', pos:[0,-7.00,1.90], size:[3.00,2.40,3.95], color:'body'},
-    {n:'carapace',   shape:'ell', role:'body', pos:[0,-8.60,2.00], size:[2.60,1.40,3.25], color:'dark'},
-    {n:'femurL1', shape:'ell', role:'leg', side:-1, phase:0.00, pivot:[-1.50,-8.40,5.00], pos:[ -3.90,-10.00,  5.15], size:[2.88,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-2.554}},
-    {n:'tibiaL1', shape:'ell', role:'leg', side:-1, phase:0.00, pivot:[-1.50,-8.40,5.00], pos:[ -7.35, -5.90,  5.49], size:[5.80,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.753}},
-    {n:'femurR1', shape:'ell', role:'leg', side:1, phase:0.00, pivot:[1.50,-8.40,5.00], pos:[  3.90,-10.00,  5.15], size:[2.88,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-0.588}},
-    {n:'tibiaR1', shape:'ell', role:'leg', side:1, phase:0.00, pivot:[1.50,-8.40,5.00], pos:[  7.35, -5.90,  5.49], size:[5.80,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.389}},
-    {n:'femurL2', shape:'ell', role:'leg', side:-1, phase:0.25, pivot:[-1.50,-8.40,3.00], pos:[ -4.20, -9.85,  3.15], size:[3.06,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-2.649}},
-    {n:'tibiaL2', shape:'ell', role:'leg', side:-1, phase:0.25, pivot:[-1.50,-8.40,3.00], pos:[ -8.00, -5.75,  3.50], size:[5.66,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.766}},
-    {n:'femurR2', shape:'ell', role:'leg', side:1, phase:0.25, pivot:[1.50,-8.40,3.00], pos:[  4.20, -9.85,  3.15], size:[3.06,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-0.493}},
-    {n:'tibiaR2', shape:'ell', role:'leg', side:1, phase:0.25, pivot:[1.50,-8.40,3.00], pos:[  8.00, -5.75,  3.50], size:[5.66,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.375}},
-    {n:'femurL3', shape:'ell', role:'leg', side:-1, phase:0.50, pivot:[-1.50,-8.40,0.90], pos:[ -4.20, -9.65,  0.75], size:[2.98,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-2.708}},
-    {n:'tibiaL3', shape:'ell', role:'leg', side:-1, phase:0.50, pivot:[-1.50,-8.40,0.90], pos:[ -8.00, -5.55,  0.41], size:[5.46,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.774}},
-    {n:'femurR3', shape:'ell', role:'leg', side:1, phase:0.50, pivot:[1.50,-8.40,0.90], pos:[  4.20, -9.65,  0.75], size:[2.98,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-0.434}},
-    {n:'tibiaR3', shape:'ell', role:'leg', side:1, phase:0.50, pivot:[1.50,-8.40,0.90], pos:[  8.00, -5.55,  0.41], size:[5.46,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.368}},
-    {n:'femurL4', shape:'ell', role:'leg', side:-1, phase:0.75, pivot:[-1.50,-8.40,-1.10], pos:[ -3.90, -9.40, -1.25], size:[2.60,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-2.747}},
-    {n:'tibiaL4', shape:'ell', role:'leg', side:-1, phase:0.75, pivot:[-1.50,-8.40,-1.10], pos:[ -7.30, -5.30, -1.60], size:[5.20,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.764}},
-    {n:'femurR4', shape:'ell', role:'leg', side:1, phase:0.75, pivot:[1.50,-8.40,-1.10], pos:[  3.90, -9.40, -1.25], size:[2.60,0.32,0.40], color:'leg', tilt:{axis:'z', ang:-0.395}},
-    {n:'tibiaR4', shape:'ell', role:'leg', side:1, phase:0.75, pivot:[1.50,-8.40,-1.10], pos:[  7.30, -5.30, -1.60], size:[5.20,0.27,0.44], color:'legDark', tilt:{axis:'z', ang:1.377}},
-
-    /* pedipalps: the short pair up front it feels the world with */
-    {n:'palpL',      shape:'ell', role:'jaw', pos:[-1.90,-5.40,5.40], size:[0.50,1.50,0.70], color:'leg', tilt:{axis:'z', ang:0.34}, hideIn:['back']},
-    {n:'palpR',      shape:'ell', role:'jaw', pos:[ 1.90,-5.40,5.40], size:[0.50,1.50,0.70], color:'leg', tilt:{axis:'z', ang:-0.34}, hideIn:['back']},
-    {n:'chelL',      shape:'ell', role:'jaw', pos:[-0.85,-5.80,4.80], size:[0.72,1.35,0.85], color:'dark', hideIn:['back']},
-    {n:'chelR',      shape:'ell', role:'jaw', pos:[ 0.85,-5.80,4.80], size:[0.72,1.35,0.85], color:'dark', hideIn:['back']},
-    {n:'mouthInner', shape:'ell', flat:true, role:'mouth', pos:[0,-5.90,5.10], size:[0.80,0.55,0.60], color:'mouth', hideIn:['back']},
-    {n:'fangL',      shape:'ell', role:'jaw', pos:[-0.82,-4.30,5.10], size:[0.30,1.00,0.34], color:'fang', tilt:{axis:'z', ang:0.20}, hideIn:['back']},
-    {n:'fangR',      shape:'ell', role:'jaw', pos:[ 0.82,-4.30,5.10], size:[0.30,1.00,0.34], color:'fang', tilt:{axis:'z', ang:-0.20}, hideIn:['back']},
-
-    /* six eyes, two big and four small, all pale on a dark face. On something
-       this colour a dark eye disappears — the glow is what makes the face
-       findable at thumbnail size. */
-    {n:'eyeWhiteL',  shape:'ell', role:'eye', pos:[-0.95,-8.30,4.60], size:[0.92,0.98,0.72], color:'sclera', hideIn:['back']},
-    {n:'eyeWhiteR',  shape:'ell', role:'eye', pos:[ 0.95,-8.30,4.60], size:[0.92,0.98,0.72], color:'sclera', hideIn:['back']},
-    {n:'pupilL',     shape:'ell', flat:true, role:'eye', pos:[-1.02,-8.22,4.88], size:[0.50,0.56,0.40], color:'eye', hideIn:['back']},
-    {n:'pupilR',     shape:'ell', flat:true, role:'eye', pos:[ 1.02,-8.22,4.88], size:[0.50,0.56,0.40], color:'eye', hideIn:['back']},
-    {n:'glintL',     shape:'ell', flat:true, role:'eye', pos:[-1.18,-8.54,5.02], size:[0.26,0.26,0.24], color:'glint', hideIn:['back']},
-    {n:'glintR',     shape:'ell', flat:true, role:'eye', pos:[ 1.18,-8.54,5.02], size:[0.26,0.26,0.24], color:'glint', hideIn:['back']},
-    {n:'ocelL1',     shape:'ell', flat:true, role:'eye', pos:[-2.05,-8.10,3.90], size:[0.42,0.44,0.36], color:'sclera', hideIn:['back']},
-    {n:'ocelR1',     shape:'ell', flat:true, role:'eye', pos:[ 2.05,-8.10,3.90], size:[0.42,0.44,0.36], color:'sclera', hideIn:['back']},
-    {n:'ocelL2',     shape:'ell', flat:true, role:'eye', pos:[-1.70,-9.00,4.10], size:[0.36,0.38,0.32], color:'sclera', hideIn:['back']},
-    {n:'ocelR2',     shape:'ell', flat:true, role:'eye', pos:[ 1.70,-9.00,4.10], size:[0.36,0.38,0.32], color:'sclera', hideIn:['back']},
-    {n:'lidL',       shape:'ell', role:'lid', pos:[-0.95,-8.30,4.64], size:[0.99,0.24,0.78], color:'body', hideIn:['back']},
-    {n:'lidR',       shape:'ell', role:'lid', pos:[ 0.95,-8.30,4.64], size:[0.99,0.24,0.78], color:'body', hideIn:['back']},
-  ],
-  extraAnims:{ idle:{frames:8, fps:5} },
-  /* Dead still, then one leg resettles. A spider waiting is not breathing
-     visibly — the only tell that it is alive is an occasional twitch. */
-  idle(cr, p, f, nF){
-    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
-    const r = p.role;
-    if(r === 'lid') sc.y = 0;
-    const TWITCH = [0,0,0.16,0,0,0,-0.13,0][f];
-    if(r === 'leg' && p.pivot && Math.abs((p.phase||0) - 0.25) < 0.01)
-      rots.push({axis:'x', ang:TWITCH, pivot:p.pivot});
-    if(r === 'leg' && p.pivot && Math.abs((p.phase||0) - 0.75) < 0.01)
-      rots.push({axis:'x', ang:-TWITCH*0.7, pivot:p.pivot});
-    const BR = [0,0.006,0.010,0.012,0.008,0.004,0.008,0.004][f];
-    if(r === 'tail'){ sc.x = 1+BR; sc.y = 1+BR; sc.z = 1+BR; }
-    return {d, sc, rots};
-  },
-  walk  (cr,p,f,nF){ return spiderStep(cr,p,f,nF,0.26,0.16,0.0); },
-  sprint(cr,p,f,nF){ return spiderStep(cr,p,f,nF,0.40,0.26,0.9); },
-  /* The shared gather swings a limb on the fore/aft axis, which is right for
-     a leg that hangs down and wrong for one that splays sideways — on this
-     body it throws the knees straight up over the back. So this one gathers
-     with the same axes its own walk uses, ramping the stride up out of a
-     crouch instead. */
-  rouse (cr,p,f,nF){ return spiderStep(cr,p,f,4,0.26*[0,0.45,0.80,1][f], 0.16*[0,0.45,0.80,1][f], [1.7,0.9,0.3,0][f]); },
-  settle(cr,p,f,nF){ return spiderStep(cr,p,3-f,4,0.26*[0,0.45,0.80,1][3-f], 0.16*[0,0.45,0.80,1][3-f], [1.7,0.9,0.3,0][3-f]); },
-  /* Rears back on the hind legs with the front pair up and the fangs out —
-     a spider's threat and its strike are the same movement. */
-  attack(cr, p, f, nF){
-    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
-    const r = p.role;
-    if(r === 'lid') sc.y = 0;
-    const REAR  = [0.12, 0.40, -0.30, -0.16, 0.04][f];
-    const RAISE = [0.30, 0.95, -0.45, -0.10, 0.12][f];
-    const GAPE  = [0.10, 0.30,  0.85,  0.55, 0.12][f];
-    d.y += [0, -1.2, -0.4, 0, 0][f];
-    rots.push({axis:'x', ang:REAR, pivot:cr.pivots.tail});
-    // only the front two pairs come up; the back four stay planted
-    if(r === 'leg' && p.pivot && (p.phase||0) < 0.4)
-      rots.push({axis:'x', ang:RAISE, pivot:p.pivot});
-    if(r === 'jaw' || r === 'mouth') rots.push({axis:'x', ang:-GAPE, pivot:cr.pivots.jaw});
-    if(r === 'eye') sc.y = f >= 1 && f <= 3 ? 0.75 : 1;
-    return {d, sc, rots};
-  }
+    {n:'tail',      shape:'ell', role:'tail', pos:[0,-6.4,-5.4], size:[2.0,2.0,3.0], color:'body'},
+    {n:'tailTip',   shape:'ell', role:'tail', pos:[0,-7.6,-8.0], size:[1.5,1.5,1.8], color:'belly'},
+    {n:'hindLegL',  shape:'box', role:'leg', grp:'hind', phase:0.5, pos:[-2.1,-2.8,-2.6], size:[1.0,2.8,1.05], color:'limb'},
+    {n:'hindLegR',  shape:'box', role:'leg', grp:'hind', phase:0,   pos:[ 2.1,-2.8,-2.6], size:[1.0,2.8,1.05], color:'limb'},
+    {n:'hindPawL',  shape:'ell', role:'paw', grp:'hind', phase:0.5, pos:[-2.1,-0.5,-2.4], size:[1.2,0.7,1.45], color:'dark'},
+    {n:'hindPawR',  shape:'ell', role:'paw', grp:'hind', phase:0,   pos:[ 2.1,-0.5,-2.4], size:[1.2,0.7,1.45], color:'dark'},
+    {n:'foreLegL',  shape:'box', role:'leg', grp:'fore', phase:0,   pos:[-1.9,-2.8,2.6], size:[0.95,2.8,1.0], color:'limb'},
+    {n:'foreLegR',  shape:'box', role:'leg', grp:'fore', phase:0.5, pos:[ 1.9,-2.8,2.6], size:[0.95,2.8,1.0], color:'limb'},
+    {n:'forePawL',  shape:'ell', role:'paw', grp:'fore', phase:0,   pos:[-1.9,-0.5,2.9], size:[1.15,0.7,1.4], color:'dark'},
+    {n:'forePawR',  shape:'ell', role:'paw', grp:'fore', phase:0.5, pos:[ 1.9,-0.5,2.9], size:[1.15,0.7,1.4], color:'dark'},
+    {n:'torso',     shape:'ell', role:'body', pos:[0,-7.4,0],   size:[3.0,2.9,4.8], color:'body'},
+    {n:'belly',     shape:'ell', role:'body', pos:[0,-6.1,0.4], size:[2.4,1.7,4.1], color:'belly'},
+    {n:'haunchL',   shape:'ell', role:'body', pos:[-2.2,-5.4,-2.5], size:[1.55,1.9,1.9], color:'body'},
+    {n:'haunchR',   shape:'ell', role:'body', pos:[ 2.2,-5.4,-2.5], size:[1.55,1.9,1.9], color:'body'},
+    {n:'shoulderL', shape:'ell', role:'body', pos:[-2.0,-5.6,2.5], size:[1.4,1.7,1.7], color:'body'},
+    {n:'shoulderR', shape:'ell', role:'body', pos:[ 2.0,-5.6,2.5], size:[1.4,1.7,1.7], color:'body'},
+    {n:'neck',      shape:'ell', role:'neck', pos:[0,-9.4,2.9], size:[1.5,1.5,1.5], color:'body'},
+    {n:'head',      shape:'ell', role:'head', pos:[0,-11.6,4.4], size:[2.8,2.6,2.9], color:'body'},
+    {n:'earL',      shape:'ell', role:'ear', pos:[-1.9,-14.6,3.6], size:[1.15,2.3,0.85], color:'limb'},
+    {n:'earR',      shape:'ell', role:'ear', pos:[ 1.9,-14.6,3.6], size:[1.15,2.3,0.85], color:'limb'},
+    {n:'earInnerL', shape:'ell', role:'ear', pos:[-2.0,-14.4,4.0], size:[0.6,1.5,0.5], color:'inner', hideIn:['back']},
+    {n:'earInnerR', shape:'ell', role:'ear', pos:[ 2.0,-14.4,4.0], size:[0.6,1.5,0.5], color:'inner', hideIn:['back']},
+    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-10.65,6.2], size:[0.95,0.55,0.9], color:'mouth', hideIn:['back']},
+    {n:'jaw',       shape:'ell', role:'jaw', pos:[0,-10.3,6.6], size:[1.2,0.65,1.4], color:'belly', hideIn:['back']},
+    {n:'muzzle',    shape:'ell', role:'head', pos:[0,-11.0,6.9], size:[1.35,1.0,1.6], color:'belly', hideIn:['back']},
+    {n:'nose',      shape:'ell', flat:true, role:'head', pos:[0,-11.5,8.2], size:[0.5,0.4,0.42], color:'eye', hideIn:['back']},
+    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-1.45,-12.3,6.1], size:[1.05,1.2,0.75], color:'sclera', hideIn:['back']},
+    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 1.45,-12.3,6.1], size:[1.05,1.2,0.75], color:'sclera', hideIn:['back']},
+    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-1.57,-12.15,6.4], size:[0.65,0.78,0.57], color:'eye', hideIn:['back']},
+    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 1.57,-12.15,6.4], size:[0.65,0.78,0.57], color:'eye', hideIn:['back']},
+    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-1.8,-12.65,6.6], size:[0.32,0.32,0.28], color:'glint', hideIn:['back']},
+    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 1.8,-12.65,6.6], size:[0.32,0.32,0.28], color:'glint', hideIn:['back']},
+    {n:'lidL',      shape:'ell', role:'lid', pos:[-1.45,-12.3,6.15], size:[1.12,0.26,0.8], color:'limb', hideIn:['back']},
+    {n:'lidR',      shape:'ell', role:'lid', pos:[ 1.45,-12.3,6.15], size:[1.12,0.26,0.8], color:'limb', hideIn:['back']},
+  ]
 },
 {
   id:'dawnlet', name:'Dawnlet', types:['lumen'], plan:'Quadruped · radiant felid',
@@ -1587,14 +1506,6 @@ function renderFrame(cr, view, anim, f, nF, blink){
         rots[j].pivot = rotatePoint(rots[j].pivot, R.pivot, R.axis, R.ang);
       if(netAxis === null || netAxis === R.axis){ netAxis = R.axis; netAng += R.ang; }
       else if(Math.abs(R.ang) > Math.abs(netAng)){ netAxis = R.axis; netAng = R.ang; }
-    }
-    // A part may carry a permanent tilt: an orientation with no movement in
-    // it, for limbs that sit diagonally on a body whose parts are otherwise
-    // all axis-aligned. It is applied last and does not touch the position,
-    // so a tilted part animates from exactly where an untilted one would.
-    if(p.tilt){
-      if(netAxis === null || netAxis === p.tilt.axis){ netAxis = p.tilt.axis; netAng += p.tilt.ang; }
-      else if(Math.abs(p.tilt.ang) > Math.abs(netAng)){ netAxis = p.tilt.axis; netAng = p.tilt.ang; }
     }
     pos[0]+=A.d.x; pos[1]+=A.d.y; pos[2]+=A.d.z;
 
