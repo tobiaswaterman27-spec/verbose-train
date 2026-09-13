@@ -58,6 +58,17 @@ table.chart td.down{background:color-mix(in srgb,var(--eff-down) 22%,transparent
 .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:11.5px; color:var(--dim); margin-top:10px; font-family:"IBM Plex Mono",monospace;}
 .legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px;}
 
+/* roster */
+.roster{display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:8px; margin:10px 0 6px;}
+.rcard{display:flex; flex-direction:column; align-items:center; gap:6px; padding:10px 6px 9px; background:var(--surface); border:1px solid var(--line); border-radius:9px; cursor:pointer; font:inherit; color:inherit;}
+.rcard:hover{border-color:var(--accent);}
+.rcard[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft);}
+.rcard canvas{image-rendering:pixelated; width:92px; height:92px; background:var(--canvas-bg); border-radius:5px;}
+.rcard .rn{font-family:"Silkscreen",monospace; font-size:9.5px; text-align:center; line-height:1.3;}
+.rcard .re{font-family:"IBM Plex Mono",monospace; font-size:8.5px; letter-spacing:.06em; text-transform:uppercase; color:#fff; padding:1px 7px; border-radius:999px;}
+.rstage{font-family:"IBM Plex Mono",monospace; font-size:8px; color:var(--dim); letter-spacing:.08em;}
+.baking{padding:40px; text-align:center; color:var(--dim); font-family:"IBM Plex Mono",monospace; font-size:12px;}
+
 /* specimen */
 .specimen{margin-top:36px; background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
 .spec-head{display:flex; align-items:flex-start; gap:14px; flex-wrap:wrap; padding:18px 20px; border-bottom:1px solid var(--line-soft);}
@@ -110,6 +121,20 @@ table.meas td:first-child{text-align:left; color:var(--dim);}
 .ana-grp h4{font-family:"Silkscreen",monospace; font-size:9px; letter-spacing:.07em; color:var(--accent); margin:0 0 5px; text-transform:uppercase;}
 .ana-grp ul{list-style:none; margin:0; padding:0; font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--dim); line-height:1.65;}
 
+/* turn */
+.turn{padding:10px 20px 18px; display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;}
+.turn-live{background:var(--canvas-alt); border:1px solid var(--line); border-radius:6px; padding:8px;}
+.turn-live canvas{display:block; image-rendering:pixelated;}
+.turn-note{flex:1; min-width:210px; font-size:13px; color:var(--dim);}
+.turn-note p{margin:0 0 9px;} .turn-note p:last-child{margin:0}
+.turn-strip{padding:0 20px 20px; overflow-x:auto;}
+.turn-frames{display:flex; gap:4px;}
+.turn-cell{background:var(--canvas-alt); border:1px solid var(--line-soft); border-radius:4px; padding:2px 2px 0; text-align:center;}
+.turn-cell.cur{border-color:var(--accent);}
+.turn-cell canvas{display:block; image-rendering:pixelated;}
+.turn-cell .deg{font-family:"IBM Plex Mono",monospace; font-size:8px; color:var(--dim); display:block; line-height:1.5;}
+.turn-cell.cur .deg{color:var(--accent);}
+
 .sheet{padding:8px 20px 20px; overflow-x:auto;}
 .sheet-row{display:flex; align-items:center; gap:8px; margin-bottom:6px;}
 .sheet-row .rlab{font-family:"Silkscreen",monospace; font-size:9px; color:var(--dim); width:42px; flex:0 0 42px;}
@@ -126,9 +151,9 @@ footer{margin-top:42px; padding-top:20px; border-top:1px solid var(--line); font
     <div class="eyebrow">Wildhollow · art pipeline · build 002</div>
     <h1>Sprite Lab</h1>
     <p class="lede">
-      All ten starter first forms, generated entirely from code — no image files. Each is its own model:
+      Every Fellaron built so far, generated entirely from code — no image files. Each is its own model:
       shared anatomy conventions and one rig, but no shared template. Pick one to inspect its four
-      directions, five animations, proportion check and frame sheet.
+      directions, its animations, the turn, the proportion check and the frame sheet.
     </p>
   </header>
 
@@ -163,7 +188,7 @@ footer{margin-top:42px; padding-top:20px; border-top:1px solid var(--line); font
     </div>
   </section>
 
-  <span class="section-label" style="padding-left:0">The ten starters — first form</span>
+  <span class="section-label" style="padding-left:0">Built so far</span>
   <div class="roster" id="roster"></div>
   <div id="detail"></div>
 
@@ -187,6 +212,15 @@ footer{margin-top:42px; padding-top:20px; border-top:1px solid var(--line); font
 const W = 80, H = 72, GROUND = H - 8, SCALE = 2.0;
 const VIEWS = ['front','right','back','left'];
 const VIEW_LABEL = {front:'FRONT', right:'RIGHT', back:'BACK', left:'LEFT'};
+/* The yaw that turns the front projection into each of the other three. Falls
+   out of project(): spinning the model +90° about its own vertical maps its
+   +z onto the front view's +x, which is exactly what the right view reads.
+   So the four fixed views are four samples of one continuous rotation, and a
+   turn is that rotation played at the angles in between. */
+const VIEW_YAW = { front:0, right:Math.PI/2, back:Math.PI, left:-Math.PI/2 };
+const TURN = { frames:16, fps:12 };
+const turnFramesOf = cr => cr.turnFrames || TURN.frames;
+const turnFpsOf    = cr => cr.turnFps    || TURN.fps;
 // Each animation carries its own natural rate — a breath is not a sprint.
 const ANIMS = { idle:{frames:6,fps:3}, walk:{frames:4,fps:7}, sprint:{frames:6,fps:12},
                 attack:{frames:5,fps:8}, call:{frames:4,fps:5} };
@@ -332,6 +366,60 @@ function gatherPose(cr, p, f, nF, dir){
   if((r === 'arm' || r === 'hand') && P.shoulder)
     rots.push({axis:'x', ang:-0.42*k, pivot:P.shoulder});
   return {d, sc, rots};
+}
+
+/* Turning on the spot. The rotation itself is a yaw handed back in `yaw` and
+   applied by the renderer; everything here is what a body does WHILE it turns,
+   which is the part that stops it reading as a model on a turntable:
+     · the head goes first and the shoulders follow it round
+     · the feet take short shuffling steps instead of skating
+     · the weight rocks between the inside and outside legs
+   A creature with a better idea overrides turn() the way it can override any
+   other animation. */
+const UPPER_ROLES = ['head','beak','jaw','eye','deco','mouth','ear','neck','lid'];
+function turnPose(cr, p, f, nF){
+  const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+  const r = p.role, P = cr.pivots;
+  if(r === 'lid') sc.y = 0;
+  const t = f/nF;
+  const grounded = (r === 'leg' || r === 'foot' || r === 'paw');
+  // four shuffling steps to the revolution
+  const s = Math.sin((t*4 + (p.phase||0))*Math.PI*2);
+  if(grounded){
+    const hip = p.pivot || (p.grp === 'hind' ? P.hipHind : (P.hipFore || P.hip));
+    if(hip) rots.push({axis:'x', ang:s*0.20, pivot:hip});
+    d.y -= Math.max(0, s)*0.55;                       // the foot clears the ground
+  }
+  // weight rocking side to side, in step with the shuffle
+  rots.push({axis:'z', ang:Math.sin(t*Math.PI*4)*0.035, pivot:P.body});
+  d.y -= Math.abs(Math.sin(t*Math.PI*4))*0.30;
+  if(r === 'tail' && P.tail) rots.push({axis:'x', ang:-0.10, pivot:P.tail});
+  if(r === 'ear'  && P.ear)  rots.push({axis:'x', ang:-0.12, pivot:P.ear});
+  if(r === 'wing' && p.pivot) rots.push({axis:'z', ang:-(p.side||1)*0.18, pivot:p.pivot});
+  if((r === 'arm' || r === 'hand') && P.shoulder)
+    rots.push({axis:'x', ang:s*0.16, pivot:P.shoulder});
+  // the lead: the head is already looking where the body is going
+  const yaw = UPPER_ROLES.includes(r) ? (r === 'neck' ? 0.10 : 0.20) : 0;
+  return {d, sc, rots, yaw};
+}
+
+/* Apparent half-width of a part yawed by `th`, along the view's horizontal.
+   Exact for an ellipsoid; the bounding extent for a box, which is what the
+   pitch path already does. */
+function yawExtent(a, b, th, isBox){
+  const c = Math.abs(Math.cos(th)), s = Math.abs(Math.sin(th));
+  return isBox ? a*c + b*s : Math.hypot(a*c, b*s);
+}
+
+/* A face only exists on the front of a head. Across the four fixed views that
+   is a list of view names; mid-turn it has to be an angle instead, or the
+   eyes pop out of existence on a view boundary. Yaw zero keeps the list, so
+   the fixed views render exactly as they always have. */
+function hiddenPart(p, view, yaw){
+  if(!p.hideIn) return false;
+  if(yaw === 0) return p.hideIn.includes(view);
+  if(p.hideIn.includes('back')) return Math.cos(VIEW_YAW[view] + yaw) < -0.09;
+  return p.hideIn.includes(view);
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -691,6 +779,7 @@ function getAnim(cr, p, anim, f, nF){
   if(typeof cr[anim] === 'function') return cr[anim](cr, p, f, nF);
   if(anim === 'rouse')  return gatherPose(cr, p, f, nF,  1);
   if(anim === 'settle') return gatherPose(cr, p, f, nF, -1);
+  if(anim === 'turn')   return turnPose(cr, p, f, nF);
   if(anim === 'sprint') return genericSprint(cr, p, f, nF);
   return baseAnim(cr, p, anim, f, nF);
 }
@@ -754,9 +843,13 @@ function outlinePass(buf, rgb){
 function renderFrame(cr, view, anim, f, nF, blink){
   const buf = makeBuffer();
   const items = [];
+  // A turn is a yaw sweep; every other animation sits at yaw zero and takes
+  // the original code path untouched.
+  const baseYaw = anim === 'turn' ? (f/nF)*Math.PI*2 : 0;
   for(const p of cr.parts){
-    if(p.hideIn && p.hideIn.includes(view)) continue;
     const A = getAnim(cr, p, anim, f, nF);
+    const yaw = baseYaw + (A.yaw || 0);
+    if(hiddenPart(p, view, yaw)) continue;
     if(blink){
       if(p.role === 'eye') A.sc.y = 0;   // eye vanishes completely — no half-shut sliver
       if(p.role === 'lid') A.sc.y = 1;   // and the lid takes its place
@@ -777,9 +870,20 @@ function renderFrame(cr, view, anim, f, nF, blink){
     }
     pos[0]+=A.d.x; pos[1]+=A.d.y; pos[2]+=A.d.z;
 
+    // The turn, applied last and about the creature's own vertical axis, so it
+    // carries the finished pose round rather than fighting with its joints.
+    if(yaw !== 0) pos = rotatePoint(pos, cr.pivots.body, 'y', yaw);
+
     const sz = [p.size[0]*A.sc.x, p.size[1]*A.sc.y, p.size[2]*A.sc.z];
     const S = SCALE * (cr.scale || 1);          // per-creature size, same proportions
     const pr = project(view, pos[0]*S, pos[1]*S, pos[2]*S, sz[0]*S, sz[1]*S, sz[2]*S);
+    // Yawed, a part shows a blend of its width and its depth. Height is the one
+    // dimension a vertical-axis spin cannot touch, which is why a turn is the
+    // cheapest possible check that a model is actually on-model.
+    if(yaw !== 0){
+      const front = (view === 'front' || view === 'back');
+      pr.ru = yawExtent((front ? sz[0] : sz[2])*S, (front ? sz[2] : sz[0])*S, yaw, p.shape === 'box');
+    }
 
     // A rotation reads as in-plane turn when its axis points at the camera,
     // and as foreshortening when it doesn't.
@@ -799,9 +903,16 @@ function renderFrame(cr, view, anim, f, nF, blink){
     if(view === 'front')      dsc = 1 + A.d.z*0.030;
     else if(view === 'back')  dsc = Math.max(0.65, 1 - A.d.z*0.030);
 
-    items.push({p, u:pr.u, v:pr.v, ru:pr.ru*dsc, rv:pr.rv*dsc, depth:pr.depth, rot});
+    items.push({p, idx:items.length, u:pr.u, v:pr.v, ru:pr.ru*dsc, rv:pr.rv*dsc, depth:pr.depth, rot});
   }
-  items.sort((a,b) => a.depth - b.depth);
+  /* Parts that sit at the same depth — a muzzle and a jaw both on the midline —
+     must keep the order they were authored in, because that order is the only
+     thing deciding which of them is in front. Comparing raw floats does not do
+     that: a yaw of exactly 90° leaves cos at 6e-17 rather than 0, and those
+     last bits are enough to reorder a tie and flip a face inside out halfway
+     through a turn. Quantising first collapses the noise, and the authored
+     index breaks what is left, so the sort is a total order and stays put. */
+  items.sort((a,b) => (Math.round(a.depth*1e4) - Math.round(b.depth*1e4)) || (a.idx - b.idx));
   for(const it of items) rasterize(buf, it, cr.pal);
   outlinePass(buf, cr.outlineRGB);
   return buf;
@@ -880,6 +991,11 @@ function bake(cr){
         cr.blinkFrames[v][a] = Array.from({length:n}, (_,f) => bufferToCanvas(renderFrame(cr,v,a,f,n,true)));
     }
   }
+  // The turn is baked once, in the front projection only: yaw already carries
+  // it through all four facings, so a second set would be the same pixels.
+  const tn = turnFramesOf(cr);
+  cr.turnBufs = Array.from({length:tn}, (_,f) => renderFrame(cr,'front','turn',f,tn,false));
+  cr.turnCanvases = cr.turnBufs.map(bufferToCanvas);
   return cr;
 }
 const THUMB = 46;   // crop window, comfortably larger than the tallest first form
@@ -960,7 +1076,7 @@ function overlayGuides(canvas, cr, scale){
 
 function buildSpecimen(cr){
   const AN = animsOf(cr);
-  const st = { anim:'idle', frame:0, playing:!reduced, scale:4, fps:AN.idle.fps,
+  const st = { anim:'idle', frame:0, turnFrame:0, playing:!reduced, scale:4, fps:AN.idle.fps,
                guides:false, grid:false, blinking:false, queued:null };
   const el = document.createElement('section');
   el.className = 'specimen';
@@ -1012,6 +1128,19 @@ function buildSpecimen(cr){
       ${VIEWS.map(v=>`<div class="cell"><canvas data-view="${v}"></canvas><span class="dir">${VIEW_LABEL[v]}</span></div>`).join('')}
     </div>
 
+    <span class="section-label">Turning in place — ${turnFramesOf(cr)} frames, <span data-role="turndeg">0°</span></span>
+    <div class="turn">
+      <div class="turn-live"><canvas data-role="turn"></canvas></div>
+      <div class="turn-note">
+        <p>One yaw sweep about the creature's own vertical axis. At 90°, 180° and 270° it lands
+        pixel-for-pixel on the right, back and left views above — the four fixed directions are four
+        samples of this rotation, not separate drawings.</p>
+        <p>The head leads and the shoulders follow it round, the feet take four shuffling steps rather
+        than skating, and the weight rocks between them. <span data-role="turnverdict"></span></p>
+      </div>
+    </div>
+    <div class="turn-strip"><div class="turn-frames" data-role="turnstrip"></div></div>
+
     <span class="section-label">Proportion check — idle frame 0, all views</span>
     <div class="check"><div class="check-flex">
       <div class="check-canvas"><canvas data-role="check"></canvas></div>
@@ -1042,6 +1171,11 @@ function buildSpecimen(cr){
   const sheetEl = el.querySelector('[data-role="sheet"]');
   const sheetAnim = el.querySelector('[data-role="sheetanim"]');
   const playBtn = el.querySelector('[data-act="play"]');
+  const turnCv = el.querySelector('canvas[data-role="turn"]');
+  const turnDeg = el.querySelector('[data-role="turndeg"]');
+  const turnStrip = el.querySelector('[data-role="turnstrip"]');
+  const turnVerdict = el.querySelector('[data-role="turnverdict"]');
+  const TN = turnFramesOf(cr);
 
   function drawPreview(){
     const f = st.frame % AN[st.anim].frames;
@@ -1052,6 +1186,32 @@ function buildSpecimen(cr){
       if(st.grid) overlayGrid(c, st.scale);
       if(st.guides) overlayGuides(c, cr, st.scale);
     }
+  }
+  function drawTurn(){
+    blit(turnCv, cr.turnCanvases[st.turnFrame], st.scale);
+    turnDeg.textContent = Math.round(st.turnFrame*360/TN) + '°';
+    turnStrip.querySelectorAll('.turn-cell').forEach((c,i) => c.classList.toggle('cur', i === st.turnFrame));
+  }
+  function buildTurnStrip(){
+    const s = 1.3;
+    turnStrip.innerHTML = Array.from({length:TN},(_,f) =>
+      `<div class="turn-cell" data-f="${f}"><span class="deg">${Math.round(f*360/TN)}°</span></div>`).join('');
+    turnStrip.querySelectorAll('.turn-cell').forEach(cell => {
+      const c = document.createElement('canvas');
+      c.width = W*s; c.height = H*s;
+      const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+      g.drawImage(cr.turnCanvases[+cell.dataset.f], 0, 0, W*s, H*s);
+      cell.prepend(c);
+      cell.addEventListener('click', () => { st.turnFrame = +cell.dataset.f; drawTurn(); });
+    });
+    // a spin about the vertical cannot change how tall something is, so any
+    // wobble here is the model coming apart rather than the turn doing its job
+    const hs = cr.turnBufs.map(b => measure(b).height);
+    const spread = Math.max(...hs) - Math.min(...hs);
+    const loose = cr.turnBufs.filter(b => islandCount(b) > 1).length;
+    turnVerdict.innerHTML = (spread <= 2 && loose === 0)
+      ? `<b style="color:var(--good)">Holds ±${spread}px through the full rotation, one connected piece in all ${TN}.</b>`
+      : `<b style="color:var(--bad)">Height varies ${spread}px · ${loose} frame(s) come apart.</b>`;
   }
   function drawCheck(){
     const s=3, gap=6;
@@ -1128,19 +1288,27 @@ function buildSpecimen(cr){
     st.frame=(st.frame+1)%AN[st.anim].frames; drawPreview();
   });
   el.querySelector(`#${cr.id}-spd`).addEventListener('input',e=>st.fps=+e.target.value);
-  el.querySelector(`#${cr.id}-scl`).addEventListener('input',e=>{ st.scale=+e.target.value; drawPreview(); });
+  el.querySelector(`#${cr.id}-scl`).addEventListener('input',e=>{ st.scale=+e.target.value; drawPreview(); drawTurn(); });
   el.querySelector(`#${cr.id}-gd`).addEventListener('change',e=>{ st.guides=e.target.checked; drawPreview(); });
   el.querySelector(`#${cr.id}-gr`).addEventListener('change',e=>{ st.grid=e.target.checked; drawPreview(); });
 
-  drawPreview(); drawCheck(); drawSheet();
+  drawPreview(); drawCheck(); drawSheet(); buildTurnStrip(); drawTurn();
 
   // Blinks fire on their own irregular clock rather than once per breath, so
   // the two creatures drift out of sync and neither looks metronomic.
-  let acc=0, last=performance.now();
+  let acc=0, tacc=0, last=performance.now();
   let untilBlink = 1.5 + Math.random()*5, blinkLeft = 0;
   (function tick(now){
     const dt=(now-last)/1000; last=now;
     if(st.playing){
+      // the turn runs on its own clock — it is not a variant of whatever
+      // animation the buttons are showing
+      tacc += dt;
+      if(tacc >= 1/turnFpsOf(cr)){
+        tacc = 0;
+        st.turnFrame = (st.turnFrame + 1) % TN;
+        drawTurn();
+      }
       let dirty = false;
       const wasBlinking = st.blinking;
       if(blinkLeft > 0){
