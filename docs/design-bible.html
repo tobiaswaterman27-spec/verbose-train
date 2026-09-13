@@ -139,6 +139,21 @@ footer{margin-top:58px; padding-top:20px; border-top:1px solid var(--rule); font
 .entry dt{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); padding-top:3px;}
 .entry dd{margin:0; color:var(--dim);}
 @media (max-width:560px){ .entry dl{grid-template-columns:1fr; gap:2px 0} .entry dd{margin-bottom:8px} }
+/* shape logic */
+#shapeLogic{display:grid; grid-template-columns:repeat(auto-fill,minmax(296px,1fr)); gap:2px; background:var(--rule); border:1px solid var(--rule);}
+.sl{background:var(--paper); padding:13px 15px;}
+.sl-head{display:flex; align-items:center; gap:9px; margin-bottom:7px; flex-wrap:wrap;}
+.sl-head b{font-family:Fraunces,serif; font-size:16px; font-weight:600;}
+.sl p{margin:0; font-size:13.5px; color:var(--dim); max-width:none;}
+.sl-tell{margin-top:8px !important; padding-top:8px; border-top:1px solid var(--line-soft); font-size:12.5px !important;}
+.sl-tell span{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--accent); margin-right:5px;}
+
+/* allocation pips */
+.pip{display:inline-block; width:17px; height:17px; line-height:17px; text-align:center; border-radius:3px;
+     font-family:"IBM Plex Mono",monospace; font-size:10px; margin-right:3px; color:var(--bg); background:var(--faint);}
+.pip1{background:var(--faint)} .pip2{background:var(--dim)} .pip3{background:var(--accent)}
+.stage{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.07em; color:var(--faint); text-transform:uppercase;}
+
 /* region list */
 .regions{display:grid; gap:2px; background:var(--rule); border:1px solid var(--rule);}
 .rgn{background:var(--paper); padding:11px 14px; display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;}
@@ -151,8 +166,9 @@ footer{margin-top:58px; padding-top:20px; border-top:1px solid var(--rule); font
 <header>
   <div class="eyebrow">Wildhollow · design bible · draft three</div>
   <h1>The Fellaron Register</h1>
-  <p class="lede">Stripped back to what has actually been decided. The story is not written yet —
-  the blanks below are deliberate and stay blank until they are filled in properly.</p>
+  <p class="lede">What has actually been decided, and nothing that has not. The story and the cast are
+  settled. The hundred is planned down to how it divides — by element, by line length and by what the
+  bodies are made of — but the entries themselves get written a line at a time, and only five exist so far.</p>
 </header>
 
 <section>
@@ -253,11 +269,20 @@ footer{margin-top:58px; padding-top:20px; border-top:1px solid var(--rule); font
 
 <section>
   <div class="sec-head"><span class="num">IV</span><h2>The ten elements</h2></div>
-  <p class="small" style="margin:0 0 16px"><b>Inherited, not confirmed.</b> The three built Fellarons use
-  Verdant, Ember and Tide, so the wheel is load-bearing for what already exists — but the count, the names
-  and the regions are all still open.</p>
+  <p class="small" style="margin:0 0 16px"><b>Now committed.</b> The wheel was inherited from an earlier
+  draft and carried along unexamined for a while. The roster allocation below is built on it — ten
+  Fellarons to each of these ten — so it is load-bearing now and changing it would mean redividing the
+  hundred. The regions are still only names.</p>
   <div class="el-strip" id="elStrip"></div>
   <div style="margin-top:18px" id="chartWrap"></div>
+
+  <h3 style="margin:30px 0 4px; font-size:19px">What makes a Fellaron that element</h3>
+  <p class="small" style="margin:0 0 16px">The first roster failed partly because the element arrived as a
+  colour — a green one, a red one — which is a decision you can make after the fact and therefore not a
+  decision at all. So each element gets a rule about <em class="term">geometry</em> instead. It has to be
+  answerable by pointing at the silhouette. If the only Verdant thing about a Fellaron is that it is green,
+  it is not Verdant, and it does not go on the register.</p>
+  <div id="shapeLogic"></div>
 </section>
 
 <section>
@@ -279,37 +304,85 @@ footer{margin-top:58px; padding-top:20px; border-top:1px solid var(--rule); font
       <li><b>A reason it changes</b> that is the thing it already does.</li>
       <li><b>One fact with no gameplay purpose whatsoever.</b></li>
     </ol>
-    <p style="margin-top:12px"><b>And one rule about process: one at a time.</b> The seven that were cut were
-    designed in a batch, and a batch converges — the second borrows from the first, and the eighth is a
-    recolour of the third.</p>
+    <p style="margin-top:12px"><b>And one rule about process: a line at a time.</b> The seven that were cut
+    were designed as a flat batch of eight unrelated animals, and a batch like that converges — the second
+    borrows from the first, and the eighth is a recolour of the third. A <em class="term">line</em> does not
+    have that problem, because the second form is <em>supposed</em> to answer the first. So the unit of work
+    is one whole line, one to three forms, start to finish, and nothing else is opened until it is done.</p>
+  </div>
+
+  <div class="sys">
+    <h3>How the hundred divides</h3>
+    <p>Ten to an element — but not ten the same way twice, or the roster reads as a spreadsheet. Each
+    element gets its own mix of line lengths, so some elements are mostly long families and others are
+    mostly one-offs that never change at all.</p>
+    <div id="alloc"></div>
+    <p class="small" style="margin-top:12px"><span id="nLines"></span> lines, of which
+    <span id="nSolo"></span> are Fellarons that never mutate — that is a position, not an unfilled gap: a
+    creature that stays what it is says something a three-stage family cannot.</p>
+  </div>
+
+  <div class="sys">
+    <h3>What they are made of</h3>
+    <p>Left to itself, every entry on a roster like this becomes a mammal with a gimmick. So the body-plan
+    split is fixed <em>before</em> anything is designed, and a category that is full is full — if the
+    vertebrate count is spent, the next idea has to be a mechanism or a rock or nothing.</p>
+    <div class="fields" id="plans"></div>
+    <p class="small" style="margin-top:12px">Two thirds of the roster is not an animal.</p>
   </div>
 </section>
 
 <section>
   <div class="sec-head"><span class="num">VI</span><h2>Built so far</h2></div>
-  <p class="small" style="margin:0 0 16px">Three of one hundred. Sprite models exist and validate in all four
-  views. Written out to the standard above as the worked example of it.</p>
+  <p class="small" style="margin:0 0 16px"><span id="nBuilt"></span> of one hundred, and one complete line
+  among them. Every one has a sprite model that renders in all four views, turns through a full rotation
+  without coming apart, and is measured rather than eyeballed. Written out to the standard above as the
+  worked example of it.</p>
   <div id="built"></div>
 </section>
 
 <footer>
-  <p style="margin:0">Wildhollow · draft three · ninety-seven entries remain, and will be written one at a
-  time.</p>
+  <p style="margin:0">Wildhollow · draft three · <span id="nLeft"></span> entries remain, and will be
+  written a line at a time.</p>
 </footer>
 </div>
 <script>
 "use strict";
+/* `shape` is the load-bearing field. It is the answer to "why is this one that
+   element", written as a rule about geometry rather than about subject matter,
+   so it can be checked against a silhouette instead of argued about. `tell` is
+   what you should be able to point at on the finished sprite. */
 const EL = {
-  verdant:{n:'Verdant', c:'#5d8a3c', region:'Thistlemoor',      gloss:'root, leaf and patient growth'},
-  ember  :{n:'Ember',   c:'#c2552b', region:'Emberreach',       gloss:'flame, ash and rising heat'},
-  tide   :{n:'Tide',    c:'#2f7fae', region:'The Sluice',       gloss:'current, rain and undertow'},
-  stone  :{n:'Stone',   c:'#8a7355', region:'Cairnfell',        gloss:'rock, soil and sheer weight'},
-  gale   :{n:'Gale',    c:'#5f8799', region:'The Aerie Steps',  gloss:'wind, altitude and open sky'},
-  spark  :{n:'Spark',   c:'#b8891f', region:'The Gantry',       gloss:'charge, arc and static'},
-  frost  :{n:'Frost',   c:'#5f9bba', region:'Rimehollow',       gloss:'ice, stillness and deep cold'},
-  venom  :{n:'Venom',   c:'#7d5a9e', region:'Mycelia Deep',     gloss:'spore, rot and slow toxin'},
-  umbra  :{n:'Umbra',   c:'#514a61', region:'Duskwood',         gloss:'shadow and everything unlit'},
-  lumen  :{n:'Lumen',   c:'#a08a2c', region:'The Lantern Field',gloss:'dawn, clarity and revelation'},
+  verdant:{n:'Verdant', c:'#5d8a3c', region:'Thistlemoor',      gloss:'root, leaf and patient growth',
+    shape:'Accretion. It only ever adds, and never removes, so the body ends up a record of its own history worn in the order it grew.',
+    tell:'Layers, tiers, rings, litter — something on it is older than the rest of it and still there.'},
+  ember  :{n:'Ember',   c:'#c2552b', region:'Emberreach',       gloss:'flame, ash and rising heat',
+    shape:'Convection. Everything is oversized for the mass it serves, because the body’s real job is moving heat rather than moving itself.',
+    tell:'Thin panels, vents, crests and membranes held out away from the core on purpose.'},
+  tide   :{n:'Tide',    c:'#2f7fae', region:'The Sluice',       gloss:'current, rain and undertow',
+    shape:'Fairing. The body reads as something shaped by what flows past it, not as something that chose its own outline.',
+    tell:'Trailing edges, countershading, and nothing anywhere that would catch a current.'},
+  stone  :{n:'Stone',   c:'#8a7355', region:'Cairnfell',        gloss:'rock, soil and sheer weight',
+    shape:'Load path. The silhouette is a structural problem already solved — you can see where the weight goes and what is holding it.',
+    tell:'Mass stacked over the feet, arches, buttresses, a base wider than the top.'},
+  gale   :{n:'Gale',    c:'#5f8799', region:'The Aerie Steps',  gloss:'wind, altitude and open sky',
+    shape:'Leverage. Surface area held a long way from the centre of mass — it should look wrong standing still and only make sense once it moves.',
+    tell:'Long spars and vanes on short bodies; a stance that reads as about to tip.'},
+  spark  :{n:'Spark',   c:'#b8891f', region:'The Gantry',       gloss:'charge, arc and static',
+    shape:'The gap. A discharge needs two terminals and a space between them, so the silhouette has a deliberate hole in it.',
+    tell:'Paired prongs, a break in the body, negative space you could put a finger through.'},
+  frost  :{n:'Frost',   c:'#5f9bba', region:'Rimehollow',       gloss:'ice, stillness and deep cold',
+    shape:'Arrest. A body that has stopped. Growth going nowhere goes outward equally in all directions instead.',
+    tell:'Radial symmetry, flat facets, straight edges where an animal would have curves.'},
+  venom  :{n:'Venom',   c:'#7d5a9e', region:'Mycelia Deep',     gloss:'spore, rot and slow toxin',
+    shape:'The reservoir. Built around a delivery system: something narrows to a point, and something swells where a swelling has no business being.',
+    tell:'A sac, a bulb, a bladder — and somewhere on it, one fine tip.'},
+  umbra  :{n:'Umbra',   c:'#514a61', region:'Duskwood',         gloss:'shadow and everything unlit',
+    shape:'The unresolved edge. The outline disagrees with the mass, so you cannot fully count what you are looking at.',
+    tell:'Edges that do not close, limbs that stop being limbs, a silhouette that will not resolve.'},
+  lumen  :{n:'Lumen',   c:'#a08a2c', region:'The Lantern Field',gloss:'dawn, clarity and revelation',
+    shape:'Inversion. It emits rather than reflects, so the shading ramp runs backwards: brightest at the core, darkest at the rim.',
+    tell:'Lit from inside. The rule the renderer applies to every other Fellaron, run the other way.'},
 };
 const EK = Object.keys(EL);
 const STRONG = {
@@ -343,20 +416,58 @@ const CAST = [
   ['The Gatekeeper','umbra','The vault Fellaron. Ancient, sealed for longer than the school has records for, because unrestrained its presence forces mutation onto anything nearby, ready or not. Not evil for its own sake — just done being patient about the dark.'],
 ];
 
+/* Ten per element, but deliberately not ten the same way twice — the mix of
+   line lengths differs per element so the roster does not read as a grid.
+   A line of 1 is a Fellaron that never changes, and there are seventeen of
+   them; that is a design position, not a gap. */
+const ALLOC = {
+  verdant:[3,3,2,1,1], ember:[3,2,2,1,1,1], tide:[3,3,2,1,1],
+  stone:[2,2,2,2,1,1],  gale:[3,2,2,2,1],    spark:[2,2,2,1,1,1,1],
+  frost:[3,3,2,1,1],    venom:[2,2,2,2,2],   umbra:[3,2,2,2,1],
+  lumen:[2,2,2,2,1,1],
+};
+
+/* The quota exists because left alone every one of these becomes a mammal with
+   a gimmick. A third of the roster is allowed to be a recognisable animal. The
+   rest has to be something else, and the count is fixed in advance so that
+   "something else" does not quietly become four more quadrupeds. */
+const PLANS = [
+  ['Vertebrate animal', 34, 'Quadrupeds, birds, fish. The default, and held to a third on purpose.'],
+  ['Made thing',        12, 'Tools, vessels, instruments. Somebody built these and then they kept going.'],
+  ['Invertebrate',      12, 'Arthropods, molluscs, worms — skeleton on the outside, or none at all.'],
+  ['Plant or fungal',   11, 'Things that grow rather than move, and have learned to move anyway.'],
+  ['Mineral',           10, 'Rock, crystal, sediment. No face unless it earns one.'],
+  ['Weather or fluid',   9, 'Fire, cloud, current, smoke. A body with no fixed edge.'],
+  ['Architectural',      7, 'A structure that walks. Spans, scaffolds, doors, stairs.'],
+  ['Abstract',           5, 'Geometry that is alive and does not explain itself.'],
+];
+
 const BUILT = [
-  {name:'Sporelet', el:'verdant', plan:'Quadruped · mycelial symbiont',
+  {name:'Sporelet', el:'verdant', stage:'1 of 3', plan:'Quadruped · mycelial symbiont',
    living:'Eats rotting wood, and its own shed caps. Sleeps pressed against something larger than itself. Will not cross open ground if there is a longer way round.',
    shape:'The caps are structural, not decoration — they grow where its spine should show, and it is lower on that side for a week after shedding.',
    obs:'<b>Diet</b> — takes rot, refuses anything fresh. <b>Ground</b> — under deadfall, never in the open. <b>Want</b> — moves toward slow water it cannot see.',
    rite:'Sheds and regrows its caps. Mutates on the third regrowth, whenever that falls.',
    idle:'Sulks for a week after shedding and will not be looked at.'},
-  {name:'Cindercrow', el:'ember', plan:'Winged biped · thermal scavenger',
+  {name:'Loambrock', el:'verdant', stage:'2 of 3', plan:'Low quadruped · standing-deadwood breaker',
+   living:'Leans on standing dead trunks until they go over, then waits for them to soften. Sleeps on top of what it has broken down, in the open — the exact thing Sporelet would not do. Afraid of fire, and of being turned over.',
+   shape:'The caps have stopped being shed. Three brackets now stack up off the spine and age as they climb: this season’s pale at the top, last year’s leathery below it, the oldest gone to bark at the base. It wears its years in order.',
+   obs:'<b>Ground</b> — in the open, on its own leavings. <b>Method</b> — puts a trunk over, then will not touch it for a week. <b>Tell</b> — the brackets lift a fraction before it moves.',
+   rite:'Reaches standing water and stays. Mutates once something has taken root on its back.',
+   idle:'Will not walk over its own old sleeping sites, and detours around them for years.'},
+  {name:'Mirebarrow', el:'verdant', stage:'3 of 3', plan:'Bridge-bodied quadruped · waterline decomposer',
+   living:'Eats almost nothing — it breaks things down by lying on them. Sleeps at the waterline, half in, leaning on the bank, because nothing is left that is larger than it to lean on.',
+   shape:'Its proportion. A decomposer at a waterline is the join between water and soil, and the body is that shape: long, low and built to span. The tiers are gone; the back is one unbroken run of litter.',
+   obs:'<b>Ground</b> — always half in slow water, never fast. <b>Traffic</b> — smaller things cross over it, and it permits this. <b>Tell</b> — the litter on its back is alive, and it does not remove the seedlings.',
+   rite:'None. This is the end of the line.',
+   idle:'Lies with its head pointing upstream every time, to no discernible benefit.'},
+  {name:'Cindercrow', el:'ember', stage:'1 of 3', plan:'Winged biped · thermal scavenger',
    living:'Eats what the fire left. Sleeps in cooling ash, as near to still-warm as it can stand. Afraid of rain, and unreasonable about it.',
    shape:'Built to ride heat rather than make it. The wings are too large for the body, which is the whole animal in one proportion.',
    obs:'<b>Ground</b> — cooling ash, and it will test the temperature with one foot first. <b>Flinch</b> — Tide. <b>Tell</b> — drops its crest a half-second before it moves.',
    rite:'Must catch a thermal that lifts it past the point it can get back down from. Mutates on landing.',
    idle:'Collects nothing, but will carry one object for weeks and then abandon it somewhere arbitrary.'},
-  {name:'Brookfin', el:'tide', plan:'Upright fish · standing river hunter',
+  {name:'Brookfin', el:'tide', stage:'1 of 3', plan:'Upright fish · standing river hunter',
    living:'Eats what the current brings. Sleeps wedged under a bank where the water still moves. Distrusts still water and will not enter it.',
    shape:'Side-set eyes, gills working on land, countershaded dark over pale — the build of something used to being looked at from above and below at once.',
    obs:'<b>Ground</b> — under a moving bank. <b>Kin</b> — will not share a pool with another Brookfin. <b>Want</b> — comes toward running water it can only hear.',
@@ -382,6 +493,31 @@ $('elStrip').innerHTML = EK.map(k => `
     <div class="small" style="font-size:12.5px; margin-top:3px">${EL[k].gloss}</div>
   </div>`).join('');
 
+$('shapeLogic').innerHTML = EK.map(k => `
+  <div class="sl">
+    <div class="sl-head"><span class="el-chip" style="background:${EL[k].c}">${EL[k].n}</span>
+      <b>${EL[k].shape.split('.')[0]}</b></div>
+    <p>${EL[k].shape.slice(EL[k].shape.indexOf('.')+1).trim()}</p>
+    <p class="sl-tell"><span>Look for</span> ${EL[k].tell}</p>
+  </div>`).join('');
+
+$('alloc').innerHTML = `<div class="tbl-wrap"><table class="reg"><thead><tr>
+  <th>Element</th><th>Region</th><th>Lines</th><th>Shape of the ten</th><th style="text-align:right">Built</th>
+  </tr></thead><tbody>${EK.map(k => {
+    const a = ALLOC[k], built = BUILT.filter(b => b.el === k).length;
+    const pips = a.map(n => `<span class="pip pip${n}" title="${n}-form line">${n}</span>`).join('');
+    return `<tr>
+      <td class="nm"><span class="t" style="background:${EL[k].c}">&nbsp;</span>${EL[k].n}</td>
+      <td class="rg">${EL[k].region}</td>
+      <td class="mu">${a.length}</td>
+      <td>${pips}</td>
+      <td class="mu" style="text-align:right">${built} / ${a.reduce((x,y)=>x+y,0)}</td>
+    </tr>`;
+  }).join('')}</tbody></table></div>`;
+
+$('plans').innerHTML = PLANS.map(([n,c,d]) => `
+  <div class="fld"><b>${n} · ${c}</b><span>${d}</span></div>`).join('');
+
 $('chartWrap').innerHTML = `<div class="tbl-wrap"><table class="reg"><thead><tr>
   <th>Attacker</th>${EK.map(k=>`<th style="text-align:center">${EL[k].n.slice(0,3)}</th>`).join('')}
   </tr></thead><tbody>${EK.map(a=>`<tr><td class="nm">${EL[a].n}</td>${EK.map(d=>{
@@ -395,17 +531,32 @@ $('chartWrap').innerHTML = `<div class="tbl-wrap"><table class="reg"><thead><tr>
 
 
 
+/* Every count on the page is derived from ALLOC and BUILT rather than typed
+   out, because the last draft had a hand-written "ninety-seven remain" in the
+   footer that was wrong the moment anything was added. */
+const N_LINES = EK.reduce((n,k) => n + ALLOC[k].length, 0);
+const N_SOLO  = EK.reduce((n,k) => n + ALLOC[k].filter(x => x === 1).length, 0);
+const N_TOTAL = EK.reduce((n,k) => n + ALLOC[k].reduce((a,b) => a+b, 0), 0);
+
 $('stats').innerHTML = [
-  ['100','Fellarons planned'],
-  ['3','written and built'],
-  ['97','to go'],
+  [String(N_TOTAL), 'Fellarons planned'],
+  [String(N_LINES), 'lines'],
+  [String(BUILT.length), 'written and built'],
+  [String(N_TOTAL - BUILT.length), 'to go'],
+  [String(N_SOLO), 'never mutate'],
 ].map(([b,s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+
+$('nLines').textContent = N_LINES;
+$('nSolo').textContent  = N_SOLO;
+$('nBuilt').textContent = BUILT.length;
+$('nLeft').textContent  = N_TOTAL - BUILT.length;
 
 $('built').innerHTML = BUILT.map(k => `
   <div class="entry">
     <div class="entry-head">
       <span class="el-chip" style="background:${EL[k.el].c}">${EL[k.el].n}</span>
       <span class="en">${k.name}</span>
+      <span class="stage">${k.stage}</span>
       <span class="plan">${k.plan}</span>
     </div>
     <dl>
