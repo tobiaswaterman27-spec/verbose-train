@@ -398,9 +398,12 @@ function turnPose(cr, p, f, nF){
   if(r === 'wing' && p.pivot) rots.push({axis:'z', ang:-(p.side||1)*0.18, pivot:p.pivot});
   if((r === 'arm' || r === 'hand') && P.shoulder)
     rots.push({axis:'x', ang:s*0.16, pivot:P.shoulder});
-  // the lead: the head is already looking where the body is going
-  const yaw = UPPER_ROLES.includes(r) ? (r === 'neck' ? 0.10 : 0.20) : 0;
-  return {d, sc, rots, yaw};
+  // the lead: the head is already looking where the body is going. It turns on
+  // its own neck, so the pivot is the head's — yawed about the body's axis
+  // instead it would swing bodily off the centreline, which is a different and
+  // much worse animation.
+  const lead = UPPER_ROLES.includes(r) ? (r === 'neck' ? 0.11 : 0.22) : 0;
+  return {d, sc, rots, yaw:lead, yawPivot:P.head};
 }
 
 /* Apparent half-width of a part yawed by `th`, along the view's horizontal.
@@ -514,6 +517,201 @@ const CREATURES = [
     if(r === 'jaw')  rots.push({axis:'x', ang:-(0.18 + 0.08*Math.sin(f/nF*Math.PI*4)), pivot:cr.pivots.jaw});
     if(r === 'eye')  sc.y = 0.82;
     return {d, sc, rots};
+  }
+},
+{
+  /* Sporelet's two caps were discrete and shed every season. Loambrock's have
+     stopped being two and stopped being shed: the spine now carries one tiered
+     shelf that steps down toward the tail, the way bracket fungus tiers down a
+     standing trunk. That is Verdant as geometry — a body that only ever adds,
+     keeping its own history on its back. */
+  id:'loambrock', name:'Loambrock', types:['verdant'], scale:0.88, stage:2, line:'sporelet',
+  plan:'Low quadruped · standing-deadwood breaker',
+  blurb:'Leans on dead trees until they go over, then sleeps on what is left. Too low and too heavy to bound; it runs in a rolling trot that barely leaves the ground.',
+  outline:'#101709',
+  /* The tiers age as they descend: this season's growth at the front is pale
+     and fresh, the one below it has gone leathery, the oldest at the tail is
+     nearly bark. Three shades rather than one is what makes the shelf read as
+     a stack of separate years instead of a single slab. */
+  colors:{ body:'#5c7a38', limb:'#4a632d', dark:'#33471f', belly:'#c2d493',
+           shelfNew:'#d29a4e', shelf:'#9d6b30', shelfOld:'#5f4321', gill:'#e6d3a4',
+           inner:'#7d5340', sclera:'#eef3dd', eye:'#161e10', glint:'#ffffff', mouth:'#6b2f30' },
+  pivots:{ body:[0,-5.2,0], head:[0,-6.6,6.4], jaw:[0,-5.4,9.4], ear:[0,-9.4,6.0],
+           tail:[0,-6.2,-7.4], back:[0,-8.0,0],
+           hipFore:[0,-4.6,5.0], hipHind:[0,-4.6,-5.2] },
+  parts:[
+    {n:'tail',      shape:'ell', role:'tail', pos:[0,-6.0,-9.4],  size:[1.9,1.7,2.6], color:'body'},
+    // legs are stubs: 3.0 long with 2.2 of that buried, so the body nearly grounds out
+    {n:'hindLegL',  shape:'box', role:'leg', grp:'hind', phase:0.5, pos:[-3.9,-3.0,-5.2], size:[1.7,3.0,1.8], color:'limb'},
+    {n:'hindLegR',  shape:'box', role:'leg', grp:'hind', phase:0,   pos:[ 3.9,-3.0,-5.2], size:[1.7,3.0,1.8], color:'limb'},
+    {n:'hindPawL',  shape:'ell', role:'paw', grp:'hind', phase:0.5, pos:[-3.9,-0.6,-4.8], size:[2.0,0.9,2.3], color:'belly'},
+    {n:'hindPawR',  shape:'ell', role:'paw', grp:'hind', phase:0,   pos:[ 3.9,-0.6,-4.8], size:[2.0,0.9,2.3], color:'belly'},
+    {n:'foreLegL',  shape:'box', role:'leg', grp:'fore', phase:0,   pos:[-3.7,-3.0,5.0], size:[1.6,3.0,1.7], color:'limb'},
+    {n:'foreLegR',  shape:'box', role:'leg', grp:'fore', phase:0.5, pos:[ 3.7,-3.0,5.0], size:[1.6,3.0,1.7], color:'limb'},
+    {n:'forePawL',  shape:'ell', role:'paw', grp:'fore', phase:0,   pos:[-3.7,-0.6,5.4], size:[1.9,0.9,2.2], color:'belly'},
+    {n:'forePawR',  shape:'ell', role:'paw', grp:'fore', phase:0.5, pos:[ 3.7,-0.6,5.4], size:[1.9,0.9,2.2], color:'belly'},
+    {n:'haunchL',   shape:'ell', role:'body', pos:[-4.0,-5.4,-5.0], size:[2.6,3.0,3.2], color:'body'},
+    {n:'haunchR',   shape:'ell', role:'body', pos:[ 4.0,-5.4,-5.0], size:[2.6,3.0,3.2], color:'body'},
+    {n:'shoulderL', shape:'ell', role:'body', pos:[-3.8,-5.4,4.8], size:[2.4,2.8,2.9], color:'body'},
+    {n:'shoulderR', shape:'ell', role:'body', pos:[ 3.8,-5.4,4.8], size:[2.4,2.8,2.9], color:'body'},
+    {n:'torso',     shape:'ell', role:'body', pos:[0,-6.4,0],   size:[6.2,4.1,9.0], color:'body'},
+    {n:'belly',     shape:'ell', role:'body', pos:[0,-4.2,0.6], size:[4.8,2.2,7.4], color:'belly'},
+    /* The shelf. Bracket fungus does not sit on top of a trunk, it juts out of
+       the side of one, and it tiers DOWNWARD as it goes. So there is a ridge
+       up the spine standing in for the trunk, and the tiers come off it —
+       widest in the middle, stepping down toward the tail, each one jutting
+       past the flank rather than capping the back. The ridge is also what
+       holds them on: every tier reaches it, so none can float free.
+       This is the whole Verdant argument in one shape — a body that only ever
+       adds, wearing the order it added in. */
+    {n:'trunk',     shape:'box', role:'deco', pos:[0,-11.9,0.4],  size:[0.90,3.50,0.90], color:'belly'},
+    {n:'tier1',     shape:'ell', role:'deco', pos:[0,-10.6,1.2],  size:[6.6,0.80,3.9], color:'shelfOld'},
+    {n:'gill1',     shape:'ell', role:'deco', pos:[0,-9.95,1.2],  size:[5.7,0.28,3.3], color:'gill', hideIn:['back']},
+    {n:'tier2',     shape:'ell', role:'deco', pos:[0,-12.8,0.4],  size:[5.4,0.72,3.2], color:'shelf'},
+    {n:'gill2',     shape:'ell', role:'deco', pos:[0,-12.22,0.4], size:[4.6,0.26,2.7], color:'gill', hideIn:['back']},
+    {n:'tier3',     shape:'ell', role:'deco', pos:[0,-14.9,-0.4], size:[4.0,0.65,2.5], color:'shelfNew'},
+    {n:'gill3',     shape:'ell', role:'deco', pos:[0,-14.40,-0.4],size:[3.4,0.24,2.1], color:'gill', hideIn:['back']},
+    /* head: a low wedge carried out front rather than up. No neck. */
+    {n:'head',      shape:'ell', role:'head', pos:[0,-6.8,8.0], size:[4.2,3.5,4.0], color:'body'},
+    {n:'brow',      shape:'ell', role:'head', pos:[0,-8.7,7.6], size:[3.6,1.1,3.2], color:'dark'},
+    // ears have gone to flat tabs — Sporelet's stood up, these are folding away
+    {n:'earL',      shape:'ell', role:'ear', side:-1, pos:[-3.2,-9.1,6.6], size:[1.5,0.75,1.9], color:'dark'},
+    {n:'earR',      shape:'ell', role:'ear', side: 1, pos:[ 3.2,-9.1,6.6], size:[1.5,0.75,1.9], color:'dark'},
+    {n:'earInnerL', shape:'ell', role:'ear', side:-1, pos:[-3.3,-8.9,6.9], size:[0.75,0.34,1.0], color:'inner', hideIn:['back']},
+    {n:'earInnerR', shape:'ell', role:'ear', side: 1, pos:[ 3.3,-8.9,6.9], size:[0.75,0.34,1.0], color:'inner', hideIn:['back']},
+    {n:'cheekL',    shape:'ell', role:'head', pos:[-3.0,-5.8,9.0], size:[1.6,1.4,1.6], color:'belly', hideIn:['back']},
+    {n:'cheekR',    shape:'ell', role:'head', pos:[ 3.0,-5.8,9.0], size:[1.6,1.4,1.6], color:'belly', hideIn:['back']},
+    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-5.3,10.6], size:[2.0,0.8,1.0], color:'mouth', hideIn:['back']},
+    {n:'jaw',       shape:'ell', role:'jaw',  pos:[0,-4.7,10.7], size:[2.4,1.0,2.0], color:'belly', hideIn:['back']},
+    {n:'muzzle',    shape:'ell', role:'head', pos:[0,-6.3,11.0], size:[2.6,1.7,2.0], color:'belly', hideIn:['back']},
+    {n:'nose',      shape:'ell', flat:true, role:'head', pos:[0,-7.0,12.5], size:[0.85,0.62,0.6], color:'eye', hideIn:['back']},
+    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-2.2,-8.1,10.1], size:[1.25,1.35,0.95], color:'sclera', hideIn:['back']},
+    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 2.2,-8.1,10.1], size:[1.25,1.35,0.95], color:'sclera', hideIn:['back']},
+    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-2.35,-8.0,10.5], size:[0.78,0.90,0.7], color:'eye', hideIn:['back']},
+    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 2.35,-8.0,10.5], size:[0.78,0.90,0.7], color:'eye', hideIn:['back']},
+    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-2.6,-8.5,10.8], size:[0.38,0.38,0.34], color:'glint', hideIn:['back']},
+    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 2.6,-8.5,10.8], size:[0.38,0.38,0.34], color:'glint', hideIn:['back']},
+    {n:'lidL',      shape:'ell', role:'lid', pos:[-2.2,-8.1,10.2], size:[1.3,0.30,1.0], color:'limb', hideIn:['back']},
+    {n:'lidR',      shape:'ell', role:'lid', pos:[ 2.2,-8.1,10.2], size:[1.3,0.30,1.0], color:'limb', hideIn:['back']},
+  ],
+  /* A rolling trot, not a bound. Sporelet leaves the ground; this does not —
+     it is too low and too heavy, so the weight rolls diagonally from one pair
+     of feet to the other and the shelf rocks a beat behind the body. */
+  sprint(cr, p, f, nF){
+    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+    const r = p.role, limb = (r === 'leg' || r === 'paw');
+    d.y += [0,-0.35,-0.5,-0.2,-0.35,-0.5][f];         // barely airborne at any point
+    const lean = [0.14,0.17,0.15,0.14,0.17,0.15][f];
+    rots.push({axis:'x', ang:-lean, pivot:cr.pivots.body});
+    // diagonal pairs: a trot moves fore-left with hind-right
+    const A = [0.42,0.10,-0.34,-0.42,-0.10,0.34];
+    if(limb) rots.push({axis:'x', ang:A[(f + (p.grp === 'fore' ? 0 : 3)) % 6],
+                        pivot: p.grp === 'fore' ? cr.pivots.hipFore : cr.pivots.hipHind});
+    // the body rolls about its long axis as each diagonal takes the weight
+    rots.push({axis:'z', ang:Math.sin(f/nF*Math.PI*2)*0.07, pivot:cr.pivots.body});
+    if(r === 'deco') rots.push({axis:'x', ang:0.10 + Math.sin((f/nF - 0.12)*Math.PI*2)*0.05, pivot:cr.pivots.back});
+    if(r === 'ear')  rots.push({axis:'x', ang:0.20, pivot:cr.pivots.ear});
+    if(r === 'tail') rots.push({axis:'x', ang:-0.16, pivot:cr.pivots.tail});
+    if(r === 'jaw')  rots.push({axis:'x', ang:-0.12, pivot:cr.pivots.jaw});
+    if(r === 'eye')  sc.y = 0.86;
+    return {d, sc, rots};
+  }
+},
+{
+  /* The end of the line, and the point of it. Sporelet slept pressed against
+     something larger than itself; nothing is larger than this, so it sleeps
+     against a bank instead, half in the slow water it has been walking toward
+     since it was small enough to hide under a log.
+     Verdant here is proportion rather than ornament: a decomposer at a
+     waterline is the join between water and soil, and the body is that shape —
+     long, low, and built to span. The shelf has stopped being tiers and become
+     one continuous run of litter, and the litter is alive. It does not remove
+     the seedlings. */
+  id:'mirebarrow', name:'Mirebarrow', types:['verdant'], scale:0.96, stage:3, line:'sporelet',
+  plan:'Bridge-bodied quadruped · waterline decomposer',
+  blurb:'Breaks things down by lying on them. Too long to bound or trot — it runs as a wave, the way a salamander does, the head swinging first and the rest following it down the body.',
+  outline:'#0d1408',
+  colors:{ body:'#4a6330', limb:'#3f5628', dark:'#2a3b19', belly:'#a3b874',
+           bark:'#63492a', litter:'#7d6338', sprout:'#93c94d', leaf:'#6ea832',
+           sclera:'#e8efd6', eye:'#131a0d', glint:'#ffffff', mouth:'#5e2b2c' },
+  pivots:{ body:[0,-4.6,0], head:[0,-5.6,9.4], jaw:[0,-4.6,12.4], ear:[0,-7.4,9.0],
+           tail:[0,-4.6,-9.0], back:[0,-7.2,0],
+           hipFore:[0,-4.4,6.0], hipHind:[0,-4.4,-6.4] },
+  parts:[
+    {n:'tailTip',   shape:'ell', role:'tail', pos:[0,-3.9,-14.6], size:[1.3,0.85,2.3], color:'belly'},
+    {n:'tailMid',   shape:'ell', role:'tail', pos:[0,-4.3,-11.8], size:[2.0,1.25,2.8], color:'body'},
+    /* Sprawling limbs: they leave the flank sideways before they turn down, so
+       the body hangs between them instead of sitting on top. That is the whole
+       reason this reads as something that spans rather than something that
+       stands. */
+    {n:'hindUpL',   shape:'ell', role:'leg', grp:'hind', phase:0.5, pos:[-4.4,-4.5,-6.4], size:[2.3,1.30,1.7], color:'limb'},
+    {n:'hindUpR',   shape:'ell', role:'leg', grp:'hind', phase:0,   pos:[ 4.4,-4.5,-6.4], size:[2.3,1.30,1.7], color:'limb'},
+    {n:'hindLoL',   shape:'box', role:'leg', grp:'hind', phase:0.5, pos:[-5.9,-2.4,-6.4], size:[1.20,2.40,1.35], color:'limb'},
+    {n:'hindLoR',   shape:'box', role:'leg', grp:'hind', phase:0,   pos:[ 5.9,-2.4,-6.4], size:[1.20,2.40,1.35], color:'limb'},
+    {n:'hindPawL',  shape:'ell', role:'paw', grp:'hind', phase:0.5, pos:[-6.1,-0.5,-5.9], size:[1.85,0.70,2.20], color:'belly'},
+    {n:'hindPawR',  shape:'ell', role:'paw', grp:'hind', phase:0,   pos:[ 6.1,-0.5,-5.9], size:[1.85,0.70,2.20], color:'belly'},
+    {n:'foreUpL',   shape:'ell', role:'leg', grp:'fore', phase:0,   pos:[-4.3,-4.5,6.0], size:[2.2,1.25,1.6], color:'limb'},
+    {n:'foreUpR',   shape:'ell', role:'leg', grp:'fore', phase:0.5, pos:[ 4.3,-4.5,6.0], size:[2.2,1.25,1.6], color:'limb'},
+    {n:'foreLoL',   shape:'box', role:'leg', grp:'fore', phase:0,   pos:[-5.7,-2.4,6.0], size:[1.15,2.40,1.30], color:'limb'},
+    {n:'foreLoR',   shape:'box', role:'leg', grp:'fore', phase:0.5, pos:[ 5.7,-2.4,6.0], size:[1.15,2.40,1.30], color:'limb'},
+    {n:'forePawL',  shape:'ell', role:'paw', grp:'fore', phase:0,   pos:[-5.9,-0.5,6.5], size:[1.80,0.70,2.15], color:'belly'},
+    {n:'forePawR',  shape:'ell', role:'paw', grp:'fore', phase:0.5, pos:[ 5.9,-0.5,6.5], size:[1.80,0.70,2.15], color:'belly'},
+    /* one long trunk of a body, barely taller than the legs are long */
+    {n:'hindQtr',   shape:'ell', role:'body', pos:[0,-4.9,-7.2], size:[4.5,2.85,4.4], color:'body'},
+    {n:'torso',     shape:'ell', role:'body', pos:[0,-5.3,0],    size:[5.4,3.30,10.4], color:'body'},
+    {n:'foreQtr',   shape:'ell', role:'body', pos:[0,-5.4,6.4],  size:[4.9,3.05,4.2], color:'body'},
+    {n:'belly',     shape:'ell', role:'body', pos:[0,-3.3,0.4],  size:[4.2,1.75,9.2], color:'belly'},
+    /* the back: one unbroken run of rotted-down litter, no tiers left */
+    {n:'shelfRun',  shape:'ell', role:'deco', pos:[0,-8.2,-0.4], size:[4.5,1.05,9.2], color:'bark'},
+    {n:'litter',    shape:'ell', role:'deco', pos:[0,-8.9,-0.4], size:[3.7,0.62,8.4], color:'litter'},
+    /* and it is growing things. Left alone, on purpose. */
+    {n:'sprStemA',  shape:'box', role:'deco', pos:[-1.6,-10.35,5.4], size:[0.30,1.55,0.30], color:'sprout'},
+    {n:'sprLeafA',  shape:'ell', role:'deco', pos:[-1.6,-11.75,5.4], size:[1.15,0.40,1.75], color:'leaf'},
+    {n:'sprStemB',  shape:'box', role:'deco', pos:[1.4,-9.85,0.6],   size:[0.26,0.95,0.26], color:'sprout'},
+    {n:'sprLeafB',  shape:'ell', role:'deco', pos:[1.4,-10.65,0.6],  size:[0.95,0.34,1.40], color:'leaf'},
+    {n:'sprStemC',  shape:'box', role:'deco', pos:[-0.8,-10.15,-3.2],size:[0.28,1.30,0.28], color:'sprout'},
+    {n:'sprLeafC',  shape:'ell', role:'deco', pos:[-0.8,-11.30,-3.2],size:[1.05,0.36,1.55], color:'leaf'},
+    /* head: broad, flat and blunt, carried level with the back. No neck. */
+    {n:'head',      shape:'ell', role:'head', pos:[0,-5.6,10.6], size:[4.4,2.55,3.9], color:'body'},
+    {n:'skullCap',  shape:'ell', role:'head', pos:[0,-7.0,10.2], size:[3.8,1.00,3.4], color:'dark'},
+    {n:'browL',     shape:'ell', role:'head', pos:[-2.5,-7.5,10.8], size:[1.25,0.85,1.35], color:'bark'},
+    {n:'browR',     shape:'ell', role:'head', pos:[ 2.5,-7.5,10.8], size:[1.25,0.85,1.35], color:'bark'},
+    {n:'cheekL',    shape:'ell', role:'head', pos:[-3.0,-4.8,11.4], size:[1.4,1.15,1.5], color:'belly', hideIn:['back']},
+    {n:'cheekR',    shape:'ell', role:'head', pos:[ 3.0,-4.8,11.4], size:[1.4,1.15,1.5], color:'belly', hideIn:['back']},
+    {n:'mouthInner',shape:'ell', flat:true, role:'mouth', pos:[0,-4.5,13.3], size:[2.2,0.70,0.9], color:'mouth', hideIn:['back']},
+    {n:'jaw',       shape:'ell', role:'jaw',  pos:[0,-4.0,13.3], size:[2.6,0.90,2.0], color:'belly', hideIn:['back']},
+    {n:'muzzle',    shape:'ell', role:'head', pos:[0,-5.4,13.6], size:[2.8,1.45,2.0], color:'body', hideIn:['back']},
+    {n:'nostrilL',  shape:'ell', flat:true, role:'head', pos:[-1.0,-6.2,15.0], size:[0.45,0.36,0.4], color:'eye', hideIn:['back']},
+    {n:'nostrilR',  shape:'ell', flat:true, role:'head', pos:[ 1.0,-6.2,15.0], size:[0.45,0.36,0.4], color:'eye', hideIn:['back']},
+    {n:'eyeWhiteL', shape:'ell', role:'eye', pos:[-2.3,-7.0,12.4], size:[1.15,1.20,0.90], color:'sclera', hideIn:['back']},
+    {n:'eyeWhiteR', shape:'ell', role:'eye', pos:[ 2.3,-7.0,12.4], size:[1.15,1.20,0.90], color:'sclera', hideIn:['back']},
+    {n:'pupilL',    shape:'ell', flat:true, role:'eye', pos:[-2.45,-6.9,12.8], size:[0.70,0.80,0.65], color:'eye', hideIn:['back']},
+    {n:'pupilR',    shape:'ell', flat:true, role:'eye', pos:[ 2.45,-6.9,12.8], size:[0.70,0.80,0.65], color:'eye', hideIn:['back']},
+    {n:'glintL',    shape:'ell', flat:true, role:'eye', pos:[-2.68,-7.35,13.0], size:[0.34,0.34,0.30], color:'glint', hideIn:['back']},
+    {n:'glintR',    shape:'ell', flat:true, role:'eye', pos:[ 2.68,-7.35,13.0], size:[0.34,0.34,0.30], color:'glint', hideIn:['back']},
+    {n:'lidL',      shape:'ell', role:'lid', pos:[-2.3,-7.0,12.5], size:[1.22,0.28,0.95], color:'limb', hideIn:['back']},
+    {n:'lidR',      shape:'ell', role:'lid', pos:[ 2.3,-7.0,12.5], size:[1.22,0.28,0.95], color:'limb', hideIn:['back']},
+  ],
+  /* Too long to bound and too long to trot. It runs the way a salamander runs:
+     a wave travelling head to tail, each part of the spine yawing by how far
+     down the body it sits. The legs do not drive it so much as catch it. */
+  sprint(cr, p, f, nF){
+    const d={x:0,y:0,z:0}, sc={x:1,y:1,z:1}, rots=[];
+    const r = p.role, limb = (r === 'leg' || r === 'paw');
+    const t = f/nF;
+    // the wave. Phase runs off the part's own z, which is what makes it travel
+    // instead of the whole animal wagging as one piece.
+    const wave = Math.sin(t*Math.PI*2 - p.pos[2]*0.17)*0.15;
+    d.y += [0,-0.25,-0.4,-0.25,0,-0.15][f];
+    if(limb){
+      const A = [0.46,0.14,-0.36,-0.46,-0.14,0.36];
+      rots.push({axis:'x', ang:A[(f + (p.grp === 'fore' ? 0 : 3)) % 6],
+                 pivot: p.grp === 'fore' ? cr.pivots.hipFore : cr.pivots.hipHind});
+    }
+    if(r === 'deco') rots.push({axis:'x', ang:0.04, pivot:cr.pivots.back});
+    if(r === 'jaw')  rots.push({axis:'x', ang:-0.10, pivot:cr.pivots.jaw});
+    if(r === 'eye')  sc.y = 0.88;
+    return {d, sc, rots, yaw:wave, yawPivot:cr.pivots.body};
   }
 },
 {
@@ -870,9 +1068,12 @@ function renderFrame(cr, view, anim, f, nF, blink){
     }
     pos[0]+=A.d.x; pos[1]+=A.d.y; pos[2]+=A.d.z;
 
-    // The turn, applied last and about the creature's own vertical axis, so it
-    // carries the finished pose round rather than fighting with its joints.
-    if(yaw !== 0) pos = rotatePoint(pos, cr.pivots.body, 'y', yaw);
+    // The turn, applied last so it carries the finished pose round rather than
+    // fighting with its joints. A pose's own yaw — a head leading a turn, a
+    // spine undulating — swings about whatever joint it names; the sweep then
+    // takes the whole creature about its vertical axis.
+    if(A.yaw) pos = rotatePoint(pos, A.yawPivot || cr.pivots.body, 'y', A.yaw);
+    if(baseYaw) pos = rotatePoint(pos, cr.pivots.body, 'y', baseYaw);
 
     const sz = [p.size[0]*A.sc.x, p.size[1]*A.sc.y, p.size[2]*A.sc.z];
     const S = SCALE * (cr.scale || 1);          // per-creature size, same proportions
