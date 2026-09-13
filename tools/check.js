@@ -40,7 +40,7 @@ for (const [name, file] of [['design-bible', BIBLE], ['sprite-lab', LAB]]) {
   ok(quota === 100, `bible · body-plan quota sums to ${quota}`);
   const FIELDS = ['name', 'el', 'stage', 'plan', 'living', 'shape', 'obs', 'rite', 'idle'];
   const incomplete = BUILT.filter(b => FIELDS.some(f => !b[f]));
-  ok(incomplete.length === 0, `bible · all ${BUILT.length} built entries meet the six-point standard`
+  ok(incomplete.length === 0, `bible · all ${BUILT.length} built entries are written out in full`
     + (incomplete.length ? ` — ${incomplete.map(b => b.name).join(', ')}` : ''));
   ok(BUILT.every(b => EL[b.el]), 'bible · every entry names a real element');
   ok(EK.every(a => STRONG[a].every(d => EK.includes(d))), 'bible · type chart references only real elements');
